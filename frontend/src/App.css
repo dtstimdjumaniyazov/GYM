@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-main: #5365CA;
+  --color-bg-header: #2a3378;
+  --color-text-primary: #e8ebf7;
+  --color-text-header: #ffffff;
+  --color-link-hover: #a3b1f0;
+  --animate-fade-in: fade-in 0.15s ease-out;
+  --animate-ken-burns: ken-burns 8s ease-out forwards;
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
