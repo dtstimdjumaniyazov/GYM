@@ -22,6 +22,10 @@ deploy/*.sh
 .DS_Store
 Thumbs.db
 
+# Project specific
+.claude/
+gym_db.xlsx
+
 # IDE
 .vscode/
 .idea/
