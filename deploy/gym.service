@@ -1,0 +1,21 @@
+[Unit]
+Description=Gym (Fit Evolution) Django/Gunicorn
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/gym/backend
+EnvironmentFile=/var/www/gym/backend/.env
+ExecStart=/var/www/gym/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --timeout 120 \
+    --access-logfile /var/log/gym/gunicorn-access.log \
+    --error-logfile /var/log/gym/gunicorn-error.log \
+    backend.wsgi:application
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

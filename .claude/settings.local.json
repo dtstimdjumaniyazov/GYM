@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(.venv/Scripts/python.exe manage.py shell:*)",
+      "Bash(mkdir -p c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/legal)",
+      "Bash(mv c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/Terms.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/Privacy.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/MedicalDisclaimer.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/PaymentRules.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/TrainerAgreement.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/ContentRights.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/ResponsibilityDisclaimer.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/TrainerPaymentRules.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/ContentRemovalRules.jsx c:/Users/User/Documents/GitHub/GYM/frontend/src/pages/legal/)"
+    ]
+  }
+}
