@@ -720,7 +720,7 @@ def trainer_course_toggle_status(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def trainer_course_delete_request(request, pk):
-    """Запрос на удаление курса (ожидает подтверждения админа)."""
+    """Удаление черновика сразу, опубликованного курса — через запрос админу."""
     user = request.user
     if user.role != User.Role.TRAINER:
         return Response({'detail': 'Доступно только для тренеров'}, status=status.HTTP_403_FORBIDDEN)
@@ -736,6 +736,10 @@ def trainer_course_delete_request(request, pk):
         course = trainer.courses.get(pk=pk)
     except Course.DoesNotExist:
         return Response({'detail': 'Курс не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+    if course.status == Course.Status.DRAFT:
+        course.delete()
+        return Response({'detail': 'Курс удалён'}, status=status.HTTP_204_NO_CONTENT)
 
     course.deletion_requested = True
     course.save(update_fields=['deletion_requested', 'updated_at'])
