@@ -1067,7 +1067,7 @@ function TrainerCoursesTab() {
           </div>
 
           {/* Desktop: table layout */}
-          <div className="hidden sm:block bg-bg-header/60 rounded-2xl overflow-hidden">
+          <div className="hidden sm:block bg-bg-header/60 rounded-2xl">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-text-header/10">
