@@ -1158,14 +1158,19 @@ function TrainerCoursesTab() {
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
-  const isPublished = status === 'published'
+  const styles = {
+    published: 'bg-green-500/20 text-green-400',
+    pending_review: 'bg-blue-500/20 text-blue-400',
+    draft: 'bg-yellow-500/20 text-yellow-400',
+  }
+  const labels = {
+    published: t('profile.status_published'),
+    pending_review: t('profile.status_pending_review'),
+    draft: t('profile.status_draft'),
+  }
   return (
-    <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
-      isPublished
-        ? 'bg-green-500/20 text-green-400'
-        : 'bg-yellow-500/20 text-yellow-400'
-    }`}>
-      {isPublished ? t('profile.status_published') : t('profile.status_draft')}
+    <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${styles[status] || styles.draft}`}>
+      {labels[status] || t('profile.status_draft')}
     </span>
   )
 }

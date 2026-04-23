@@ -86,6 +86,8 @@ class CourseDetailView(generics.RetrieveAPIView):
         q = Q(status=Course.Status.PUBLISHED)
         if self.request.user.is_authenticated:
             q |= Q(enrollments__user=self.request.user, enrollments__is_active=True)
+            if hasattr(self.request.user, 'trainer_profile'):
+                q |= Q(trainer=self.request.user.trainer_profile)
         return qs.filter(q).distinct()
 
     def get_serializer_context(self):
