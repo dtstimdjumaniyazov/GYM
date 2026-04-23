@@ -5,6 +5,8 @@ def get_lang(request):
         if lang in ('ru', 'uz'):
             return lang
         accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+        if accept in ('uz', 'ru'):
+            return accept
         if accept.startswith('uz'):
             return 'uz'
     return 'ru'

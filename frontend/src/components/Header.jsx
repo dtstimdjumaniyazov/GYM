@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useGetCategoriesQuery } from '../app/api/coursesApi'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { apiSlice } from '../app/api/apiSlice'
 
 function Header() {
   const { t, i18n } = useTranslation()
+  const dispatch = useDispatch()
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -64,6 +67,7 @@ function Header() {
     const next = i18n.language === 'ru' ? 'uz' : 'ru'
     i18n.changeLanguage(next)
     localStorage.setItem('lang', next)
+    dispatch(apiSlice.util.resetEntireApiState())
   }
 
   return (

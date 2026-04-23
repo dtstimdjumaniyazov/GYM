@@ -9,6 +9,8 @@ const rawBaseQuery = fetchBaseQuery({
     if (token) {
       headers.set('Authorization', `Bearer ${token}`)
     }
+    const lang = localStorage.getItem('lang') || 'ru'
+    headers.set('Accept-Language', lang)
     return headers
   },
 })
