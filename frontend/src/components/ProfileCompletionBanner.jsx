@@ -1,22 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 function ProfileCompletionBanner() {
   const [dismissed, setDismissed] = useState(
     () => sessionStorage.getItem('profile_banner_dismissed') === 'true'
   )
+  const [isComplete, setIsComplete] = useState(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      return user.is_profile_complete !== false
+    } catch {
+      return true
+    }
+  })
 
-  const userData = localStorage.getItem('user')
-  if (!userData || dismissed) return null
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        setIsComplete(user.is_profile_complete !== false)
+      } catch {
+        setIsComplete(true)
+      }
+    }
+    window.addEventListener('storage', handleStorage)
+    // Also poll localStorage for same-tab updates
+    const interval = setInterval(handleStorage, 1000)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      clearInterval(interval)
+    }
+  }, [])
 
-  let user
-  try {
-    user = JSON.parse(userData)
-  } catch {
-    return null
-  }
-
-  if (user.is_profile_complete !== false) return null
+  if (dismissed || isComplete) return null
 
   const handleDismiss = () => {
     sessionStorage.setItem('profile_banner_dismissed', 'true')
