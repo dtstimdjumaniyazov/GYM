@@ -64,8 +64,8 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
         status: 'processing',
       }).unwrap()
 
-      setState('done')
       onUploaded(vimeo_video_id, file.name.replace(/\.[^.]+$/, ''))
+      setState('idle')
     } catch (err) {
       console.error('Video upload error:', err)
       setError(err?.data?.detail || err?.message || t('create.upload_error_video'))

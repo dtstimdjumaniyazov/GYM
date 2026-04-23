@@ -60,8 +60,8 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
         accessToken: token,
       })
 
-      setState('done')
       onUploaded(result.id, file.name, file.type, result)
+      setState('idle')
     } catch (err) {
       console.error('File upload error:', err)
       const detail = err?.detail || (typeof err === 'string' ? err : t('create.upload_error_file'))
