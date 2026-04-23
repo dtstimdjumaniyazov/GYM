@@ -77,6 +77,14 @@ export const courseCreateApi = apiSlice.injectEndpoints({
       }),
     }),
 
+    // DELETE /api/storage/vimeo/<id>/delete/
+    deleteVimeoVideo: builder.mutation({
+      query: (id) => ({
+        url: `/storage/vimeo/${id}/delete/`,
+        method: 'DELETE',
+      }),
+    }),
+
     // ── Google Drive upload ───────────────────────────────────
 
     // POST /api/storage/gdrive/upload/ — upload PDF/JPEG file
@@ -206,6 +214,7 @@ export const {
   useGetTrainerCoursesQuery,
   useInitVimeoUploadMutation,
   useUpdateVimeoStatusMutation,
+  useDeleteVimeoVideoMutation,
   useUploadGDriveFileMutation,
   useDeleteGDriveFileMutation,
   useSaveTrainingVariantMutation,

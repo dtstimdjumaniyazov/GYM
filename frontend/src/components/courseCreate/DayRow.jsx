@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import VideoUploader from './VideoUploader'
 import FileUploader from './FileUploader'
-import { useDeleteGDriveFileMutation } from '../../app/api/courseCreateApi'
+import { useDeleteGDriveFileMutation, useDeleteVimeoVideoMutation } from '../../app/api/courseCreateApi'
 
 const MAX_VIDEOS = 5
 const MAX_FILES = 5
@@ -9,6 +9,7 @@ const MAX_FILES = 5
 export default function DayRow({ day, onChange }) {
   const { t } = useTranslation()
   const [deleteGDriveFile] = useDeleteGDriveFileMutation()
+  const [deleteVimeoVideo] = useDeleteVimeoVideoMutation()
 
   const DAY_NAMES = {
     1: t('create.day_mon'),
@@ -32,7 +33,11 @@ export default function DayRow({ day, onChange }) {
     onChange({ ...day, videos: [...videos, { vimeo_video_id: vimeoVideoId, title }] })
   }
 
-  function removeVideo(idx) {
+  async function removeVideo(idx) {
+    const video = videos[idx]
+    if (video?.vimeo_video_id) {
+      try { await deleteVimeoVideo(video.vimeo_video_id) } catch {}
+    }
     onChange({ ...day, videos: videos.filter((_, i) => i !== idx) })
   }
 

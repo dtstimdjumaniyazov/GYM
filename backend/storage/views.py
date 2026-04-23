@@ -133,6 +133,37 @@ class VimeoStatusView(APIView):
         return Response(VimeoVideoReadSerializer(video).data)
 
 
+class VimeoDeleteView(APIView):
+    """
+    DELETE /api/storage/vimeo/<uuid:pk>/delete/
+    Удаляет видео с Vimeo и из базы данных.
+    """
+    permission_classes = [IsAuthenticated, IsTrainer]
+
+    def delete(self, request, pk):
+        try:
+            video = VimeoVideo.objects.get(pk=pk, uploaded_by=request.user.trainer_profile)
+        except VimeoVideo.DoesNotExist:
+            return Response({'detail': 'Видео не найдено'}, status=status.HTTP_404_NOT_FOUND)
+
+        token = settings.VIMEO_ACCESS_TOKEN
+        if token and video.vimeo_id:
+            try:
+                requests.delete(
+                    f'https://api.vimeo.com/videos/{video.vimeo_id}',
+                    headers={
+                        'Authorization': f'bearer {token}',
+                        'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+                    },
+                    timeout=15,
+                )
+            except Exception:
+                pass
+
+        video.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class GDriveUploadView(APIView):
     """
     POST /api/storage/gdrive/upload/
