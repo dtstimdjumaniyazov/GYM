@@ -199,7 +199,7 @@ export default function CourseCreate() {
     setGlobalError('')
     try {
       await publishCourse({ id: courseId, action: 'publish' }).unwrap()
-      navigate('/trainer/courses?submitted=1')
+      navigate('/profile?submitted=1')
     } catch (err) {
       setGlobalError(err?.data?.detail || t('create.error_publish'))
     } finally {
