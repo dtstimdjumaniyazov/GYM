@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInitVimeoUploadMutation, useUpdateVimeoStatusMutation, uploadVideoViaTus } from '../../app/api/courseCreateApi'
 
@@ -11,6 +11,10 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
 
   const [initVimeoUpload] = useInitVimeoUploadMutation()
   const [updateVimeoStatus] = useUpdateVimeoStatusMutation()
+
+  useEffect(() => {
+    if (!uploadedVideo) setState('idle')
+  }, [uploadedVideo])
 
   if (uploadedVideo) {
     return (

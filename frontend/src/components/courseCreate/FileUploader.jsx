@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { uploadFileToGDrive } from '../../app/api/courseCreateApi'
 
@@ -14,6 +14,10 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
   const [state, setState] = useState('idle') // idle | uploading | done | error
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!uploadedFile) setState('idle')
+  }, [uploadedFile])
 
   if (uploadedFile) {
     return (
