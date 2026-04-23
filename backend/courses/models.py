@@ -10,9 +10,11 @@ class Category(models.Model):
     """Категория курсов."""
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField('Название', max_length=100)
+    title = models.CharField('Название (RU)', max_length=100)
+    title_uz = models.CharField('Название (UZ)', max_length=100, blank=True)
     slug = models.SlugField('Slug (URL)', max_length=50, unique=True)
-    description = models.TextField('Описание')
+    description = models.TextField('Описание (RU)')
+    description_uz = models.TextField('Описание (UZ)', blank=True)
     icon_url = models.URLField('Иконка/Фон', max_length=500, blank=True)
     order = models.PositiveSmallIntegerField('Порядок', default=0)
     is_active = models.BooleanField('Активна', default=True)
@@ -62,17 +64,27 @@ class Course(models.Model):
         verbose_name='Категория'
     )
     
-    title = models.CharField('Название', max_length=200)
+    title = models.CharField('Название (RU)', max_length=200)
+    title_uz = models.CharField('Название (UZ)', max_length=200, blank=True)
     cover_url = models.URLField('Обложка курса (URL)', max_length=500, blank=True)
     short_description = models.CharField(
-        'Краткое описание',
+        'Краткое описание (RU)',
         max_length=500,
         help_text='1-2 предложения об основном результате курса'
     )
+    short_description_uz = models.CharField(
+        'Краткое описание (UZ)',
+        max_length=500,
+        blank=True,
+    )
     full_description = models.TextField(
-        'Полное описание',
+        'Полное описание (RU)',
         blank=True,
         help_text='Поддерживает Markdown'
+    )
+    full_description_uz = models.TextField(
+        'Полное описание (UZ)',
+        blank=True,
     )
     
     level = models.CharField(
@@ -280,9 +292,10 @@ class ModuleContent(models.Model):
         related_name='contents',
         verbose_name='Модуль'
     )
-    title = models.CharField('Название', max_length=255)
+    title = models.CharField('Название (RU)', max_length=255)
+    title_uz = models.CharField('Название (UZ)', max_length=255, blank=True)
     order = models.PositiveSmallIntegerField('Порядок', default=0)
-    
+
     vimeo_video = models.ForeignKey(
         VimeoVideo,
         on_delete=models.SET_NULL,

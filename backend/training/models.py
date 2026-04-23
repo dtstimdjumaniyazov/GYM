@@ -21,14 +21,24 @@ class TrainingVariant(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(3)]
     )
     name = models.CharField(
-        'Название',
+        'Название (RU)',
         max_length=100,
         help_text='Например: "2 раза в неделю"'
     )
+    name_uz = models.CharField(
+        'Название (UZ)',
+        max_length=100,
+        blank=True,
+    )
     description = models.CharField(
-        'Описание',
+        'Описание (RU)',
         max_length=255,
         blank=True
+    )
+    description_uz = models.CharField(
+        'Описание (UZ)',
+        max_length=255,
+        blank=True,
     )
     is_required = models.BooleanField(
         'Обязательный',

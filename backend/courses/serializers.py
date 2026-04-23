@@ -3,11 +3,15 @@ from courses.models import Category, Course, CourseModule, ModuleContent, Favori
 from storage.models import VimeoVideo, GoogleDriveFile
 from users.models import Trainer
 from training.models import TrainingVariant
+from core.i18n import get_lang, loc
 
 
 # ─── Card serializers (for listing) ───────────────────────────
 
 class CategoryCardSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
         fields = [
@@ -20,11 +24,18 @@ class CategoryCardSerializer(serializers.ModelSerializer):
             'is_active',
         ]
 
+    def get_title(self, obj):
+        return loc(obj, 'title', get_lang(self.context.get('request')))
+
+    def get_description(self, obj):
+        return loc(obj, 'description', get_lang(self.context.get('request')))
+
 
 class CourseCardSerializer(serializers.ModelSerializer):
     trainer_name = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     variants_count = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -34,6 +45,9 @@ class CourseCardSerializer(serializers.ModelSerializer):
             'duration_weeks', 'purchases_count', 'rating', 'status', 'is_favorited',
             'variants_count',
         ]
+
+    def get_title(self, obj):
+        return loc(obj, 'title', get_lang(self.context.get('request')))
 
     def get_trainer_name(self, obj):
         return obj.trainer.user.full_name or str(obj.trainer.user.phone)
@@ -78,6 +92,7 @@ class GoogleDriveFileSerializer(serializers.ModelSerializer):
 class ModuleContentSerializer(serializers.ModelSerializer):
     vimeo_video = VimeoVideoSerializer(read_only=True)
     gdrive_file = GoogleDriveFileSerializer(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = ModuleContent
@@ -85,6 +100,9 @@ class ModuleContentSerializer(serializers.ModelSerializer):
             'id', 'title', 'order', 'content_type',
             'is_preview', 'vimeo_video', 'gdrive_file',
         ]
+
+    def get_title(self, obj):
+        return loc(obj, 'title', get_lang(self.context.get('request')))
 
 
 class CourseModuleSerializer(serializers.ModelSerializer):
@@ -112,9 +130,18 @@ class TrainerNestedSerializer(serializers.ModelSerializer):
 
 
 class TrainingVariantBriefSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = TrainingVariant
         fields = ['id', 'variant_number', 'name', 'description']
+
+    def get_name(self, obj):
+        return loc(obj, 'name', get_lang(self.context.get('request')))
+
+    def get_description(self, obj):
+        return loc(obj, 'description', get_lang(self.context.get('request')))
 
 
 # ─── Write serializers (trainer course creation) ──────────────
@@ -197,6 +224,9 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     stats = serializers.SerializerMethodField()
     trainer_name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+    full_description = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -211,6 +241,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'modules', 'training_variants',
             'is_purchased', 'is_favorited', 'stats',
         ]
+
+    def get_title(self, obj):
+        return loc(obj, 'title', get_lang(self.context.get('request')))
+
+    def get_short_description(self, obj):
+        return loc(obj, 'short_description', get_lang(self.context.get('request')))
+
+    def get_full_description(self, obj):
+        return loc(obj, 'full_description', get_lang(self.context.get('request')))
 
     def get_trainer_name(self, obj):
         return obj.trainer.user.full_name or str(obj.trainer.user.phone)
