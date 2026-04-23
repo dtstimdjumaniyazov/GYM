@@ -19,19 +19,16 @@ from storage.serializers import (
 
 
 def _get_drive_service():
-    """Строит авторизованный Google Drive клиент через service account."""
-    import json
-    from google.oauth2 import service_account
+    """Строит авторизованный Google Drive клиент через OAuth2 refresh token."""
+    from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
 
-    raw = settings.GDRIVE_SERVICE_ACCOUNT_JSON
-    credentials_info = json.loads(raw)
-    # dotenv reads \n as literal two chars — convert to real newlines
-    if 'private_key' in credentials_info:
-        credentials_info['private_key'] = credentials_info['private_key'].replace('\\n', '\n')
-    credentials = service_account.Credentials.from_service_account_info(
-        credentials_info,
-        scopes=['https://www.googleapis.com/auth/drive'],
+    credentials = Credentials(
+        token=None,
+        refresh_token=settings.GDRIVE_REFRESH_TOKEN,
+        client_id=settings.GDRIVE_CLIENT_ID,
+        client_secret=settings.GDRIVE_CLIENT_SECRET,
+        token_uri='https://oauth2.googleapis.com/token',
     )
     return build('drive', 'v3', credentials=credentials)
 
@@ -159,9 +156,9 @@ class GDriveUploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not settings.GDRIVE_SERVICE_ACCOUNT_JSON:
+        if not settings.GDRIVE_REFRESH_TOKEN:
             return Response(
-                {'detail': 'Google Drive не настроен. Укажите GDRIVE_SERVICE_ACCOUNT_JSON в .env'},
+                {'detail': 'Google Drive не настроен. Укажите GDRIVE_REFRESH_TOKEN в .env'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
@@ -224,7 +221,7 @@ class GDriveFileProxyView(APIView):
         except GoogleDriveFile.DoesNotExist:
             return Response({'detail': 'Файл не найден'}, status=status.HTTP_404_NOT_FOUND)
 
-        if not settings.GDRIVE_SERVICE_ACCOUNT_JSON:
+        if not settings.GDRIVE_REFRESH_TOKEN:
             return Response(
                 {'detail': 'Google Drive не настроен'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
