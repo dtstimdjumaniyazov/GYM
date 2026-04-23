@@ -181,6 +181,7 @@
     "request_sent": "So'rov yuborildi",
     "delete_course_title": "Kursni o'chirish?",
     "delete_course_desc": "O'chirish so'rovi tasdiqlash uchun platforma administratoriga yuboriladi.",
+    "delete_course_desc_draft": "Qoralama darhol o'chiriladi. Bu amalni bekor qilib bo'lmaydi.",
     "send_request": "So'rov yuborish"
   },
   "course": {

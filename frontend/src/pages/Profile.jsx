@@ -990,7 +990,7 @@ function TrainerCoursesTab() {
   const [toggleStatus] = useToggleCourseStatusMutation()
   const [requestDeletion] = useRequestCourseDeletionMutation()
   const [openMenuId, setOpenMenuId] = useState(null)
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
+  const [deleteConfirmCourse, setDeleteConfirmCourse] = useState(null)
 
   if (isLoading) return <Loader text={t('profile.loading_courses')} />
 
@@ -1000,7 +1000,7 @@ function TrainerCoursesTab() {
   }
 
   const handleRequestDelete = async (courseId) => {
-    setDeleteConfirmId(null)
+    setDeleteConfirmCourse(null)
     setOpenMenuId(null)
     await requestDeletion(courseId)
   }
@@ -1043,7 +1043,7 @@ function TrainerCoursesTab() {
                         course={course}
                         onView={() => { setOpenMenuId(null); navigate(`/courses/${course.id}`) }}
                         onToggleStatus={() => handleToggleStatus(course.id)}
-                        onDelete={() => { setOpenMenuId(null); setDeleteConfirmId(course.id) }}
+                        onDelete={() => { setOpenMenuId(null); setDeleteConfirmCourse(course) }}
                         onClose={() => setOpenMenuId(null)}
                       />
                     )}
@@ -1109,7 +1109,7 @@ function TrainerCoursesTab() {
                           course={course}
                           onView={() => { setOpenMenuId(null); navigate(`/courses/${course.id}`) }}
                           onToggleStatus={() => handleToggleStatus(course.id)}
-                          onDelete={() => { setOpenMenuId(null); setDeleteConfirmId(course.id) }}
+                          onDelete={() => { setOpenMenuId(null); setDeleteConfirmCourse(course) }}
                           onClose={() => setOpenMenuId(null)}
                         />
                       )}
@@ -1123,25 +1123,27 @@ function TrainerCoursesTab() {
       )}
 
       {/* Delete confirmation modal */}
-      {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setDeleteConfirmId(null)}>
+      {deleteConfirmCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setDeleteConfirmCourse(null)}>
           <div className="bg-bg-header rounded-2xl p-6 w-full max-w-sm mx-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle size={24} className="text-amber-400" />
               <h3 className="text-lg font-bold text-text-header">{t('profile.delete_course_title')}</h3>
             </div>
             <p className="text-text-primary text-sm mb-6">
-              {t('profile.delete_course_desc')}
+              {deleteConfirmCourse.status === 'draft'
+                ? t('profile.delete_course_desc_draft')
+                : t('profile.delete_course_desc')}
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => handleRequestDelete(deleteConfirmId)}
+                onClick={() => handleRequestDelete(deleteConfirmCourse.id)}
                 className="flex-1 bg-red-500 text-white font-medium py-2 rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
               >
-                {t('profile.send_request')}
+                {deleteConfirmCourse.status === 'draft' ? t('common.delete') : t('profile.send_request')}
               </button>
               <button
-                onClick={() => setDeleteConfirmId(null)}
+                onClick={() => setDeleteConfirmCourse(null)}
                 className="flex-1 bg-bg-main/30 text-text-header font-medium py-2 rounded-lg hover:bg-bg-main/50 transition-colors cursor-pointer"
               >
                 {t('common.cancel')}
