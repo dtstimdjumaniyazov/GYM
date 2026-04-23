@@ -151,7 +151,11 @@ function Header() {
 
           <select
             value={i18n.language}
-            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            onChange={(e) => {
+              i18n.changeLanguage(e.target.value)
+              localStorage.setItem('lang', e.target.value)
+              dispatch(apiSlice.util.resetEntireApiState())
+            }}
             className="text-xs font-bold px-2 py-1 rounded-lg bg-link-hover/20 hover:bg-link-hover/30 transition-colors cursor-pointer"
           >
             <option value="uz" className="bg-link-hover text-bg-header">
