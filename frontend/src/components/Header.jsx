@@ -3,12 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useGetCategoriesQuery } from '../app/api/coursesApi'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
-import { apiSlice } from '../app/api/apiSlice'
 
 function Header() {
   const { t, i18n } = useTranslation()
-  const dispatch = useDispatch()
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -152,9 +149,8 @@ function Header() {
           <select
             value={i18n.language}
             onChange={(e) => {
-              i18n.changeLanguage(e.target.value)
               localStorage.setItem('lang', e.target.value)
-              dispatch(apiSlice.util.resetEntireApiState())
+              window.location.reload()
             }}
             className="text-xs font-bold px-2 py-1 rounded-lg bg-link-hover/20 hover:bg-link-hover/30 transition-colors cursor-pointer"
           >
