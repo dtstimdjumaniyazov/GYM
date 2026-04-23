@@ -313,10 +313,10 @@ def google_auth(request):
         )
 
     try:
-        from google.oauth2 import id_tokens
+        from google.oauth2 import id_token
         from google.auth.transport import requests as google_requests
 
-        idinfo = id_tokens.verify_oauth2_token(
+        idinfo = id_token.verify_oauth2_token(
             credential,
             google_requests.Request(),
             settings.GOOGLE_CLIENT_ID,
@@ -858,10 +858,10 @@ def link_google_profile(request):
         return Response({'detail': 'Credential отсутствует'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        from google.oauth2 import id_tokens
+        from google.oauth2 import id_token
         from google.auth.transport import requests as google_requests
 
-        idinfo = id_tokens.verify_oauth2_token(
+        idinfo = id_token.verify_oauth2_token(
             credential,
             google_requests.Request(),
             settings.GOOGLE_CLIENT_ID,
