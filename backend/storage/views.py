@@ -207,6 +207,30 @@ class GDriveUploadView(APIView):
         )
 
 
+class GDriveDeleteView(APIView):
+    """
+    DELETE /api/storage/gdrive/<uuid:pk>/delete/
+    Удаляет файл с Google Drive и из базы данных.
+    """
+    permission_classes = [IsAuthenticated, IsTrainer]
+
+    def delete(self, request, pk):
+        try:
+            gdrive_file = GoogleDriveFile.objects.get(pk=pk, uploaded_by=request.user.trainer_profile)
+        except GoogleDriveFile.DoesNotExist:
+            return Response({'detail': 'Файл не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+        if settings.GDRIVE_REFRESH_TOKEN:
+            try:
+                drive_service = _get_drive_service()
+                drive_service.files().delete(fileId=gdrive_file.gdrive_id).execute()
+            except Exception:
+                pass
+
+        gdrive_file.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class GDriveFileProxyView(APIView):
     """
     GET /api/storage/gdrive/<uuid:pk>/view/

@@ -92,6 +92,14 @@ export const courseCreateApi = apiSlice.injectEndpoints({
       },
     }),
 
+    // DELETE /api/storage/gdrive/<id>/delete/
+    deleteGDriveFile: builder.mutation({
+      query: (id) => ({
+        url: `/storage/gdrive/${id}/delete/`,
+        method: 'DELETE',
+      }),
+    }),
+
     // ── Training variants ─────────────────────────────────────
 
     // POST /api/training/variants/ — create variant with full nested data
@@ -199,6 +207,7 @@ export const {
   useInitVimeoUploadMutation,
   useUpdateVimeoStatusMutation,
   useUploadGDriveFileMutation,
+  useDeleteGDriveFileMutation,
   useSaveTrainingVariantMutation,
   useUpdateTrainingVariantMutation,
   useDeleteTrainingVariantMutation,
