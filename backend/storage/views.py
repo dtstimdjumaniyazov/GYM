@@ -24,7 +24,11 @@ def _get_drive_service():
     from google.oauth2 import service_account
     from googleapiclient.discovery import build
 
-    credentials_info = json.loads(settings.GDRIVE_SERVICE_ACCOUNT_JSON)
+    raw = settings.GDRIVE_SERVICE_ACCOUNT_JSON
+    credentials_info = json.loads(raw)
+    # dotenv reads \n as literal two chars — convert to real newlines
+    if 'private_key' in credentials_info:
+        credentials_info['private_key'] = credentials_info['private_key'].replace('\\n', '\n')
     credentials = service_account.Credentials.from_service_account_info(
         credentials_info,
         scopes=['https://www.googleapis.com/auth/drive'],
