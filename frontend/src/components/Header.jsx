@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useGetCategoriesQuery } from '../app/api/coursesApi'
-import { useGetProfileQuery } from '../app/api/usersApi'
+import { useGetUserProfileQuery } from '../app/api/usersApi'
 import { useTranslation } from 'react-i18next'
 
 function Header() {
@@ -17,7 +17,7 @@ function Header() {
   const { data: categories = [] } = useGetCategoriesQuery()
 
   const [user, setUser] = useState(null)
-  const { data: profile } = useGetProfileQuery(undefined, { skip: !user })
+  const { data: profile } = useGetUserProfileQuery(undefined, { skip: !user })
   const avatarUrl = profile?.avatar_url || null
 
   useEffect(() => {
