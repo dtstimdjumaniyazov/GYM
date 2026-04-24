@@ -69,6 +69,9 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
         onAbort: (fn) => { cancelRef.current = fn },
       })
 
+      setProgress(100)
+      cancelRef.current = null
+
       onUploaded(result.id, file.name, file.type, result)
       setState('idle')
     } catch (err) {

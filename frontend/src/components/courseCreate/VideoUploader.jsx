@@ -75,6 +75,9 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
         onAbort: (fn) => { cancelRef.current = fn },
       })
 
+      setProgress(100)
+      cancelRef.current = null
+
       await updateVimeoStatus({
         id: vimeo_video_id,
         status: 'processing',
