@@ -952,7 +952,7 @@ def upload_avatar(request):
             body={'type': 'anyone', 'role': 'reader'},
         ).execute()
 
-        avatar_url = f'https://drive.google.com/uc?export=view&id={gdrive_id}'
+        avatar_url = f'https://lh3.googleusercontent.com/d/{gdrive_id}'
 
     except Exception as exc:
         return Response(
@@ -1020,9 +1020,21 @@ def change_password(request):
 @permission_classes([IsAuthenticated])
 def delete_avatar(request):
     """Удалить фото профиля."""
+    from storage.views import _get_drive_service
+
     user = request.user
     if not user.avatar_url:
         return Response({'detail': 'Фото не найдено'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Извлекаем gdrive_id из URL вида https://lh3.googleusercontent.com/d/{id}
+    gdrive_id = user.avatar_url.split('/d/')[-1] if '/d/' in user.avatar_url else None
+    if gdrive_id:
+        try:
+            drive_service = _get_drive_service()
+            drive_service.files().delete(fileId=gdrive_id).execute()
+        except Exception:
+            pass
+
     user.avatar_url = ''
     user.save(update_fields=['avatar_url', 'updated_at'])
     return Response({'detail': 'Фото удалено'})
