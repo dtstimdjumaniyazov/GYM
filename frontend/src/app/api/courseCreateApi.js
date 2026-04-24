@@ -144,17 +144,16 @@ export const courseCreateApi = apiSlice.injectEndpoints({
 // ── Raw Vimeo TUS upload (uses tus-js-client directly) ────────
 // Called outside RTK Query because tus-js-client needs full control over the request
 
-export async function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, onSuccess }) {
+export async function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, onSuccess, onAbort }) {
   const { Upload } = await import('tus-js-client')
 
   return new Promise((resolve, reject) => {
     const upload = new Upload(file, {
       uploadUrl,
-      // Vimeo TUS requires these exact headers
       headers: {
         Accept: 'application/vnd.vimeo.*+json;version=3.4',
       },
-      chunkSize: 128 * 1024 * 1024, // 128 MB chunks
+      chunkSize: 128 * 1024 * 1024,
       retryDelays: [0, 3000, 5000, 10000],
       metadata: {
         filename: file.name,
@@ -173,12 +172,13 @@ export async function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, 
         resolve()
       },
     })
+    onAbort?.(() => { upload.abort(false); reject(new DOMException('Aborted', 'AbortError')) })
     upload.start()
   })
 }
 
 // ── Raw GDrive upload (with progress via XMLHttpRequest) ───────
-export function uploadFileToGDrive({ file, onProgress, accessToken }) {
+export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
   const API_URL = API_BASE
   return new Promise((resolve, reject) => {
     const formData = new FormData()
@@ -187,6 +187,8 @@ export function uploadFileToGDrive({ file, onProgress, accessToken }) {
     const xhr = new XMLHttpRequest()
     xhr.open('POST', `${API_URL}/storage/gdrive/upload/`)
     xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
+
+    onAbort?.(() => { xhr.abort(); reject(new DOMException('Aborted', 'AbortError')) })
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {

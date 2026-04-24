@@ -1,16 +1,19 @@
 import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useInitVimeoUploadMutation, useUpdateVimeoStatusMutation, uploadVideoViaTus } from '../../app/api/courseCreateApi'
+import { useInitVimeoUploadMutation, useUpdateVimeoStatusMutation, useDeleteVimeoVideoMutation, uploadVideoViaTus } from '../../app/api/courseCreateApi'
 
 export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, disabled, index }) {
   const { t } = useTranslation()
   const inputRef = useRef(null)
+  const cancelRef = useRef(null)
+  const vimeoIdRef = useRef(null)
   const [state, setState] = useState('idle') // idle | uploading | done | error
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
 
   const [initVimeoUpload] = useInitVimeoUploadMutation()
   const [updateVimeoStatus] = useUpdateVimeoStatusMutation()
+  const [deleteVimeoVideo] = useDeleteVimeoVideoMutation()
 
   useEffect(() => {
     if (!uploadedVideo) setState('idle')
@@ -35,6 +38,17 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
     )
   }
 
+  function handleCancel() {
+    cancelRef.current?.()
+    cancelRef.current = null
+    if (vimeoIdRef.current) {
+      deleteVimeoVideo(vimeoIdRef.current).catch(() => {})
+      vimeoIdRef.current = null
+    }
+    setState('idle')
+    setProgress(0)
+  }
+
   async function handleFileSelect(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -51,12 +65,14 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
       }).unwrap()
 
       const { vimeo_video_id, upload_url } = initResult
+      vimeoIdRef.current = vimeo_video_id
 
       await uploadVideoViaTus({
         uploadUrl: upload_url,
         file,
         onProgress: setProgress,
         onError: (err) => { throw err },
+        onAbort: (fn) => { cancelRef.current = fn },
       })
 
       await updateVimeoStatus({
@@ -67,6 +83,7 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
       onUploaded(vimeo_video_id, file.name.replace(/\.[^.]+$/, ''))
       setState('idle')
     } catch (err) {
+      if (err?.name === 'AbortError') return
       console.error('Video upload error:', err)
       setError(err?.data?.detail || err?.message || t('create.upload_error_video'))
       setState('error')
@@ -103,7 +120,14 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
         <div className="bg-white/5 border border-white/15 rounded-lg px-3 py-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-white/60">{t('create.uploading_vimeo')}</span>
-            <span className="text-xs text-main font-mono">{progress}%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-main font-mono">{progress}%</span>
+              <button type="button" onClick={handleCancel} className="text-white/30 hover:text-red-400 transition-colors" title={t('common.cancel')}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div

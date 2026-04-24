@@ -11,6 +11,7 @@ const MIME_ICONS = {
 export default function FileUploader({ onUploaded, onRemove, uploadedFile, disabled, index }) {
   const { t } = useTranslation()
   const inputRef = useRef(null)
+  const cancelRef = useRef(null)
   const [state, setState] = useState('idle') // idle | uploading | done | error
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
@@ -36,6 +37,13 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
     )
   }
 
+  function handleCancel() {
+    cancelRef.current?.()
+    cancelRef.current = null
+    setState('idle')
+    setProgress(0)
+  }
+
   async function handleFileSelect(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -58,11 +66,13 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
         file,
         onProgress: setProgress,
         accessToken: token,
+        onAbort: (fn) => { cancelRef.current = fn },
       })
 
       onUploaded(result.id, file.name, file.type, result)
       setState('idle')
     } catch (err) {
+      if (err?.name === 'AbortError') return
       console.error('File upload error:', err)
       const detail = err?.detail || (typeof err === 'string' ? err : t('create.upload_error_file'))
       setError(detail)
@@ -100,7 +110,14 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
         <div className="bg-white/5 border border-white/15 rounded-lg px-3 py-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-white/60">{t('create.uploading_gdrive')}</span>
-            <span className="text-xs text-main font-mono">{progress}%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-main font-mono">{progress}%</span>
+              <button type="button" onClick={handleCancel} className="text-white/30 hover:text-red-400 transition-colors" title={t('common.cancel')}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
