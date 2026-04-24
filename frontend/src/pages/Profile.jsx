@@ -37,17 +37,21 @@ function toDirectUrl(url) {
 }
 
 // ─── Edit Profile Modal ───────────────────────────────────────────
-function EditProfileModal({ profile, onClose }) {
+function EditProfileModal({ profile, trainerProfile, onClose }) {
   const { t } = useTranslation()
-  const [updateProfile, { isLoading }] = useUpdateUserProfileMutation()
+  const [updateProfile, { isLoading: savingUser }] = useUpdateUserProfileMutation()
+  const [updateTrainer, { isLoading: savingTrainer }] = useUpdateTrainerProfileMutation()
+  const isTrainer = profile.role === 'trainer'
   const [form, setForm] = useState({
     first_name: profile.first_name || '',
     last_name: profile.last_name || '',
     age: profile.age || '',
     gender: profile.gender || '',
     weight: profile.weight || '',
+    career_start_year: trainerProfile?.career_start_year || '',
   })
   const [error, setError] = useState(null)
+  const isLoading = savingUser || savingTrainer
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -57,14 +61,13 @@ function EditProfileModal({ profile, onClose }) {
     e.preventDefault()
     setError(null)
     try {
-      const payload = {
+      const updated = await updateProfile({
         first_name: form.first_name,
         last_name: form.last_name,
         age: form.age ? Number(form.age) : null,
         gender: form.gender || '',
         weight: form.weight ? Number(form.weight) : null,
-      }
-      const updated = await updateProfile(payload).unwrap()
+      }).unwrap()
       const stored = JSON.parse(localStorage.getItem('user') || '{}')
       localStorage.setItem('user', JSON.stringify({
         ...stored,
@@ -73,6 +76,11 @@ function EditProfileModal({ profile, onClose }) {
         full_name: updated.full_name,
         is_profile_complete: updated.is_profile_complete,
       }))
+      if (isTrainer) {
+        await updateTrainer({
+          career_start_year: form.career_start_year ? Number(form.career_start_year) : null,
+        }).unwrap()
+      }
       onClose()
     } catch (err) {
       setError(err?.data?.detail || t('profile.save_error'))
@@ -148,6 +156,23 @@ function EditProfileModal({ profile, onClose }) {
               className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
             />
           </label>
+
+          {isTrainer && (
+            <label className="flex flex-col gap-1">
+              <span className="text-sm text-text-primary">{t('register.career_start_year')}</span>
+              <select
+                name="career_start_year"
+                value={form.career_start_year}
+                onChange={handleChange}
+                className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
+              >
+                <option value="">{t('register.career_start_year_placeholder')}</option>
+                {Array.from({ length: new Date().getFullYear() - 1959 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </label>
+          )}
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
 
@@ -1420,6 +1445,7 @@ function Profile() {
       {showEditModal && (
         <EditProfileModal
           profile={profile}
+          trainerProfile={trainerProfile}
           onClose={() => setShowEditModal(false)}
         />
       )}
