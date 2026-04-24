@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard } from 'lucide-react'
 import { useGetCategoriesQuery } from '../app/api/coursesApi'
+import { useGetProfileQuery } from '../app/api/usersApi'
 import { useTranslation } from 'react-i18next'
 
 function Header() {
@@ -16,6 +17,8 @@ function Header() {
   const { data: categories = [] } = useGetCategoriesQuery()
 
   const [user, setUser] = useState(null)
+  const { data: profile } = useGetProfileQuery(undefined, { skip: !user })
+  const avatarUrl = profile?.avatar_url || null
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -185,8 +188,11 @@ function Header() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-link-hover flex items-center justify-center text-white text-sm font-bold">
-                    {user.first_name?.[0]?.toUpperCase() || user.phone?.[0] || '?'}
+                  <div className="w-8 h-8 rounded-full bg-link-hover flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                    {avatarUrl
+                      ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                      : (user.first_name?.[0]?.toUpperCase() || user.phone?.[0] || '?')
+                    }
                   </div>
                   <span className="text-sm max-w-30 truncate">{user.full_name || user.phone}</span>
                 </button>
@@ -344,8 +350,11 @@ function Header() {
                 ) : (
                   <>
                     <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="w-10 h-10 rounded-full bg-link-hover flex items-center justify-center text-white font-bold">
-                        {user.first_name?.[0]?.toUpperCase() || '?'}
+                      <div className="w-10 h-10 rounded-full bg-link-hover flex items-center justify-center text-white font-bold overflow-hidden">
+                        {avatarUrl
+                          ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                          : (user.first_name?.[0]?.toUpperCase() || '?')
+                        }
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-text-header truncate">

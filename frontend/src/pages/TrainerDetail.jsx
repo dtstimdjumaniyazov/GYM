@@ -45,7 +45,7 @@ function TrainerDetail() {
     )
   }
 
-  const photoSrc = toDirectUrl(trainer.photo_url)
+  const photoSrc = toDirectUrl(trainer.photo_url) || trainer.avatar_url
   const fullName = `${trainer.first_name} ${trainer.last_name}`.trim()
 
   return (
