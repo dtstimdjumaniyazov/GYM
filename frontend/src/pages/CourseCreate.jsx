@@ -272,8 +272,11 @@ export default function CourseCreate() {
       if (step === 2) {
         const activeVariants = variants.filter((v) => v.active)
         for (const variant of activeVariants) {
-          if (!variant.name.trim()) continue
-          const payload = buildVariantPayload(variant, courseId)
+          const draftVariant = {
+            ...variant,
+            name: variant.name.trim() || `Вариант ${variant.variant_number}`,
+          }
+          const payload = buildVariantPayload(draftVariant, courseId)
           if (variant.savedId) {
             await updateVariant({ id: variant.savedId, ...payload }).unwrap()
           } else {
