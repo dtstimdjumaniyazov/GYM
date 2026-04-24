@@ -8,7 +8,7 @@ function toDirectUrl(url) {
 }
 
 function TrainerCard({ trainer }) {
-  const photoSrc = toDirectUrl(trainer.photo_url)
+  const photoSrc = toDirectUrl(trainer.photo_url) || trainer.avatar_url
 
   return (
     <Link
