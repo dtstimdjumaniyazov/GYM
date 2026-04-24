@@ -197,8 +197,6 @@ class CourseCreateSerializer(serializers.ModelSerializer):
 
 class CourseTrainerDetailSerializer(serializers.ModelSerializer):
     """Детали курса для тренера (включает черновики)."""
-    from training.serializers import TrainingVariantDetailSerializer
-
     modules = CourseModuleSerializer(many=True, read_only=True)
     training_variants = serializers.SerializerMethodField()
     category = serializers.PrimaryKeyRelatedField(read_only=True)
