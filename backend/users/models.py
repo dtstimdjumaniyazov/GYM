@@ -64,11 +64,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     email = models.EmailField('Email', unique=True, null=True, blank=True)
     google_id = models.CharField('Google ID', max_length=255, unique=True, null=True, blank=True)
-    avatar = models.ImageField(
+    avatar_url = models.URLField(
         'Фото профиля',
-        upload_to='avatars/',
+        max_length=500,
         blank=True,
-        null=True,
     )
 
     token_version = models.PositiveIntegerField('Версия токена', default=0)

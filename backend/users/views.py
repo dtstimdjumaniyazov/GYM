@@ -896,17 +896,19 @@ def link_google_profile(request):
 @permission_classes([IsAuthenticated])
 def upload_avatar(request):
     """
-    Загрузить фото профиля.
+    Загрузить фото профиля на Google Drive (публичный доступ).
     Принимает multipart/form-data с полем 'avatar'.
-    Сохраняет локально (в будущем — Google Drive).
     """
+    import io
+    from django.conf import settings
+    from storage.views import _get_drive_service
+
     user = request.user
     avatar_file = request.FILES.get('avatar')
 
     if not avatar_file:
         return Response({'detail': 'Файл не найден'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Проверяем тип файла
     allowed_types = ['image/jpeg', 'image/png', 'image/webp']
     if avatar_file.content_type not in allowed_types:
         return Response(
@@ -914,21 +916,53 @@ def upload_avatar(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Проверяем размер (макс 5 МБ)
     if avatar_file.size > 5 * 1024 * 1024:
         return Response(
             {'detail': 'Максимальный размер файла — 5 МБ'},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Удаляем старый аватар если есть
-    if user.avatar:
-        user.avatar.delete(save=False)
+    try:
+        from googleapiclient.http import MediaIoBaseUpload
 
-    user.avatar = avatar_file
-    user.save(update_fields=['avatar', 'updated_at'])
+        drive_service = _get_drive_service()
+        folder_id = settings.GDRIVE_FOLDER_ID
 
-    avatar_url = request.build_absolute_uri(user.avatar.url) if user.avatar else None
+        file_metadata = {'name': f'avatar_{user.id}_{avatar_file.name}'}
+        if folder_id:
+            file_metadata['parents'] = [folder_id]
+
+        media = MediaIoBaseUpload(
+            io.BytesIO(avatar_file.read()),
+            mimetype=avatar_file.content_type,
+            resumable=True,
+        )
+        uploaded = drive_service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id',
+            supportsAllDrives=True,
+        ).execute()
+
+        gdrive_id = uploaded['id']
+
+        # Открываем публичный доступ
+        drive_service.permissions().create(
+            fileId=gdrive_id,
+            body={'type': 'anyone', 'role': 'reader'},
+        ).execute()
+
+        avatar_url = f'https://drive.google.com/uc?export=view&id={gdrive_id}'
+
+    except Exception as exc:
+        return Response(
+            {'detail': f'Ошибка загрузки: {str(exc)}'},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+    user.avatar_url = avatar_url
+    user.save(update_fields=['avatar_url', 'updated_at'])
+
     return Response({'detail': 'Фото обновлено', 'avatar_url': avatar_url})
 
 
@@ -987,10 +1021,9 @@ def change_password(request):
 def delete_avatar(request):
     """Удалить фото профиля."""
     user = request.user
-    if not user.avatar:
+    if not user.avatar_url:
         return Response({'detail': 'Фото не найдено'}, status=status.HTTP_400_BAD_REQUEST)
-    user.avatar.delete(save=False)
-    user.avatar = None
-    user.save(update_fields=['avatar', 'updated_at'])
+    user.avatar_url = ''
+    user.save(update_fields=['avatar_url', 'updated_at'])
     return Response({'detail': 'Фото удалено'})
 

@@ -5,6 +5,7 @@ from users.models import User, Trainer
 class TrainerCardSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Trainer
@@ -12,10 +13,13 @@ class TrainerCardSerializer(serializers.ModelSerializer):
             'id', 'first_name', 'last_name',
             'bio', 'short_description',
             'specialization', 'experience_years',
-            'certificates', 'photo_url',
+            'certificates', 'photo_url', 'avatar_url',
             'instagram_url', 'intro_video_url',
             'is_verified', 'created_at', 'updated_at'
         ]
+
+    def get_avatar_url(self, obj):
+        return obj.user.avatar_url or None
 
 
 class TrainerDetailSerializer(TrainerCardSerializer):
@@ -112,6 +116,9 @@ class TrainerProfileNestedSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    def get_avatar_url(self, obj):
+        return obj.user.avatar_url or None
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Сериализатор профиля пользователя."""
@@ -133,12 +140,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'phone', 'telegram_id', 'google_id', 'is_active', 'created_at', 'updated_at']
 
     def get_avatar_url(self, obj):
-        if obj.avatar:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
+        return obj.avatar_url or None
 
 
 class AccountLinkSerializer(serializers.Serializer):
