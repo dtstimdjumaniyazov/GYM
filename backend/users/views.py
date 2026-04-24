@@ -75,7 +75,7 @@ def register(request):
         if request.data.get('role') == User.Role.TRAINER:
             trainer_data = {
                 'specialization': request.data.get('specialization', ''),
-                'experience_years': request.data.get('experience_years', 0),
+                'career_start_year': request.data.get('career_start_year') or None,
                 'short_description': request.data.get('short_description', ''),
                 'bio': request.data.get('bio', ''),
             }

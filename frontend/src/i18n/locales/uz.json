@@ -71,6 +71,8 @@
     "last_name": "Familiya",
     "specialization": "Mutaxassislik",
     "experience_years": "Tajriba (yil)",
+    "career_start_year": "Murabbiylik faoliyatini boshlagan yil",
+    "career_start_year_placeholder": "Yilni tanlang",
     "short_description": "Qisqa tavsif",
     "about_me": "O'zim haqimda",
     "phone": "Telefon raqami",

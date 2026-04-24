@@ -1,18 +1,26 @@
+from datetime import date
 from rest_framework import serializers
 from users.models import User, Trainer
+
+
+def compute_experience_years(obj):
+    if obj.career_start_year:
+        return max(0, date.today().year - obj.career_start_year)
+    return obj.experience_years
 
 
 class TrainerCardSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     avatar_url = serializers.SerializerMethodField()
+    experience_years = serializers.SerializerMethodField()
 
     class Meta:
         model = Trainer
         fields = [
             'id', 'first_name', 'last_name',
             'bio', 'short_description',
-            'specialization', 'experience_years',
+            'specialization', 'experience_years', 'career_start_year',
             'certificates', 'photo_url', 'avatar_url',
             'instagram_url', 'intro_video_url',
             'is_verified', 'created_at', 'updated_at'
@@ -20,6 +28,9 @@ class TrainerCardSerializer(serializers.ModelSerializer):
 
     def get_avatar_url(self, obj):
         return obj.user.avatar_url or None
+
+    def get_experience_years(self, obj):
+        return compute_experience_years(obj)
 
 
 class TrainerDetailSerializer(TrainerCardSerializer):
@@ -106,15 +117,19 @@ class TelegramAuthSerializer(serializers.Serializer):
 
 class TrainerProfileNestedSerializer(serializers.ModelSerializer):
     """Вложенный сериализатор профиля тренера (для UserProfileSerializer)."""
+    experience_years = serializers.SerializerMethodField()
 
     class Meta:
         model = Trainer
         fields = [
             'id', 'bio', 'short_description', 'specialization',
-            'experience_years', 'certificates', 'photo_url',
+            'experience_years', 'career_start_year', 'certificates', 'photo_url',
             'instagram_url', 'intro_video_url', 'is_verified',
         ]
         read_only_fields = fields
+
+    def get_experience_years(self, obj):
+        return compute_experience_years(obj)
 
     def get_avatar_url(self, obj):
         return obj.user.avatar_url or None
@@ -170,7 +185,7 @@ class TrainerProfileUpdateSerializer(serializers.ModelSerializer):
         model = Trainer
         fields = [
             'bio', 'short_description', 'specialization',
-            'experience_years', 'certificates', 'photo_url',
+            'career_start_year', 'certificates', 'photo_url',
             'instagram_url', 'intro_video_url',
         ]
 
@@ -231,7 +246,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             Trainer.objects.create(
                 user=user,
                 specialization=trainer_data.get('specialization', ''),
-                experience_years=trainer_data.get('experience_years', 0),
+                career_start_year=trainer_data.get('career_start_year') or None,
                 short_description=trainer_data.get('short_description', ''),
                 bio=trainer_data.get('bio', ''),
             )

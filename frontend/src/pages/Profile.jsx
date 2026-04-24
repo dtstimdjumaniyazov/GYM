@@ -178,6 +178,7 @@ function EditTrainerLinksModal({ trainerProfile, onClose }) {
   const { t } = useTranslation()
   const [updateTrainer, { isLoading }] = useUpdateTrainerProfileMutation()
   const [form, setForm] = useState({
+    career_start_year: trainerProfile?.career_start_year || '',
     instagram_url: trainerProfile?.instagram_url || '',
     intro_video_url: trainerProfile?.intro_video_url || '',
   })
@@ -190,6 +191,7 @@ function EditTrainerLinksModal({ trainerProfile, onClose }) {
     setError(null)
     try {
       await updateTrainer({
+        career_start_year: form.career_start_year ? Number(form.career_start_year) : null,
         instagram_url: form.instagram_url.trim(),
         intro_video_url: form.intro_video_url.trim(),
       }).unwrap()
@@ -207,6 +209,20 @@ function EditTrainerLinksModal({ trainerProfile, onClose }) {
       >
         <h2 className="text-xl font-bold text-text-header mb-4">{t('profile.social_and_video')}</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-text-primary">{t('register.career_start_year')}</span>
+            <select
+              name="career_start_year"
+              value={form.career_start_year}
+              onChange={handleChange}
+              className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
+            >
+              <option value="">{t('register.career_start_year_placeholder')}</option>
+              {Array.from({ length: new Date().getFullYear() - 1959 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm text-text-primary">{t('profile.instagram_link')}</span>
             <input

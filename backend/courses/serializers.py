@@ -119,6 +119,7 @@ class CourseModuleSerializer(serializers.ModelSerializer):
 class TrainerNestedSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
+    experience_years = serializers.SerializerMethodField()
 
     class Meta:
         model = Trainer
@@ -127,6 +128,12 @@ class TrainerNestedSerializer(serializers.ModelSerializer):
             'specialization', 'experience_years', 'certificates',
             'bio', 'short_description',
         ]
+
+    def get_experience_years(self, obj):
+        from datetime import date
+        if obj.career_start_year:
+            return max(0, date.today().year - obj.career_start_year)
+        return obj.experience_years
 
 
 class TrainingVariantBriefSerializer(serializers.ModelSerializer):

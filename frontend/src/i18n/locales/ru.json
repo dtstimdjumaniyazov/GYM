@@ -71,6 +71,8 @@
     "last_name": "Фамилия",
     "specialization": "Специализация",
     "experience_years": "Стаж (лет)",
+    "career_start_year": "Год начала тренерской деятельности",
+    "career_start_year_placeholder": "Выберите год",
     "short_description": "Краткое описание",
     "about_me": "О себе",
     "phone": "Номер телефона",

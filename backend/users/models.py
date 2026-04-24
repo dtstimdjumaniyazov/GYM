@@ -175,8 +175,15 @@ class Trainer(models.Model):
     )
     specialization = models.CharField('Специализация', max_length=255, blank=True)
     experience_years = models.PositiveSmallIntegerField(
-        'Стаж (лет)', 
-        default=0
+        'Стаж (лет)',
+        default=0,
+        help_text='Устаревшее поле — используйте career_start_year'
+    )
+    career_start_year = models.PositiveSmallIntegerField(
+        'Год начала карьеры',
+        null=True,
+        blank=True,
+        help_text='Год, с которого тренер ведёт тренерскую деятельность'
     )
     certificates = models.JSONField(
         'Сертификаты', 

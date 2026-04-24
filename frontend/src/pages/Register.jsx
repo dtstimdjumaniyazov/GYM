@@ -20,7 +20,7 @@ function Register() {
     first_name: '',
     last_name: '',
     specialization: '',
-    experience_years: '',
+    career_start_year: '',
     short_description: '',
     bio: '',
   })
@@ -76,7 +76,7 @@ function Register() {
 
       if (role === 'trainer') {
         body.specialization = formData.specialization
-        body.experience_years = formData.experience_years ? Number(formData.experience_years) : 0
+        body.career_start_year = formData.career_start_year ? Number(formData.career_start_year) : null
         body.short_description = formData.short_description
         body.bio = formData.bio
         body.trainer_agreement_consent = true
@@ -187,19 +187,20 @@ function Register() {
 
               <div>
                 <label className="block text-sm font-medium text-text-header mb-1.5">
-                  {t('register.experience_years')} <span className="text-red-400">*</span>
+                  {t('register.career_start_year')} <span className="text-red-400">*</span>
                 </label>
-                <input
-                  type="number"
-                  name="experience_years"
-                  value={formData.experience_years}
+                <select
+                  name="career_start_year"
+                  value={formData.career_start_year}
                   onChange={handleChange}
-                  placeholder="0"
-                  min="0"
-                  max="50"
                   className={inputClass}
                   required
-                />
+                >
+                  <option value="">{t('register.career_start_year_placeholder')}</option>
+                  {Array.from({ length: new Date().getFullYear() - 1959 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
