@@ -266,7 +266,34 @@ export default function CourseCreate() {
 
   async function handleSaveDraft() {
     if (!courseId) return
-    navigate(`/courses/${courseId}`)
+    setSaving(true)
+    setGlobalError('')
+    try {
+      if (step === 2) {
+        const activeVariants = variants.filter((v) => v.active)
+        for (const variant of activeVariants) {
+          if (!variant.name.trim()) continue
+          const payload = buildVariantPayload(variant, courseId)
+          if (variant.savedId) {
+            await updateVariant({ id: variant.savedId, ...payload }).unwrap()
+          } else {
+            const result = await saveVariant(payload).unwrap()
+            setVariants((prev) =>
+              prev.map((v) =>
+                v.variant_number === variant.variant_number
+                  ? { ...v, savedId: result.id }
+                  : v
+              )
+            )
+          }
+        }
+      }
+      navigate('/profile')
+    } catch (err) {
+      setGlobalError(err?.data?.detail || JSON.stringify(err?.data) || t('create.error_save'))
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
