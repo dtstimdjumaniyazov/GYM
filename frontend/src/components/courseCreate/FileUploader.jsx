@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { uploadFileToGDrive } from '../../app/api/courseCreateApi'
+import { uploadFileToGDrive, useDeleteGDriveFileMutation } from '../../app/api/courseCreateApi'
 
 const MIME_ICONS = {
   'application/pdf': '📄',
@@ -12,6 +12,7 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
   const { t } = useTranslation()
   const inputRef = useRef(null)
   const cancelRef = useRef(null)
+  const [deleteGDriveFile] = useDeleteGDriveFileMutation()
   const [state, setState] = useState('idle') // idle | uploading | done | error
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
@@ -75,7 +76,12 @@ export default function FileUploader({ onUploaded, onRemove, uploadedFile, disab
       onUploaded(result.id, file.name, file.type, result)
       setState('idle')
     } catch (err) {
-      if (err?.name === 'AbortError') return
+      if (err?.name === 'AbortError') {
+        if (err.uploadedResult?.id) {
+          deleteGDriveFile(err.uploadedResult.id).catch(() => {})
+        }
+        return
+      }
       console.error('File upload error:', err)
       const detail = err?.detail || (typeof err === 'string' ? err : t('create.upload_error_file'))
       setError(detail)

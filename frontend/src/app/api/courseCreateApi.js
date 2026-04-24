@@ -188,7 +188,18 @@ export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
     xhr.open('POST', `${API_URL}/storage/gdrive/upload/`)
     xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
 
-    onAbort?.(() => { xhr.abort(); reject(new DOMException('Aborted', 'AbortError')) })
+    onAbort?.(() => {
+      // Check BEFORE abort — if server already responded, include result so caller can delete the file
+      if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const result = JSON.parse(xhr.responseText)
+          reject(Object.assign(new DOMException('Aborted', 'AbortError'), { uploadedResult: result }))
+          return
+        } catch {}
+      }
+      xhr.abort()
+      reject(new DOMException('Aborted', 'AbortError'))
+    })
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
