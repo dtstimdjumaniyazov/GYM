@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import StepIndicator from '../components/courseCreate/StepIndicator'
 import Step1BasicInfo from '../components/courseCreate/Step1BasicInfo'
@@ -13,6 +13,7 @@ import {
   useSaveTrainingVariantMutation,
   useUpdateTrainingVariantMutation,
   useGetCategoriesQuery,
+  useGetTrainerCourseQuery,
 } from '../app/api/courseCreateApi'
 
 const INITIAL_STEP1 = {
@@ -80,12 +81,43 @@ function buildVariantPayload(variant, courseId) {
   }
 }
 
+function buildVariantsFromApi(apiVariants) {
+  const result = DEFAULT_VARIANTS.map((def) => {
+    const saved = apiVariants.find((v) => v.variant_number === def.variant_number)
+    if (!saved) return def
+    return {
+      ...def,
+      active: true,
+      savedId: saved.id,
+      name: saved.name || '',
+      description: saved.description || '',
+      weeks: (saved.weeks || []).map((w) => ({
+        id: w.id,
+        week_number: w.week_number,
+        days: (w.days || []).map((d) => ({
+          id: d.id,
+          day_of_week: d.day_of_week,
+          is_rest_day: d.is_rest_day,
+          videos: (d.contents || [])
+            .filter((c) => c.content_type === 'video' && c.vimeo_video)
+            .map((c) => ({ vimeo_video_id: c.vimeo_video.id, title: c.vimeo_video.title })),
+          files: (d.contents || [])
+            .filter((c) => (c.content_type === 'pdf' || c.content_type === 'image') && c.gdrive_file)
+            .map((c) => ({ gdrive_file_id: c.gdrive_file.id, filename: c.gdrive_file.filename, mime_type: c.gdrive_file.mime_type })),
+        })),
+      })),
+    }
+  })
+  return result
+}
+
 export default function CourseCreate() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { id: editId } = useParams()
 
   const [step, setStep] = useState(1)
-  const [courseId, setCourseId] = useState(null)
+  const [courseId, setCourseId] = useState(editId || null)
   const [step1Data, setStep1Data] = useState(INITIAL_STEP1)
   const [variants, setVariants] = useState(DEFAULT_VARIANTS)
   const [moduleContents, setModuleContents] = useState({})
@@ -94,6 +126,31 @@ export default function CourseCreate() {
   const [saving, setSaving] = useState(false)
 
   const { data: categories = [] } = useGetCategoriesQuery()
+  const { data: existingCourse } = useGetTrainerCourseQuery(editId, { skip: !editId })
+
+  useEffect(() => {
+    if (!existingCourse) return
+    const moduleTypes = (existingCourse.modules || []).map((m) => m.type)
+    setStep1Data({
+      category: existingCourse.category || '',
+      title: existingCourse.title || '',
+      short_description: existingCourse.short_description || '',
+      full_description: existingCourse.full_description || '',
+      modules: moduleTypes.length ? moduleTypes : ['training'],
+      level: existingCourse.level || 'beginner',
+      format: existingCourse.format || 'gym',
+      target_weight_range: existingCourse.target_weight_range || '',
+      language: existingCourse.language || 'ru',
+      price: existingCourse.price || '',
+      duration_weeks: existingCourse.duration_weeks || 4,
+      equipment: existingCourse.equipment || '',
+      requirements: existingCourse.requirements || '',
+      goals_text: existingCourse.goals_text || '',
+    })
+    if (existingCourse.training_variants?.length) {
+      setVariants(buildVariantsFromApi(existingCourse.training_variants))
+    }
+  }, [existingCourse])
 
   const [createCourse] = useCreateCourseMutation()
   const [updateCourse] = useUpdateCourseMutation()

@@ -197,19 +197,30 @@ class CourseCreateSerializer(serializers.ModelSerializer):
 
 class CourseTrainerDetailSerializer(serializers.ModelSerializer):
     """Детали курса для тренера (включает черновики)."""
+    from training.serializers import TrainingVariantDetailSerializer
+
     modules = CourseModuleSerializer(many=True, read_only=True)
-    training_variants = TrainingVariantBriefSerializer(many=True, read_only=True)
+    training_variants = serializers.SerializerMethodField()
+    category = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'short_description', 'full_description',
+            'id', 'category', 'title', 'short_description', 'full_description',
             'level', 'format', 'equipment', 'target_weight_range',
             'language', 'price', 'duration_weeks',
             'requirements', 'goals_text', 'status',
             'cover_url', 'created_at', 'updated_at',
             'modules', 'training_variants',
         ]
+
+    def get_training_variants(self, obj):
+        from training.serializers import TrainingVariantDetailSerializer
+        qs = obj.training_variants.prefetch_related(
+            'weeks__days__contents__vimeo_video',
+            'weeks__days__contents__gdrive_file',
+        ).order_by('variant_number')
+        return TrainingVariantDetailSerializer(qs, many=True).data
 
 
 # ─── Course Detail serializer ─────────────────────────────────

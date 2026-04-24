@@ -1042,6 +1042,7 @@ function TrainerCoursesTab() {
                       <CourseActionMenu
                         course={course}
                         onView={() => { setOpenMenuId(null); navigate(`/courses/${course.id}`) }}
+                        onEdit={() => { setOpenMenuId(null); navigate(`/courses/${course.id}/edit`) }}
                         onToggleStatus={() => handleToggleStatus(course.id)}
                         onDelete={() => { setOpenMenuId(null); setDeleteConfirmCourse(course) }}
                         onClose={() => setOpenMenuId(null)}
@@ -1108,6 +1109,7 @@ function TrainerCoursesTab() {
                         <CourseActionMenu
                           course={course}
                           onView={() => { setOpenMenuId(null); navigate(`/courses/${course.id}`) }}
+                          onEdit={() => { setOpenMenuId(null); navigate(`/courses/${course.id}/edit`) }}
                           onToggleStatus={() => handleToggleStatus(course.id)}
                           onDelete={() => { setOpenMenuId(null); setDeleteConfirmCourse(course) }}
                           onClose={() => setOpenMenuId(null)}
@@ -1175,9 +1177,10 @@ function StatusBadge({ status }) {
   )
 }
 
-function CourseActionMenu({ course, onView, onToggleStatus, onDelete, onClose }) {
+function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, onClose }) {
   const { t } = useTranslation()
   const isPublished = course.status === 'published'
+  const isDraft = course.status === 'draft'
 
   return (
     <>
@@ -1190,8 +1193,9 @@ function CourseActionMenu({ course, onView, onToggleStatus, onDelete, onClose })
           <Eye size={14} className="opacity-70" /> {t('profile.view_course')}
         </button>
         <button
-          disabled
-          className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-text-primary/50 cursor-not-allowed"
+          onClick={isDraft ? onEdit : undefined}
+          disabled={!isDraft}
+          className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${isDraft ? 'text-text-header hover:bg-link-hover/10 cursor-pointer' : 'text-text-primary/50 cursor-not-allowed'}`}
         >
           <Edit3 size={14} className="opacity-70" /> {t('profile.edit_course')}
         </button>
