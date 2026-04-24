@@ -181,6 +181,8 @@ export async function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, 
 export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
   const API_URL = API_BASE
   return new Promise((resolve, reject) => {
+    let aborted = false
+
     const formData = new FormData()
     formData.append('file', file)
 
@@ -189,14 +191,7 @@ export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
     xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
 
     onAbort?.(() => {
-      // Check BEFORE abort — if server already responded, include result so caller can delete the file
-      if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const result = JSON.parse(xhr.responseText)
-          reject(Object.assign(new DOMException('Aborted', 'AbortError'), { uploadedResult: result }))
-          return
-        } catch {}
-      }
+      aborted = true
       xhr.abort()
       reject(new DOMException('Aborted', 'AbortError'))
     })
@@ -208,12 +203,18 @@ export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
     }
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(JSON.parse(xhr.responseText))
+        const result = JSON.parse(xhr.responseText)
+        if (aborted) {
+          // Server processed upload despite client abort — pass result for cleanup
+          reject(Object.assign(new DOMException('Aborted', 'AbortError'), { uploadedResult: result }))
+        } else {
+          resolve(result)
+        }
       } else {
-        reject(JSON.parse(xhr.responseText))
+        if (!aborted) reject(JSON.parse(xhr.responseText))
       }
     }
-    xhr.onerror = () => reject(new Error('Network error'))
+    xhr.onerror = () => { if (!aborted) reject(new Error('Network error')) }
     xhr.send(formData)
   })
 }

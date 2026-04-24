@@ -125,11 +125,13 @@ export default function VideoUploader({ onUploaded, onRemove, uploadedVideo, dis
             <span className="text-xs text-white/60">{t('create.uploading_vimeo')}</span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-main font-mono">{progress}%</span>
-              <button type="button" onClick={handleCancel} className="text-white/30 hover:text-red-400 transition-colors" title={t('common.cancel')}>
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              {progress < 100 && (
+                <button type="button" onClick={handleCancel} className="text-white/30 hover:text-red-400 transition-colors" title={t('common.cancel')}>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
