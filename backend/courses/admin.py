@@ -56,10 +56,14 @@ class CourseAdmin(admin.ModelAdmin):
         )
         self.message_user(request, f'Запрос на удаление отклонён у {updated} курс(ов).')
 
-    @admin.action(description='Опубликовать выбранные курсы')
+    @admin.action(description='Одобрить и опубликовать курсы')
     def publish_courses(self, request, queryset):
-        updated = queryset.update(status='published')
-        self.message_user(request, f'{updated} курс(ов) опубликовано.')
+        now = timezone.now()
+        updated = queryset.filter(status='pending_review').update(
+            status='published',
+            published_at=now,
+        )
+        self.message_user(request, f'{updated} курс(ов) одобрено и опубликовано.')
 
     @admin.action(description='Снять с публикации')
     def unpublish_courses(self, request, queryset):

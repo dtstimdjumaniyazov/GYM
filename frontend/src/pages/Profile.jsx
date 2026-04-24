@@ -986,7 +986,7 @@ function TrainerOverviewTab() {
 function TrainerCoursesTab() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { data: courses, isLoading } = useGetTrainerCoursesQuery()
+  const { data: courses, isLoading } = useGetTrainerCoursesQuery(undefined, { refetchOnMountOrArgChange: true })
   const [toggleStatus] = useToggleCourseStatusMutation()
   const [requestDeletion] = useRequestCourseDeletionMutation()
   const [openMenuId, setOpenMenuId] = useState(null)
@@ -1181,11 +1181,13 @@ function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, on
   const { t } = useTranslation()
   const isPublished = course.status === 'published'
   const isDraft = course.status === 'draft'
+  const isPending = course.status === 'pending_review'
+  const canEdit = isDraft || isPending
 
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="absolute right-0 top-full mt-1 z-50 w-48 bg-bg-header rounded-xl shadow-lg border border-link-hover/20 py-2 animate-fade-in">
+      <div className="absolute right-0 top-full mt-1 z-50 w-52 bg-bg-header rounded-xl shadow-lg border border-link-hover/20 py-2 animate-fade-in">
         <button
           onClick={onView}
           className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-text-header hover:bg-link-hover/10 transition-colors cursor-pointer"
@@ -1193,20 +1195,23 @@ function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, on
           <Eye size={14} className="opacity-70" /> {t('profile.view_course')}
         </button>
         <button
-          onClick={isDraft ? onEdit : undefined}
-          disabled={!isDraft}
-          className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${isDraft ? 'text-text-header hover:bg-link-hover/10 cursor-pointer' : 'text-text-primary/50 cursor-not-allowed'}`}
+          onClick={canEdit ? onEdit : undefined}
+          disabled={!canEdit}
+          className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${canEdit ? 'text-text-header hover:bg-link-hover/10 cursor-pointer' : 'text-text-primary/50 cursor-not-allowed'}`}
         >
           <Edit3 size={14} className="opacity-70" /> {t('profile.edit_course')}
         </button>
         <button
-          onClick={onToggleStatus}
-          className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-text-header hover:bg-link-hover/10 transition-colors cursor-pointer"
+          onClick={isPending ? undefined : onToggleStatus}
+          disabled={isPending}
+          className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${isPending ? 'text-blue-400/50 cursor-not-allowed' : 'text-text-header hover:bg-link-hover/10 cursor-pointer'}`}
         >
           {isPublished ? (
             <><ToggleLeft size={14} className="opacity-70" /> {t('profile.unpublish')}</>
+          ) : isPending ? (
+            <><CheckCircle size={14} className="opacity-70" /> {t('profile.status_pending_review')}</>
           ) : (
-            <><ToggleRight size={14} className="opacity-70" /> {t('profile.publish')}</>
+            <><ToggleRight size={14} className="opacity-70" /> {t('profile.submit_review')}</>
           )}
         </button>
         <div className="border-t border-text-header/10 my-1" />

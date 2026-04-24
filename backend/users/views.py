@@ -702,18 +702,24 @@ def trainer_course_toggle_status(request, pk):
     except Course.DoesNotExist:
         return Response({'detail': 'Курс не найден'}, status=status.HTTP_404_NOT_FOUND)
 
-    if not trainer.is_verified:
-        return Response({'detail': 'Для публикации курсов необходима верификация аккаунта'}, status=status.HTTP_403_FORBIDDEN)
+    if course.status == Course.Status.PENDING_REVIEW:
+        return Response(
+            {'detail': 'Курс на проверке у администратора. Дождитесь одобрения.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     if course.status == Course.Status.PUBLISHED:
         course.status = Course.Status.DRAFT
     else:
-        course.status = Course.Status.PUBLISHED
-        from django.utils import timezone
-        if not course.published_at:
-            course.published_at = timezone.now()
+        # draft → pending_review (требует одобрения администратора)
+        if not trainer.is_verified:
+            return Response(
+                {'detail': 'Для публикации курсов необходима верификация аккаунта'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        course.status = Course.Status.PENDING_REVIEW
 
-    course.save(update_fields=['status', 'published_at', 'updated_at'])
+    course.save(update_fields=['status', 'updated_at'])
     return Response({'status': course.status})
 
 
