@@ -1239,7 +1239,7 @@ function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, on
   const isDraft = course.status === 'draft'
   const isPending = course.status === 'pending_review'
   const isRevision = course.status === 'revision_required'
-  const canEdit = isDraft || isPending || isRevision
+  const canEdit = isDraft || isRevision
 
   return (
     <>
