@@ -69,11 +69,19 @@ class CourseAdmin(admin.ModelAdmin):
 
     @admin.action(description='Одобрить и опубликовать курсы')
     def publish_courses(self, request, queryset):
+        from notifications.services import notify_user
+        from notifications.models import Notification
         now = timezone.now()
-        updated = queryset.filter(status='pending_review').update(
-            status='published',
-            published_at=now,
-        )
+        courses_to_publish = list(queryset.filter(status='pending_review').select_related('trainer__user'))
+        updated = queryset.filter(status='pending_review').update(status='published', published_at=now)
+        for course in courses_to_publish:
+            notify_user(
+                course.trainer.user,
+                Notification.Type.COURSE_PUBLISHED,
+                '✅ Ваш курс опубликован!',
+                f'Курс «{course.title}» одобрен администратором и теперь доступен в каталоге.',
+                related_url=f'/courses/{course.pk}',
+            )
         self.message_user(request, f'{updated} курс(ов) одобрено и опубликовано.')
 
     @admin.action(description='Снять с публикации')
@@ -88,10 +96,15 @@ class CourseAdmin(admin.ModelAdmin):
             if form.is_valid():
                 notes = form.cleaned_data['revision_notes']
                 ids = list(queryset.values_list('id', flat=True))
+                courses_to_revise = list(
+                    Course.objects.filter(id__in=ids, status__in=['pending_review', 'published'])
+                    .select_related('trainer__user')
+                )
                 updated = Course.objects.filter(
                     id__in=ids,
                     status__in=['pending_review', 'published'],
                 ).update(status='revision_required', revision_notes=notes)
+                self._notify_revision(courses_to_revise, notes)
                 self.message_user(request, f'{updated} курс(ов) отправлено на доработку.')
                 return None
         else:
@@ -104,3 +117,15 @@ class CourseAdmin(admin.ModelAdmin):
             'opts': self.model._meta,
             'title': 'Отправить курсы на доработку',
         })
+
+    def _notify_revision(self, courses, notes):
+        from notifications.services import notify_user
+        from notifications.models import Notification
+        for course in courses:
+            notify_user(
+                course.trainer.user,
+                Notification.Type.COURSE_REVISION,
+                '⚠️ Курс требует доработки',
+                f'Курс «{course.title}».\n\nЗамечания: {notes}',
+                related_url=f'/profile?tab=trainer-courses',
+            )

@@ -20,6 +20,7 @@ import {
 } from '../app/api/usersApi'
 import { useGetUserEnrollmentsQuery } from '../app/api/enrollmentsApi'
 import { useGetUserFavoritesQuery } from '../app/api/coursesApi'
+import { useRequestVerificationMutation } from '../app/api/notificationsApi'
 import Pagination from '../components/Pagination'
 import Loader from '../components/Loader'
 import { MoreVertical, Eye, Edit3, Trash2, ToggleLeft, ToggleRight, AlertTriangle, CheckCircle, X, Camera, Lock } from 'lucide-react'
@@ -666,6 +667,7 @@ function ProfileTab({ profile, onEdit, onEditCerts, onEditTrainerLinks }) {
   const { t } = useTranslation()
   const isTrainer = profile.role === 'trainer'
   const trainerProfile = profile.trainer_profile
+  const [requestVerification, { isLoading: requestingVerif, isSuccess: verifRequested }] = useRequestVerificationMutation()
 
   const GENDER_LABELS = {
     male: t('profile.gender_male'),
@@ -692,12 +694,23 @@ function ProfileTab({ profile, onEdit, onEditCerts, onEditTrainerLinks }) {
             </div>
           ))}
         </div>
-        <button
-          onClick={onEdit}
-          className="mt-6 bg-link-hover text-bg-header font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          {t('profile.edit_profile')}
-        </button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            onClick={onEdit}
+            className="bg-link-hover text-bg-header font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            {t('profile.edit_profile')}
+          </button>
+          {isTrainer && trainerProfile && !trainerProfile.is_verified && (
+            <button
+              onClick={() => requestVerification()}
+              disabled={requestingVerif || verifRequested}
+              className="bg-bg-header border border-link-hover/40 text-link-hover font-medium px-6 py-2.5 rounded-xl hover:bg-link-hover/10 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {verifRequested ? '✅ Запрос отправлен' : requestingVerif ? 'Отправка...' : '🆔 Запросить верификацию'}
+            </button>
+          )}
+        </div>
       </div>
 
       {isTrainer && trainerProfile && (

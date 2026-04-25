@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard } from 'lucide-react'
+import { Menu, X, ChevronDown, ShoppingCart, LogOut, User, Heart, BookOpen, LayoutDashboard, Bell } from 'lucide-react'
 import { useGetCategoriesQuery } from '../app/api/coursesApi'
 import { useGetUserProfileQuery } from '../app/api/usersApi'
+import { useGetNotificationsQuery, useMarkAllReadMutation } from '../app/api/notificationsApi'
 import { useTranslation } from 'react-i18next'
 
 function Header() {
@@ -10,8 +11,10 @@ function Header() {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
   const catalogRef = useRef(null)
   const userMenuRef = useRef(null)
+  const notifRef = useRef(null)
   const navigate = useNavigate()
 
   const { data: categories = [] } = useGetCategoriesQuery()
@@ -19,6 +22,18 @@ function Header() {
   const [user, setUser] = useState(null)
   const { data: profile } = useGetUserProfileQuery(undefined, { skip: !user })
   const avatarUrl = profile?.avatar_url || null
+
+  const { data: notifications = [] } = useGetNotificationsQuery(undefined, {
+    skip: !user,
+    pollingInterval: 30000,
+  })
+  const [markAllRead] = useMarkAllReadMutation()
+  const unreadCount = notifications.filter((n) => !n.is_read).length
+
+  const handleNotifOpen = () => {
+    setNotifOpen((v) => !v)
+    if (!notifOpen && unreadCount > 0) markAllRead()
+  }
 
   useEffect(() => {
     const userData = localStorage.getItem('user')
@@ -39,6 +54,9 @@ function Header() {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setUserMenuOpen(false)
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -172,6 +190,61 @@ function Header() {
               0
             </span>
           </button>
+
+          {/* Notification bell */}
+          {user && (
+            <div ref={notifRef} className="relative">
+              <button
+                onClick={handleNotifOpen}
+                className="relative hover:text-link-hover transition-colors cursor-pointer p-1"
+                aria-label="Уведомления"
+              >
+                <Bell size={22} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {notifOpen && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-bg-header rounded-xl shadow-lg border border-link-hover/20 py-2 animate-fade-in z-50 max-h-[70vh] overflow-y-auto">
+                  <div className="px-4 py-2 border-b border-text-header/10 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-text-header">Уведомления</span>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllRead}
+                        className="text-xs text-link-hover hover:underline cursor-pointer"
+                      >
+                        Прочитать все
+                      </button>
+                    )}
+                  </div>
+                  {notifications.length === 0 ? (
+                    <p className="px-4 py-6 text-sm text-text-primary/50 text-center">Уведомлений нет</p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        onClick={() => { if (n.related_url) navigate(n.related_url); setNotifOpen(false) }}
+                        className={`px-4 py-3 border-b border-text-header/5 last:border-0 transition-colors ${n.related_url ? 'cursor-pointer hover:bg-link-hover/10' : ''} ${!n.is_read ? 'bg-link-hover/5' : ''}`}
+                      >
+                        <div className="flex items-start gap-2">
+                          {!n.is_read && <span className="mt-1.5 w-2 h-2 rounded-full bg-link-hover shrink-0" />}
+                          <div className={!n.is_read ? '' : 'ml-4'}>
+                            <p className="text-sm font-medium text-text-header leading-snug">{n.title}</p>
+                            {n.body && <p className="text-xs text-text-primary/60 mt-0.5 leading-relaxed">{n.body}</p>}
+                            <p className="text-xs text-text-primary/40 mt-1">
+                              {new Date(n.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Desktop auth */}
           <div className="hidden md:block">

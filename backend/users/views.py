@@ -708,11 +708,13 @@ def trainer_course_toggle_status(request, pk):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    from notifications.services import notify_admins, notify_user
+    from notifications.models import Notification
+
     if course.status == Course.Status.PUBLISHED:
         course.status = Course.Status.DRAFT
         course.save(update_fields=['status', 'updated_at'])
     elif course.status == Course.Status.REVISION_REQUIRED:
-        # Trainer resubmits after fixing issues → clear revision notes
         if not trainer.is_verified:
             return Response(
                 {'detail': 'Для публикации курсов необходима верификация аккаунта'},
@@ -721,8 +723,13 @@ def trainer_course_toggle_status(request, pk):
         course.status = Course.Status.PENDING_REVIEW
         course.revision_notes = ''
         course.save(update_fields=['status', 'revision_notes', 'updated_at'])
+        notify_admins(
+            Notification.Type.COURSE_SUBMITTED,
+            f'🔄 Курс повторно отправлен на проверку',
+            f'Тренер {user.full_name or user.phone} повторно отправил курс «{course.title}» после доработки.',
+            related_url=f'/admin/courses/course/{course.pk}/change/',
+        )
     else:
-        # draft → pending_review
         if not trainer.is_verified:
             return Response(
                 {'detail': 'Для публикации курсов необходима верификация аккаунта'},
@@ -730,6 +737,12 @@ def trainer_course_toggle_status(request, pk):
             )
         course.status = Course.Status.PENDING_REVIEW
         course.save(update_fields=['status', 'updated_at'])
+        notify_admins(
+            Notification.Type.COURSE_SUBMITTED,
+            f'📋 Новый курс на проверке',
+            f'Тренер {user.full_name or user.phone} отправил курс «{course.title}» на проверку.',
+            related_url=f'/admin/courses/course/{course.pk}/change/',
+        )
 
     return Response({'status': course.status})
 
@@ -1055,4 +1068,32 @@ def delete_avatar(request):
     user.avatar_url = ''
     user.save(update_fields=['avatar_url', 'updated_at'])
     return Response({'detail': 'Фото удалено'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def trainer_request_verification(request):
+    """Тренер отправляет запрос на верификацию администраторам."""
+    user = request.user
+    if user.role != User.Role.TRAINER:
+        return Response({'detail': 'Доступно только для тренеров'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        trainer = user.trainer_profile
+    except Trainer.DoesNotExist:
+        return Response({'detail': 'Профиль тренера не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+    if trainer.is_verified:
+        return Response({'detail': 'Аккаунт уже верифицирован'}, status=status.HTTP_400_BAD_REQUEST)
+
+    from notifications.services import notify_admins
+    from notifications.models import Notification
+    notify_admins(
+        Notification.Type.VERIFICATION_REQUESTED,
+        '🆔 Запрос на верификацию тренера',
+        f'Тренер {user.full_name or user.phone} запрашивает верификацию аккаунта.\nСпециализация: {trainer.specialization or "не указана"}',
+        related_url=f'/admin/users/trainer/?q={user.phone}',
+    )
+    return Response({'detail': 'Запрос на верификацию отправлен'})
+
 

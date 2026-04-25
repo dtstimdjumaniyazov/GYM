@@ -8,7 +8,7 @@ from users.views import (
     SingleSessionTokenRefreshView,
     trainer_dashboard, trainer_courses,
     trainer_course_toggle_status, trainer_course_delete_request,
-    trainer_profile_update,
+    trainer_profile_update, trainer_request_verification,
     disconnect_telegram, disconnect_google,
     link_telegram_profile, link_google_profile,
     upload_avatar, delete_avatar,
@@ -50,4 +50,5 @@ urlpatterns = [
     path('trainer/courses/<uuid:pk>/toggle-status/', trainer_course_toggle_status, name='trainer-course-toggle-status'),
     path('trainer/courses/<uuid:pk>/request-delete/', trainer_course_delete_request, name='trainer-course-delete-request'),
     path('trainer/profile/update/', trainer_profile_update, name='trainer-profile-update'),
+    path('trainer/request-verification/', trainer_request_verification, name='trainer-request-verification'),
 ]

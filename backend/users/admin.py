@@ -23,8 +23,19 @@ class TrainerAdmin(admin.ModelAdmin):
 
     @admin.action(description='Верифицировать выбранных тренеров')
     def verify_trainers(self, request, queryset):
-        updated = queryset.update(is_verified=True)
-        self.message_user(request, f'{updated} тренер(ов) верифицировано.')
+        from notifications.services import notify_user
+        from notifications.models import Notification
+        trainers_to_notify = list(queryset.filter(is_verified=False).select_related('user'))
+        queryset.update(is_verified=True)
+        for trainer in trainers_to_notify:
+            notify_user(
+                trainer.user,
+                Notification.Type.TRAINER_VERIFIED,
+                '✅ Ваш аккаунт верифицирован!',
+                'Поздравляем! Администратор подтвердил ваш аккаунт тренера. Теперь вы можете публиковать курсы.',
+                related_url='/profile?tab=trainer-courses',
+            )
+        self.message_user(request, f'{len(trainers_to_notify)} тренер(ов) верифицировано.')
 
     @admin.action(description='Снять верификацию')
     def unverify_trainers(self, request, queryset):

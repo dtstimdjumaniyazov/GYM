@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'storage',
     'enrollments',
     'payments',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -152,6 +153,7 @@ REST_FRAMEWORK = {
 # Telegram Bot
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', '')
+ADMIN_TELEGRAM_IDS = os.getenv('ADMIN_TELEGRAM_IDS', '')  # comma-separated chat IDs
 
 # Google OAuth
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
