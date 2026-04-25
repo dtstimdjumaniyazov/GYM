@@ -269,6 +269,7 @@ class CoursePublishView(APIView):
             return Response({'detail': 'Курс не найден'}, status=status.HTTP_404_NOT_FOUND)
 
         action = request.data.get('action', 'publish')
+        already_pending = course.status == Course.Status.PENDING_REVIEW
         if action == 'publish':
             if course.status == Course.Status.PUBLISHED:
                 return Response(
@@ -279,4 +280,16 @@ class CoursePublishView(APIView):
         else:
             course.status = Course.Status.DRAFT
         course.save()
+
+        if action == 'publish' and not already_pending:
+            from notifications.services import notify_admins
+            from notifications.models import Notification
+            user = request.user
+            notify_admins(
+                Notification.Type.COURSE_SUBMITTED,
+                '📋 Новый курс на проверке',
+                f'Тренер {user.full_name or user.phone} отправил курс «{course.title}» на проверку.',
+                related_url=f'/admin/courses/course/{course.pk}/change/',
+            )
+
         return Response({'status': course.status})
