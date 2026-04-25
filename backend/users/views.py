@@ -710,16 +710,27 @@ def trainer_course_toggle_status(request, pk):
 
     if course.status == Course.Status.PUBLISHED:
         course.status = Course.Status.DRAFT
-    else:
-        # draft → pending_review (требует одобрения администратора)
+        course.save(update_fields=['status', 'updated_at'])
+    elif course.status == Course.Status.REVISION_REQUIRED:
+        # Trainer resubmits after fixing issues → clear revision notes
         if not trainer.is_verified:
             return Response(
                 {'detail': 'Для публикации курсов необходима верификация аккаунта'},
                 status=status.HTTP_403_FORBIDDEN,
             )
         course.status = Course.Status.PENDING_REVIEW
+        course.revision_notes = ''
+        course.save(update_fields=['status', 'revision_notes', 'updated_at'])
+    else:
+        # draft → pending_review
+        if not trainer.is_verified:
+            return Response(
+                {'detail': 'Для публикации курсов необходима верификация аккаунта'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        course.status = Course.Status.PENDING_REVIEW
+        course.save(update_fields=['status', 'updated_at'])
 
-    course.save(update_fields=['status', 'updated_at'])
     return Response({'status': course.status})
 
 

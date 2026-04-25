@@ -48,6 +48,7 @@ class Course(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'draft', 'Черновик'
         PENDING_REVIEW = 'pending_review', 'На проверке'
+        REVISION_REQUIRED = 'revision_required', 'На доработке'
         PUBLISHED = 'published', 'Опубликован'
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -167,6 +168,8 @@ class Course(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
     
+    revision_notes = models.TextField('Замечания администратора', blank=True, default='')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField('Дата публикации', null=True, blank=True)

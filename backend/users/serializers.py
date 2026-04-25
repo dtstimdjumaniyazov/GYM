@@ -196,6 +196,7 @@ class TrainerCourseManageSerializer(serializers.Serializer):
     title = serializers.CharField()
     category_name = serializers.SerializerMethodField()
     status = serializers.CharField()
+    revision_notes = serializers.CharField()
     purchases_count = serializers.IntegerField()
     price = serializers.DecimalField(max_digits=12, decimal_places=2)
     deletion_requested = serializers.BooleanField()

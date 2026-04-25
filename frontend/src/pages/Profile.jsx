@@ -1098,6 +1098,12 @@ function TrainerCoursesTab() {
                     {Number(course.price).toLocaleString('ru-RU')} UZS
                   </span>
                 </div>
+                {course.status === 'revision_required' && course.revision_notes && (
+                  <div className="flex items-start gap-1.5 text-orange-400 text-xs bg-orange-500/10 rounded-lg px-2.5 py-2">
+                    <AlertTriangle size={12} className="mt-0.5 shrink-0" />
+                    <span><span className="font-medium">{t('profile.revision_notes_label')}:</span> {course.revision_notes}</span>
+                  </div>
+                )}
                 {course.deletion_requested && (
                   <div className="flex items-center gap-1 text-amber-400 text-xs">
                     <AlertTriangle size={12} />
@@ -1134,7 +1140,14 @@ function TrainerCoursesTab() {
                         )}
                       </div>
                     </td>
-                    <td className="px-5 py-3"><StatusBadge status={course.status} /></td>
+                    <td className="px-5 py-3">
+                      <StatusBadge status={course.status} />
+                      {course.status === 'revision_required' && course.revision_notes && (
+                        <p className="text-xs text-orange-400 mt-1 max-w-xs">
+                          <span className="font-medium">{t('profile.revision_notes_label')}:</span> {course.revision_notes}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-5 py-3 text-text-header text-center">{course.purchases_count}</td>
                     <td className="px-5 py-3 text-text-header text-right">
                       {Number(course.price).toLocaleString('ru-RU')} UZS
@@ -1204,11 +1217,13 @@ function StatusBadge({ status }) {
   const styles = {
     published: 'bg-green-500/20 text-green-400',
     pending_review: 'bg-blue-500/20 text-blue-400',
+    revision_required: 'bg-orange-500/20 text-orange-400',
     draft: 'bg-yellow-500/20 text-yellow-400',
   }
   const labels = {
     published: t('profile.status_published'),
     pending_review: t('profile.status_pending_review'),
+    revision_required: t('profile.status_revision_required'),
     draft: t('profile.status_draft'),
   }
   return (
@@ -1223,7 +1238,8 @@ function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, on
   const isPublished = course.status === 'published'
   const isDraft = course.status === 'draft'
   const isPending = course.status === 'pending_review'
-  const canEdit = isDraft || isPending
+  const isRevision = course.status === 'revision_required'
+  const canEdit = isDraft || isPending || isRevision
 
   return (
     <>
@@ -1251,6 +1267,8 @@ function CourseActionMenu({ course, onView, onEdit, onToggleStatus, onDelete, on
             <><ToggleLeft size={14} className="opacity-70" /> {t('profile.unpublish')}</>
           ) : isPending ? (
             <><CheckCircle size={14} className="opacity-70" /> {t('profile.status_pending_review')}</>
+          ) : isRevision ? (
+            <><ToggleRight size={14} className="opacity-70" /> {t('profile.resubmit_review')}</>
           ) : (
             <><ToggleRight size={14} className="opacity-70" /> {t('profile.submit_review')}</>
           )}

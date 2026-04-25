@@ -1,6 +1,16 @@
+from django import forms
 from django.contrib import admin
+from django.shortcuts import render
 from django.utils import timezone
 from courses.models import Category, Course, CourseModule, ModuleContent, Favorite
+
+
+class RevisionNotesForm(forms.Form):
+    revision_notes = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 5, 'style': 'width:100%'}),
+        label='Замечания (будут видны тренеру)',
+        required=True,
+    )
 
 
 admin.site.register(Category)
@@ -18,7 +28,8 @@ class CourseAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', 'deletion_requested', 'category')
     search_fields = ('title', 'trainer__user__first_name', 'trainer__user__last_name')
-    actions = ['approve_deletion', 'reject_deletion', 'publish_courses', 'unpublish_courses']
+    readonly_fields = ('revision_notes',)
+    actions = ['approve_deletion', 'reject_deletion', 'publish_courses', 'unpublish_courses', 'send_for_revision']
 
     def get_trainer_name(self, obj):
         return obj.trainer.user.full_name or str(obj.trainer.user.phone)
@@ -69,3 +80,27 @@ class CourseAdmin(admin.ModelAdmin):
     def unpublish_courses(self, request, queryset):
         updated = queryset.update(status='draft')
         self.message_user(request, f'{updated} курс(ов) снято с публикации.')
+
+    @admin.action(description='Отправить на доработку (с замечаниями)')
+    def send_for_revision(self, request, queryset):
+        if 'apply' in request.POST:
+            form = RevisionNotesForm(request.POST)
+            if form.is_valid():
+                notes = form.cleaned_data['revision_notes']
+                ids = list(queryset.values_list('id', flat=True))
+                updated = Course.objects.filter(
+                    id__in=ids,
+                    status__in=['pending_review', 'published'],
+                ).update(status='revision_required', revision_notes=notes)
+                self.message_user(request, f'{updated} курс(ов) отправлено на доработку.')
+                return None
+        else:
+            form = RevisionNotesForm()
+
+        return render(request, 'admin/courses/send_for_revision.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            'opts': self.model._meta,
+            'title': 'Отправить курсы на доработку',
+        })
