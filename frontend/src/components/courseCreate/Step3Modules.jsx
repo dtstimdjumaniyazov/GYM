@@ -1,16 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import VideoUploader from './VideoUploader'
 import FileUploader from './FileUploader'
+import { useDeleteVimeoVideoMutation, useDeleteGDriveFileMutation } from '../../app/api/courseCreateApi'
 
 const MAX_ITEMS = 20
 
 export default function Step3Modules({ selectedModuleTypes, modules, onChange }) {
   const { t } = useTranslation()
+  const [deleteVimeoVideo] = useDeleteVimeoVideoMutation()
+  const [deleteGDriveFile] = useDeleteGDriveFileMutation()
 
   const MODULE_LABELS = {
     theory: t('course.module_theory'),
     nutrition: t('course.module_nutrition'),
     recovery: t('course.module_recovery'),
+    sports_nutrition: t('course.module_sports_nutrition'),
+    training_nuances: t('course.module_training_nuances'),
   }
 
   const activeTypes = (selectedModuleTypes || []).filter((t) => t !== 'training')
@@ -57,6 +62,9 @@ export default function Step3Modules({ selectedModuleTypes, modules, onChange })
   }
 
   function removeItem(type, idx) {
+    const item = getItems(type)[idx]
+    if (item?.vimeo_video_id) deleteVimeoVideo(item.vimeo_video_id).catch(() => {})
+    if (item?.gdrive_file_id) deleteGDriveFile(item.gdrive_file_id).catch(() => {})
     setItems(type, getItems(type).filter((_, i) => i !== idx))
   }
 

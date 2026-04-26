@@ -34,7 +34,7 @@ const INITIAL_STEP1 = {
 }
 
 function buildModulesPayload(moduleTypes) {
-  const priorityMap = { training: 5, theory: 4, nutrition: 3, recovery: 2 }
+  const priorityMap = { training: 5, theory: 4, nutrition: 3, recovery: 2, sports_nutrition: 1, training_nuances: 0 }
   return moduleTypes.map((type) => ({
     type,
     priority: priorityMap[type] ?? 1,

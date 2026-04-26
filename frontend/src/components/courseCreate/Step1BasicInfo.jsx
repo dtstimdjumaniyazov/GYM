@@ -24,6 +24,8 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
     { value: 'theory', label: t('course.module_theory') },
     { value: 'nutrition', label: t('course.module_nutrition') },
     { value: 'recovery', label: t('course.module_recovery') },
+    { value: 'sports_nutrition', label: t('course.module_sports_nutrition') },
+    { value: 'training_nuances', label: t('course.module_training_nuances') },
   ]
 
   const LEVEL_OPTIONS = [

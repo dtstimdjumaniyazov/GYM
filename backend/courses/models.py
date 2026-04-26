@@ -203,6 +203,8 @@ class CourseModule(models.Model):
         THEORY = 'theory', 'Теория'
         NUTRITION = 'nutrition', 'Питание'
         RECOVERY = 'recovery', 'Восстановление'
+        SPORTS_NUTRITION = 'sports_nutrition', 'Спортивное питание'
+        TRAINING_NUANCES = 'training_nuances', 'Нюансы тренировок'
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     course = models.ForeignKey(
@@ -218,8 +220,8 @@ class CourseModule(models.Model):
     )
     priority = models.PositiveSmallIntegerField(
         'Приоритет',
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        help_text='От 1 до 5 звёзд, 5 = основной модуль'
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        help_text='От 0 до 5, 5 = основной модуль'
     )
     is_primary = models.BooleanField(
         'Основной модуль',
