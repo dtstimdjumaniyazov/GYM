@@ -376,6 +376,7 @@
     "rest_tooltip": "Dam olish — mashg'ulot uchun bosing",
     "workout_tooltip": "Mashg'ulot — dam olish uchun bosing",
     "select_video": "Videoni tanlash",
+    "video_title_placeholder": "Video nomi (o'quvchi ko'radi)",
     "uploading_vimeo": "Vimeoga yuklanmoqda...",
     "upload_error_video": "Videoni yuklashda xato",
     "retry": "Qayta urinish",

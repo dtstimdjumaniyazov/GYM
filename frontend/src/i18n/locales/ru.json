@@ -376,6 +376,7 @@
     "rest_tooltip": "Отдых — нажмите для тренировки",
     "workout_tooltip": "Тренировка — нажмите для отдыха",
     "select_video": "Выбрать видео",
+    "video_title_placeholder": "Название видео (видит ученик)",
     "uploading_vimeo": "Загрузка на Vimeo...",
     "upload_error_video": "Ошибка загрузки видео",
     "retry": "Попробовать снова",

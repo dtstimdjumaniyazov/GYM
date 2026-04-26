@@ -3,7 +3,6 @@ import VideoUploader from './VideoUploader'
 import FileUploader from './FileUploader'
 import { useDeleteGDriveFileMutation, useDeleteVimeoVideoMutation } from '../../app/api/courseCreateApi'
 
-const MAX_VIDEOS = 5
 const MAX_FILES = 5
 
 export default function DayRow({ day, onChange }) {
@@ -29,8 +28,11 @@ export default function DayRow({ day, onChange }) {
   }
 
   function addVideo(vimeoVideoId, title) {
-    if (videos.length >= MAX_VIDEOS) return
     onChange({ ...day, videos: [...videos, { vimeo_video_id: vimeoVideoId, title }] })
+  }
+
+  function updateVideoTitle(idx, title) {
+    onChange({ ...day, videos: videos.map((v, i) => i === idx ? { ...v, title } : v) })
   }
 
   async function removeVideo(idx) {
@@ -95,14 +97,13 @@ export default function DayRow({ day, onChange }) {
                   index={i + 1}
                   uploadedVideo={v}
                   onRemove={() => removeVideo(i)}
+                  onTitleChange={(title) => updateVideoTitle(i, title)}
                 />
               ))}
-              {videos.length < MAX_VIDEOS && (
-                <VideoUploader
-                  index={videos.length + 1}
-                  onUploaded={addVideo}
-                />
-              )}
+              <VideoUploader
+                index={videos.length + 1}
+                onUploaded={addVideo}
+              />
               {videos.length === 0 && (
                 <p className="text-xs text-white/25 italic px-1">{t('create.no_videos')}</p>
               )}
