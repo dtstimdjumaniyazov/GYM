@@ -147,9 +147,12 @@ export default function CourseCreate() {
       requirements: existingCourse.requirements || '',
       goals_text: existingCourse.goals_text || '',
     })
-    if (existingCourse.training_variants?.length) {
+    const hasVariants = existingCourse.training_variants?.length > 0
+    if (hasVariants) {
       setVariants(buildVariantsFromApi(existingCourse.training_variants))
     }
+    const hasExtra = moduleTypes.some((m) => m !== 'training')
+    setStep(hasVariants && hasExtra ? 3 : 2)
   }, [existingCourse])
 
   const [createCourse] = useCreateCourseMutation()
