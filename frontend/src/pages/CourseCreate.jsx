@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import StepIndicator from '../components/courseCreate/StepIndicator'
 import Step1BasicInfo from '../components/courseCreate/Step1BasicInfo'
 import Step2Training from '../components/courseCreate/Step2Training'
 import { DEFAULT_VARIANTS } from '../components/courseCreate/Step2Training'
 import Step3Modules from '../components/courseCreate/Step3Modules'
+import StepTip from '../components/courseCreate/StepTip'
 import {
   useCreateCourseMutation,
   useUpdateCourseMutation,
@@ -304,9 +305,20 @@ export default function CourseCreate() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">{t('create.title')}</h1>
-        <p className="text-white/50 text-sm">{t('create.subtitle')}</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">{t('create.title')}</h1>
+          <p className="text-white/50 text-sm">{t('create.subtitle')}</p>
+        </div>
+        <Link
+          to="/trainer/faq"
+          className="shrink-0 flex items-center gap-1.5 text-xs text-white/40 hover:text-amber-300 transition-colors mt-1"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Инструкция
+        </Link>
       </div>
 
       <StepIndicator currentStep={step} totalSteps={totalSteps} />
@@ -315,6 +327,12 @@ export default function CourseCreate() {
         {step === 1 && (
           <>
             <h2 className="text-lg font-semibold text-white mb-5">{t('create.block1')}</h2>
+            <StepTip tips={[
+              'Название курса — конкретное и понятное. Пример: «Похудение за 4 недели дома» вместо «Мой курс».',
+              'Краткое описание — 1–2 предложения о главном результате, который получит ученик.',
+              'Выбирайте только те модули, которые планируете заполнить. Пустые модули не будут видны ученикам.',
+              'Цена 0 = бесплатный курс.',
+            ]} />
             <Step1BasicInfo
               data={step1Data}
               onChange={setStep1Data}
@@ -327,6 +345,13 @@ export default function CourseCreate() {
         {step === 2 && (
           <>
             <h2 className="text-lg font-semibold text-white mb-5">{t('create.block2')}</h2>
+            <StepTip tips={[
+              'Вариант 1 обязателен. Варианты 2 и 3 — если хотите предложить разные программы (например, «Дома» и «В зале»).',
+              'Каждая неделя содержит 7 дней. Отметьте дни отдыха переключателем — тогда видео для них не нужны.',
+              'Если видео сняты вперемежку — создайте таблицу: какое видео для какой недели и дня, затем загружайте по порядку.',
+              'В один день можно добавить несколько видео (например, разминка + тренировка + заминка).',
+              'Порядок видео в дне = порядок загрузки. Если ошиблись — удалите и загрузите заново.',
+            ]} />
             <Step2Training variants={variants} onChange={setVariants} />
           </>
         )}
@@ -334,6 +359,13 @@ export default function CourseCreate() {
         {step === 3 && (
           <>
             <h2 className="text-lg font-semibold text-white mb-5">{t('create.block3')}</h2>
+            <StepTip tips={[
+              'Теория — вводные видео, объяснения техники упражнений, инструкции.',
+              'Питание / Спортивное питание — загрузите план питания в PDF или таблицу калорий.',
+              'Восстановление — видео растяжки, рекомендации по восстановлению в PDF.',
+              'В каждый модуль можно добавить до 20 файлов и видео.',
+              'Эти материалы ученик видит в отдельных вкладках на странице курса.',
+            ]} />
             <Step3Modules
               selectedModuleTypes={step1Data.modules}
               modules={moduleContents}

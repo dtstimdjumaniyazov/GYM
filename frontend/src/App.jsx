@@ -11,6 +11,7 @@ import Profile from './pages/Profile'
 import SocialLink from './pages/SocialLink'
 import TrainerDetail from './pages/TrainerDetail'
 import CourseCreate from './pages/CourseCreate'
+import TrainerFaq from './pages/TrainerFaq'
 import Terms from './pages/legal/Terms'
 import Privacy from './pages/legal/Privacy'
 import MedicalDisclaimer from './pages/legal/MedicalDisclaimer'
@@ -29,6 +30,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/trainer/faq" element={<TrainerFaq />} />
         <Route path="/courses/create" element={<CourseCreate />} />
         <Route path="/courses/:id/edit" element={<CourseCreate />} />
         <Route path="/courses/:id" element={<CourseDetail />} />

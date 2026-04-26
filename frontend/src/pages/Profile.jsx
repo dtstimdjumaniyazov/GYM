@@ -1061,12 +1061,21 @@ function TrainerCoursesTab() {
 
   return (
     <>
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-3 flex-wrap">
         <button
           onClick={() => navigate('/courses/create')}
           className="bg-link-hover text-bg-header font-medium px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
         >
           {t('profile.create_new_course')}
+        </button>
+        <button
+          onClick={() => navigate('/trainer/faq')}
+          className="flex items-center gap-1.5 text-sm text-white/40 hover:text-amber-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Инструкция
         </button>
       </div>
 
