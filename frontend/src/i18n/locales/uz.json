@@ -320,7 +320,7 @@
     "validate_category": "Kategoriyani tanlang",
     "validate_title": "Kurs nomini kiriting",
     "validate_desc": "Qisqa tavsifni kiriting",
-    "validate_price": "To'g'ri narxni kiriting",
+    "validate_price": "Minimal narx — 300 000 so'm",
     "step_description": "Tavsif",
     "step_training": "Mashg'ulotlar",
     "step_materials": "Materiallar",

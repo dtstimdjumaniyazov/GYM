@@ -170,7 +170,7 @@ export default function CourseCreate() {
     if (!data.category) errors.category = t('create.validate_category')
     if (!data.title.trim()) errors.title = t('create.validate_title')
     if (!data.short_description.trim()) errors.short_description = t('create.validate_desc')
-    if (!data.price || Number(data.price) < 0) errors.price = t('create.validate_price')
+    if (!data.price || Number(data.price) < 300000) errors.price = t('create.validate_price')
     return errors
   }
 
@@ -331,7 +331,7 @@ export default function CourseCreate() {
               'Название курса — конкретное и понятное. Пример: «Похудение за 4 недели дома» вместо «Мой курс».',
               'Краткое описание — 1–2 предложения о главном результате, который получит ученик.',
               'Выбирайте только те модули, которые планируете заполнить. Пустые модули не будут видны ученикам.',
-              'Цена 0 = бесплатный курс.',
+              'Минимальная цена — 300 000 сум.',
             ]} />
             <Step1BasicInfo
               data={step1Data}

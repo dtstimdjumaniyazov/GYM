@@ -320,7 +320,7 @@
     "validate_category": "Выберите категорию",
     "validate_title": "Укажите название курса",
     "validate_desc": "Укажите краткое описание",
-    "validate_price": "Укажите корректную цену",
+    "validate_price": "Минимальная цена — 300 000 сум",
     "step_description": "Описание",
     "step_training": "Тренировки",
     "step_materials": "Материалы",

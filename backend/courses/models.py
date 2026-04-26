@@ -122,7 +122,7 @@ class Course(models.Model):
         'Цена (UZS)',
         max_digits=12,
         decimal_places=2,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(300000)]
     )
     duration_weeks = models.PositiveSmallIntegerField(
         'Длительность (недель)',
