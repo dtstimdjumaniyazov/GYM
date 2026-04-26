@@ -13,6 +13,14 @@ class RevisionNotesForm(forms.Form):
     )
 
 
+class DeletionRejectionForm(forms.Form):
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 5, 'style': 'width:100%'}),
+        label='Причина отказа (будет отправлена тренеру)',
+        required=True,
+    )
+
+
 admin.site.register(Category)
 admin.site.register(CourseModule)
 admin.site.register(ModuleContent)
@@ -48,11 +56,22 @@ class CourseAdmin(admin.ModelAdmin):
 
     @admin.action(description='Подтвердить удаление (запустить 90-дневный период)')
     def approve_deletion(self, request, queryset):
+        from notifications.services import notify_user
+        from notifications.models import Notification
         qs = queryset.filter(deletion_requested=True, deletion_confirmed_at__isnull=True)
+        courses_to_approve = list(qs.select_related('trainer__user'))
         count = qs.update(
             status=Course.Status.DRAFT,
             deletion_confirmed_at=timezone.now(),
         )
+        for course in courses_to_approve:
+            notify_user(
+                course.trainer.user,
+                Notification.Type.COURSE_DELETION_APPROVED,
+                '🗑️ Запрос на удаление подтверждён',
+                f'Курс «{course.title}» будет удалён через 90 дней. За это время ученики сохранят доступ к материалам.',
+                related_url='/profile?tab=trainer-courses',
+            )
         self.message_user(
             request,
             f'Запущен 90-дневный переходный период для {count} курс(ов). '
@@ -61,11 +80,32 @@ class CourseAdmin(admin.ModelAdmin):
 
     @admin.action(description='Отклонить запрос на удаление')
     def reject_deletion(self, request, queryset):
-        updated = queryset.filter(deletion_requested=True).update(
-            deletion_requested=False,
-            deletion_confirmed_at=None,
-        )
-        self.message_user(request, f'Запрос на удаление отклонён у {updated} курс(ов).')
+        if 'apply' in request.POST:
+            form = DeletionRejectionForm(request.POST)
+            if form.is_valid():
+                reason = form.cleaned_data['reason']
+                ids = list(queryset.values_list('id', flat=True))
+                courses_to_reject = list(
+                    Course.objects.filter(id__in=ids, deletion_requested=True)
+                    .select_related('trainer__user')
+                )
+                updated = Course.objects.filter(id__in=ids, deletion_requested=True).update(
+                    deletion_requested=False,
+                    deletion_confirmed_at=None,
+                )
+                self._notify_deletion_rejected(courses_to_reject, reason)
+                self.message_user(request, f'Запрос на удаление отклонён у {updated} курс(ов).')
+                return None
+        else:
+            form = DeletionRejectionForm()
+
+        return render(request, 'admin/courses/reject_deletion.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            'opts': self.model._meta,
+            'title': 'Отклонить запрос на удаление',
+        })
 
     @admin.action(description='Одобрить и опубликовать курсы')
     def publish_courses(self, request, queryset):
@@ -117,6 +157,18 @@ class CourseAdmin(admin.ModelAdmin):
             'opts': self.model._meta,
             'title': 'Отправить курсы на доработку',
         })
+
+    def _notify_deletion_rejected(self, courses, reason):
+        from notifications.services import notify_user
+        from notifications.models import Notification
+        for course in courses:
+            notify_user(
+                course.trainer.user,
+                Notification.Type.COURSE_DELETION_REJECTED,
+                '❌ Запрос на удаление отклонён',
+                f'Курс «{course.title}».\n\nПричина: {reason}',
+                related_url='/profile?tab=trainer-courses',
+            )
 
     def _notify_revision(self, courses, notes):
         from notifications.services import notify_user

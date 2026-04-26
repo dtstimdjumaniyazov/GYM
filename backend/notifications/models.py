@@ -10,6 +10,8 @@ class Notification(models.Model):
         COURSE_REVISION = 'course_revision', 'Курс отправлен на доработку'
         TRAINER_VERIFIED = 'trainer_verified', 'Тренер верифицирован'
         VERIFICATION_REQUESTED = 'verification_requested', 'Запрос на верификацию'
+        COURSE_DELETION_APPROVED = 'course_deletion_approved', 'Удаление курса подтверждено'
+        COURSE_DELETION_REJECTED = 'course_deletion_rejected', 'Запрос на удаление отклонён'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

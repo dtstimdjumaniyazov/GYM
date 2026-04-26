@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p>Укажите причину отказа для следующих курсов:</p>
+<ul>
+{% for course in queryset %}
+  <li><strong>{{ course.title }}</strong> — {{ course.trainer.user.full_name }}</li>
+{% endfor %}
+</ul>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% for course in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ course.pk }}">
+  {% endfor %}
+  <input type="hidden" name="action" value="reject_deletion">
+  <input type="hidden" name="apply" value="1">
+  <button type="submit" class="button default">Отклонить запрос</button>
+  &nbsp;
+  <a href="javascript:history.back()" class="button cancel-link">Отмена</a>
+</form>
+{% endblock %}
