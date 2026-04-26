@@ -773,6 +773,16 @@ def trainer_course_delete_request(request, pk):
 
     course.deletion_requested = True
     course.save(update_fields=['deletion_requested', 'updated_at'])
+
+    from notifications.services import notify_admins
+    from notifications.models import Notification
+    notify_admins(
+        Notification.Type.COURSE_SUBMITTED,
+        '🗑️ Запрос на удаление курса',
+        f'Тренер {user.full_name or user.phone} запрашивает удаление курса «{course.title}».',
+        related_url=f'/admin/courses/course/{course.pk}/change/',
+    )
+
     return Response({'detail': 'Запрос на удаление отправлен администратору'})
 
 
