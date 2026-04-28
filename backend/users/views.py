@@ -306,21 +306,42 @@ def google_auth(request):
     Matches by google_id or email.
     """
     credential = request.data.get('credential')
-    if not credential:
+    access_token_value = request.data.get('access_token')
+
+    if not credential and not access_token_value:
         return Response(
-            {'detail': 'Credential отсутствует'},
+            {'detail': 'Credential или access_token обязателен'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
-        from google.oauth2 import id_token
-        from google.auth.transport import requests as google_requests
-
-        idinfo = id_token.verify_oauth2_token(
-            credential,
-            google_requests.Request(),
-            settings.GOOGLE_CLIENT_ID,
-        )
+        if credential:
+            from google.oauth2 import id_token
+            from google.auth.transport import requests as google_requests
+            idinfo = id_token.verify_oauth2_token(
+                credential,
+                google_requests.Request(),
+                settings.GOOGLE_CLIENT_ID,
+            )
+        else:
+            import requests as _http
+            r = _http.get(
+                'https://www.googleapis.com/oauth2/v1/userinfo',
+                params={'alt': 'json', 'access_token': access_token_value},
+                timeout=10,
+            )
+            if r.status_code != 200:
+                return Response(
+                    {'detail': 'Неверный Google токен'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            info = r.json()
+            idinfo = {
+                'sub': info.get('id'),
+                'email': info.get('email'),
+                'given_name': info.get('given_name', ''),
+                'family_name': info.get('family_name', ''),
+            }
     except ValueError:
         return Response(
             {'detail': 'Неверный Google токен'},
