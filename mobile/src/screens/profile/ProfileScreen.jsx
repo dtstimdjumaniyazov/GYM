@@ -18,7 +18,7 @@ export default function ProfileScreen({ navigation }) {
     dispatch(logout())
   }
 
-  const isTrainer = !!user?.trainer_profile
+  const isTrainer = !!user?.trainer_profile?.id
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

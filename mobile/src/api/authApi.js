@@ -2,27 +2,20 @@ import { baseApi } from './baseApi'
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    requestOtp: build.mutation({
-      query: (phone) => ({
-        url: '/users/request-otp/',
+    login: build.mutation({
+      query: ({ phone, password }) => ({
+        url: '/users/token/',
         method: 'POST',
-        body: { phone },
-      }),
-    }),
-    verifyOtp: build.mutation({
-      query: (body) => ({
-        url: '/users/verify-otp/',
-        method: 'POST',
-        body,
+        body: { phone, password },
       }),
     }),
     getMe: build.query({
-      query: () => '/users/me/',
+      query: () => '/users/profile/',
       providesTags: ['User'],
     }),
     updateMe: build.mutation({
       query: (body) => ({
-        url: '/users/me/',
+        url: '/users/profile/update/',
         method: 'PATCH',
         body,
       }),
@@ -32,8 +25,7 @@ export const authApi = baseApi.injectEndpoints({
 })
 
 export const {
-  useRequestOtpMutation,
-  useVerifyOtpMutation,
+  useLoginMutation,
   useGetMeQuery,
   useUpdateMeMutation,
 } = authApi
