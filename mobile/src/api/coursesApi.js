@@ -10,6 +10,7 @@ export const coursesApi = baseApi.injectEndpoints({
         url: '/courses/',
         params,
       }),
+      transformResponse: (response) => response?.results ?? response,
       providesTags: ['Courses'],
     }),
     getCourse: build.query({

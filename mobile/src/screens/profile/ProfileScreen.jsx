@@ -52,13 +52,6 @@ export default function ProfileScreen({ navigation }) {
           label="Уведомления"
           onPress={() => navigation.navigate('Notifications')}
         />
-        {isTrainer && (
-          <MenuItem
-            icon="stats-chart-outline"
-            label="Мои курсы (тренер)"
-            onPress={() => navigation.navigate('TrainerCourses')}
-          />
-        )}
         <MenuItem
           icon="log-out-outline"
           label="Выйти"

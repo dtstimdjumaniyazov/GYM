@@ -69,7 +69,7 @@ export default function CatalogScreen({ navigation }) {
               <View style={styles.cardBody}>
                 <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.cardTrainer} numberOfLines={1}>
-                  {item.trainer?.full_name || item.trainer?.phone}
+                  {item.trainer_name}
                 </Text>
                 <Text style={styles.cardPrice}>
                   {Number(item.price).toLocaleString()} сум

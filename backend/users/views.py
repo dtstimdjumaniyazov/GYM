@@ -11,6 +11,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.conf import settings
+from django.http import HttpResponse
 
 from django.db.models import Sum
 
@@ -1128,3 +1129,46 @@ def trainer_request_verification(request):
     return Response({'detail': 'Запрос на верификацию отправлен'})
 
 
+
+
+def telegram_widget_page(request):
+    """HTML страница с Telegram Login Widget для мобильного приложения."""
+    bot_username = settings.TELEGRAM_BOT_USERNAME
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #1a1f4e;
+      gap: 20px;
+      padding: 24px;
+    }}
+    p {{ color: #9ca3af; font-size: 14px; text-align: center; font-family: sans-serif; line-height: 1.5; }}
+  </style>
+</head>
+<body>
+  <p>Нажмите кнопку ниже, чтобы войти через Telegram</p>
+  <script async src="https://telegram.org/js/telegram-widget.js?22"
+    data-telegram-login="{bot_username}"
+    data-size="large"
+    data-radius="8"
+    data-onauth="onTelegramAuth(user)"
+    data-request-access="write">
+  </script>
+  <script>
+    function onTelegramAuth(user) {{
+      if (window.ReactNativeWebView) {{
+        window.ReactNativeWebView.postMessage(JSON.stringify(user));
+      }}
+    }}
+  </script>
+</body>
+</html>"""
+    return HttpResponse(html, content_type='text/html')
