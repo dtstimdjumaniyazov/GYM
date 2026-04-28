@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "FitEvolution",
+    "slug": "fitevolution",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2a3378"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "uz.fitevolution.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2a3378"
+      },
+      "package": "uz.fitevolution.app",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-video"
+    ]
+  }
+}
