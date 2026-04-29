@@ -34,6 +34,7 @@ class CategoryCardSerializer(serializers.ModelSerializer):
 class CourseCardSerializer(serializers.ModelSerializer):
     trainer_name = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
+    is_purchased = serializers.SerializerMethodField()
     variants_count = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
 
@@ -43,7 +44,7 @@ class CourseCardSerializer(serializers.ModelSerializer):
             'id', 'trainer', 'trainer_name', 'category', 'title', 'cover_url', 'level',
             'format', 'target_weight_range', 'language', 'price',
             'duration_weeks', 'purchases_count', 'rating', 'status', 'is_favorited',
-            'variants_count',
+            'is_purchased', 'variants_count',
         ]
 
     def get_title(self, obj):
@@ -54,6 +55,12 @@ class CourseCardSerializer(serializers.ModelSerializer):
 
     def get_variants_count(self, obj):
         return obj.training_variants.count()
+
+    def get_is_purchased(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.enrollments.filter(user=request.user, is_active=True).exists()
 
     def get_is_favorited(self, obj):
         # Use annotation if available (avoids N+1)
