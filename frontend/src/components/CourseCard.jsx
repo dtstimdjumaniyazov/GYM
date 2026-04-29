@@ -12,7 +12,7 @@ function toDirectUrl(url) {
 
 function CourseCard({ course }) {
   const { t } = useTranslation()
-  const isPurchased = false // TODO: определяется из enrollments API
+  const isPurchased = course.is_purchased
   const coverSrc = toDirectUrl(course.cover_url)
   const isLoggedIn = !!localStorage.getItem('access_token')
   const navigate = useNavigate()
