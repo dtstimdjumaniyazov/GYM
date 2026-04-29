@@ -49,6 +49,11 @@ class CourseListView(generics.ListAPIView):
         if trainer:
             qs = qs.filter(trainer_id=trainer)
 
+        # Поиск по названию
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(Q(title__icontains=search) | Q(title_uz__icontains=search))
+
         if self.request.user.is_authenticated:
             qs = qs.annotate(
                 _is_favorited=Exists(
