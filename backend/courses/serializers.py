@@ -317,46 +317,31 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     def get_stats(self, obj):
         """Aggregate content stats across all filled modules + training."""
         video_count = 0
-        total_duration = 0
         pdf_count = 0
         image_count = 0
 
-        # Module content (theory, nutrition, recovery)
         for module in obj.modules.filter(is_filled=True):
             for content in module.contents.all():
-                if content.content_type == 'video' and content.vimeo_video:
+                if content.content_type == 'video':
                     video_count += 1
-                    total_duration += content.vimeo_video.duration_seconds or 0
                 elif content.content_type == 'pdf':
                     pdf_count += 1
                 elif content.content_type == 'image':
                     image_count += 1
 
-        # Training content (day contents across all variants)
         for variant in obj.training_variants.all():
             for week in variant.weeks.all():
                 for day in week.days.all():
                     for dc in day.contents.all():
-                        if dc.content_type == 'video' and dc.vimeo_video:
+                        if dc.content_type == 'video':
                             video_count += 1
-                            total_duration += dc.vimeo_video.duration_seconds or 0
                         elif dc.content_type == 'pdf':
                             pdf_count += 1
                         elif dc.content_type == 'image':
                             image_count += 1
 
-        # Format total duration
-        hours, remainder = divmod(total_duration, 3600)
-        minutes, _ = divmod(remainder, 60)
-        if hours:
-            duration_str = f"{hours} ч {minutes} мин"
-        else:
-            duration_str = f"{minutes} мин"
-
         return {
             'video_count': video_count,
-            'total_duration': duration_str,
-            'total_duration_seconds': total_duration,
             'pdf_count': pdf_count,
             'image_count': image_count,
         }

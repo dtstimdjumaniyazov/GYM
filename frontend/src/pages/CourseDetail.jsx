@@ -294,9 +294,8 @@ function CourseDetail() {
         {course.stats && (
           <div className="bg-bg-header/40 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-text-header mb-4">{t('course.what_includes')}</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <StatCard icon="🎬" label={t('course.stat_videos')} value={course.stats.video_count} />
-              <StatCard icon="⏱️" label={t('course.stat_duration')} value={course.stats.total_duration} />
               <StatCard icon="📄" label={t('course.stat_pdfs')} value={course.stats.pdf_count} />
               <StatCard icon="🖼️" label={t('course.stat_images')} value={course.stats.image_count} />
             </div>
