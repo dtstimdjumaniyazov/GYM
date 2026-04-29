@@ -26,6 +26,7 @@ function Header() {
   const { data: notifications = [] } = useGetNotificationsQuery(undefined, {
     skip: !user,
     pollingInterval: 30000,
+    skipPollingIfUnfocused: true,
   })
   const [markAllRead] = useMarkAllReadMutation()
   const unreadCount = notifications.filter((n) => !n.is_read).length
