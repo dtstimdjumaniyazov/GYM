@@ -127,6 +127,7 @@ class TrainerNestedSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     experience_years = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Trainer
@@ -135,6 +136,9 @@ class TrainerNestedSerializer(serializers.ModelSerializer):
             'specialization', 'experience_years', 'certificates',
             'bio', 'short_description',
         ]
+
+    def get_photo_url(self, obj):
+        return obj.photo_url or obj.user.avatar_url or ''
 
     def get_experience_years(self, obj):
         from datetime import date
