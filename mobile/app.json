@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Fit Evolution",
+    "slug": "fit-evolution",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "fitevolution",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2a3378"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "uz.fitevolution.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2a3378"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "uz.fitevolution.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-screen-orientation"
+    ],
+    "extra": {
+      "apiUrl": "https://fitevolution.uz/api",
+      "router": {},
+      "eas": {
+        "projectId": "653c07bb-a209-465a-9650-f7d92c0c8a57"
+      }
+    }
+  }
+}
