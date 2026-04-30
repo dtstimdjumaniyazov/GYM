@@ -136,15 +136,10 @@ function CourseDetail() {
             <div className="flex items-center gap-2 mb-4">
               <span className="text-sm text-text-primary/70">{t('course.primary_focus')}</span>
               <span className="font-medium">{MODULE_LABELS[primaryModule.type]}</span>
-              <StarRating rating={primaryModule.priority} />
             </div>
           )}
 
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-1">
-              <StarRating rating={course.rating} />
-              <span className="text-sm ml-1">{Number(course.rating || 0).toFixed(1)}</span>
-            </div>
             <span className="text-sm text-text-primary/70">
               {t('course.students_count', { count: course.purchases_count || 0 })}
             </span>

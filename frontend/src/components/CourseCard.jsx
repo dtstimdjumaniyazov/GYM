@@ -114,7 +114,6 @@ function CourseCard({ course }) {
 
         <div className="flex items-center gap-3 text-sm text-text-header opacity-75">
           <span>{t('course.purchases_count', { count: course.purchases_count || 0 })}</span>
-          <span>{'★'.repeat(Math.round(course.rating || 0))}{'☆'.repeat(5 - Math.round(course.rating || 0))} {Number(course.rating || 0).toFixed(1)}</span>
           {variantCount > 0 && (
             <span>🗂 {variantLabel}</span>
           )}
