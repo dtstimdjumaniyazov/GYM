@@ -86,5 +86,4 @@ const authSlice = createSlice({
 })
 
 export const { clearError } = authSlice.actions
-export { googleLogin }
 export default authSlice.reducer
