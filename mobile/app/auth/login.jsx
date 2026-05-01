@@ -43,8 +43,10 @@ export default function LoginScreen() {
 
   const handleTelegramLogin = async () => {
     setTgWaiting(true)
+    Alert.alert('Debug', 'Step 1: dispatching telegramLogin')
     const result = await dispatch(telegramLogin())
     setTgWaiting(false)
+    Alert.alert('Debug', `Step 2: result.type=${result.type} payload=${JSON.stringify(result.payload)}`)
     if (telegramLogin.fulfilled.match(result)) {
       router.replace('/(tabs)')
     } else if (result.payload?.pending_link) {
