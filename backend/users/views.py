@@ -1194,9 +1194,9 @@ def telegram_bot_webhook(request, webhook_token):
     if not text or not telegram_id:
         return Response({'ok': True})
 
-    # Пользователь открыл бота без параметра — подсказываем (+ debug)
+    # Пользователь открыл бота без параметра — подсказываем
     if text == '/start' or (text.startswith('/start') and 'mobile_auth_' not in text):
-        send_bot_message(chat_id, f'[debug] Получено: «{text}»\n👋 Для входа нажмите кнопку «Войти через Telegram» в приложении.')
+        send_bot_message(chat_id, '👋 Для входа в Fit Evolution откройте приложение и нажмите «Войти через Telegram».')
         return Response({'ok': True})
 
     if not text.startswith('/start mobile_auth_'):
