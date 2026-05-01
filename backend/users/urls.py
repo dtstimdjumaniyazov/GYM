@@ -2,6 +2,7 @@ from django.urls import path
 from users.views import (
     TrainerListView, TrainerDetailView,
     telegram_auth, telegram_widget_auth, telegram_widget_page, google_auth,
+    telegram_mobile_init, telegram_bot_webhook, telegram_mobile_poll,
     register, user_profile, user_profile_update,
     link_account, social_register, update_phone,
     SingleSessionTokenObtainPairView,
@@ -26,6 +27,9 @@ urlpatterns = [
     path('auth/telegram/', telegram_auth, name='telegram-auth'),
     path('auth/telegram/callback/', telegram_widget_auth, name='telegram-widget-auth'),
     path('auth/telegram/widget/', telegram_widget_page, name='telegram-widget-page'),
+    path('auth/telegram/mobile-init/', telegram_mobile_init, name='telegram-mobile-init'),
+    path('auth/telegram/bot-webhook/<str:webhook_token>/', telegram_bot_webhook, name='telegram-bot-webhook'),
+    path('auth/telegram/mobile-poll/<str:state>/', telegram_mobile_poll, name='telegram-mobile-poll'),
     path('auth/google/', google_auth, name='google-auth'),
     path('auth/link/', link_account, name='link-account'),
     path('auth/social-register/', social_register, name='social-register'),

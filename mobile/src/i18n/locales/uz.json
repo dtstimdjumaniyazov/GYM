@@ -96,7 +96,11 @@
     "or": "yoki",
     "google_btn": "Google orqali kirish",
     "google_pending_title": "Hisob topilmadi",
-    "google_pending_desc": "Bu Google hisob hech bir foydalanuvchiga bog'lanmagan. Avval telefon raqami orqali ro'yxatdan o'ting."
+    "google_pending_desc": "Bu Google hisob hech bir foydalanuvchiga bog'lanmagan. Avval telefon raqami orqali ro'yxatdan o'ting.",
+    "telegram_btn": "Telegram orqali kirish",
+    "telegram_pending_title": "Hisob topilmadi",
+    "telegram_pending_desc": "Bu Telegram hisob bog'lanmagan. Avval telefon raqami orqali ro'yxatdan o'ting.",
+    "telegram_timeout": "Kutish vaqti tugadi. Qaytadan urinib ko'ring."
   },
   "register": {
     "title": "Ro'yxatdan o'tish",

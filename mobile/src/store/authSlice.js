@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { Linking } from 'react-native'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import api from '../services/api'
 import { storage } from '../services/storage'
@@ -44,6 +45,50 @@ export const googleLogin = createAsyncThunk('auth/googleLogin', async (_, { reje
   }
 })
 
+const MAX_POLL_ATTEMPTS = 45  // 45 × 2s = 90 seconds
+
+async function pollTelegramAuth(state) {
+  for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    const { data } = await api.get(ENDPOINTS.TELEGRAM_MOBILE_POLL(state))
+    if (data.status === 'expired') {
+      throw new Error('expired')
+    }
+    if (data.status !== 'pending') {
+      return data
+    }
+  }
+  throw new Error('timeout')
+}
+
+export const telegramLogin = createAsyncThunk('auth/telegramLogin', async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post(ENDPOINTS.TELEGRAM_MOBILE_INIT)
+    const { state, bot_url } = data
+
+    await Linking.openURL(bot_url)
+
+    const result = await pollTelegramAuth(state)
+
+    if (result.status === 'pending_link') {
+      return rejectWithValue({
+        pending_link: true,
+        social_token: result.social_token,
+        social_name: result.social_name,
+      })
+    }
+
+    await storage.setTokens(result.access, result.refresh)
+    return result
+  } catch (e) {
+    if (e?.message === 'cancelled') return rejectWithValue(null)
+    if (e?.message === 'expired' || e?.message === 'timeout') {
+      return rejectWithValue({ detail: 'telegram_timeout' })
+    }
+    return rejectWithValue(e.response?.data || { detail: 'Ошибка входа через Telegram' })
+  }
+})
+
 export const loadProfile = createAsyncThunk('auth/loadProfile', async (_, { rejectWithValue }) => {
   try {
     const { data } = await api.get(ENDPOINTS.PROFILE)
@@ -77,6 +122,10 @@ const authSlice = createSlice({
       .addCase(googleLogin.pending, (state) => { state.isLoading = true; state.error = null })
       .addCase(googleLogin.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
       .addCase(googleLogin.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
+
+      .addCase(telegramLogin.pending, (state) => { state.isLoading = true; state.error = null })
+      .addCase(telegramLogin.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
+      .addCase(telegramLogin.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
 
       .addCase(loadProfile.fulfilled, (state, action) => { state.user = action.payload; state.isAuthenticated = true })
       .addCase(loadProfile.rejected, (state) => { state.isAuthenticated = false; state.user = null })

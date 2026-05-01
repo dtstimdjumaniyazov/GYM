@@ -1,5 +1,6 @@
 import hmac
 import hashlib
+import secrets
 import time
 import jwt as pyjwt
 
@@ -11,7 +12,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Sum
 
@@ -1129,6 +1132,131 @@ def trainer_request_verification(request):
     return Response({'detail': 'Запрос на верификацию отправлен'})
 
 
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def telegram_mobile_init(request):
+    """
+    Инициализация входа через Telegram deep-link для мобильного приложения.
+
+    Генерирует одноразовый state-токен и возвращает ссылку на бота.
+    Mobile-приложение открывает эту ссылку, пользователь нажимает START в боте.
+    """
+    state = secrets.token_urlsafe(16)
+    cache.set(f'tg_mobile_{state}', {'status': 'pending'}, timeout=300)
+    bot_username = settings.TELEGRAM_BOT_USERNAME
+    return Response({
+        'state': state,
+        'bot_url': f'https://t.me/{bot_username}?start=mobile_auth_{state}',
+    })
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def telegram_bot_webhook(request, webhook_token):
+    """
+    Вебхук для Telegram Bot API.
+
+    Telegram отправляет сюда все обновления бота.
+    Обрабатываем только команду /start mobile_auth_<state>.
+    URL: /api/users/auth/telegram/bot-webhook/<webhook_token>/
+    Security: сравниваем webhook_token с TELEGRAM_BOT_TOKEN через hmac.compare_digest.
+    """
+    # Timing-safe сравнение токена (защита от timing-атак)
+    expected = settings.TELEGRAM_BOT_TOKEN
+    if not expected or not hmac.compare_digest(
+        webhook_token.encode('utf-8'),
+        expected.encode('utf-8'),
+    ):
+        return Response({'ok': True})
+
+    update = request.data
+    message = update.get('message', {})
+    text = message.get('text', '')
+
+    # Обрабатываем только /start mobile_auth_<state>
+    if not text.startswith('/start mobile_auth_'):
+        return Response({'ok': True})
+
+    state = text[len('/start mobile_auth_'):]
+    if not state:
+        return Response({'ok': True})
+
+    cache_key = f'tg_mobile_{state}'
+    cached = cache.get(cache_key)
+    if cached is None:
+        # Сессия истекла или не существует — игнорируем
+        return Response({'ok': True})
+
+    tg_user = message.get('from', {})
+    telegram_id = tg_user.get('id')
+    if not telegram_id:
+        return Response({'ok': True})
+
+    first_name = tg_user.get('first_name', '')
+    last_name = tg_user.get('last_name', '')
+
+    try:
+        user = User.objects.get(telegram_id=telegram_id)
+        # Обновляем имя если изменилось
+        updated = False
+        if first_name and user.first_name != first_name:
+            user.first_name = first_name
+            updated = True
+        if last_name and user.last_name != last_name:
+            user.last_name = last_name
+            updated = True
+        if updated:
+            user.save(update_fields=['first_name', 'last_name', 'updated_at'])
+
+        tokens = get_tokens_for_user(user)
+        cache.set(cache_key, {
+            'status': 'authenticated',
+            'access': tokens['access'],
+            'refresh': tokens['refresh'],
+            'user': UserProfileSerializer(user).data,
+        }, timeout=300)
+    except User.DoesNotExist:
+        social_token = create_social_token(
+            provider='telegram',
+            social_id=telegram_id,
+            extra_data={
+                'first_name': first_name,
+                'last_name': last_name,
+            },
+        )
+        cache.set(cache_key, {
+            'status': 'pending_link',
+            'social_token': social_token,
+            'social_name': first_name,
+        }, timeout=300)
+
+    return Response({'ok': True})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def telegram_mobile_poll(request, state):
+    """
+    Опрос статуса Telegram mobile-аутентификации.
+
+    Mobile-приложение вызывает этот endpoint каждые 2 секунды после открытия бота.
+    Возвращает статус: pending | authenticated | pending_link | expired.
+    При authenticated или pending_link — данные возвращаются и удаляются из кеша (one-time).
+    """
+    cache_key = f'tg_mobile_{state}'
+    data = cache.get(cache_key)
+
+    if data is None:
+        return Response({'status': 'expired'})
+
+    # Если результат готов — возвращаем и удаляем из кеша
+    if data.get('status') in ('authenticated', 'pending_link'):
+        cache.delete(cache_key)
+
+    return Response(data)
 
 
 def telegram_widget_page(request):

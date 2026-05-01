@@ -7,6 +7,8 @@ export const ENDPOINTS = {
   REGISTER: '/users/register/',
   TELEGRAM_AUTH: '/users/auth/telegram/',
   GOOGLE_AUTH: '/users/auth/google/',
+  TELEGRAM_MOBILE_INIT: '/users/auth/telegram/mobile-init/',
+  TELEGRAM_MOBILE_POLL: (state) => `/users/auth/telegram/mobile-poll/${state}/`,
 
   // Profile
   PROFILE: '/users/profile/',

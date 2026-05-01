@@ -6,7 +6,7 @@ import {
 import { useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { login, googleLogin, clearError } from '../../src/store/authSlice'
+import { login, googleLogin, telegramLogin, clearError } from '../../src/store/authSlice'
 import { COLORS } from '../../src/constants/colors'
 
 export default function LoginScreen() {
@@ -37,6 +37,20 @@ export default function LoginScreen() {
         t('auth.google_pending_title'),
         t('auth.google_pending_desc'),
       )
+    }
+  }
+
+  const handleTelegramLogin = async () => {
+    const result = await dispatch(telegramLogin())
+    if (telegramLogin.fulfilled.match(result)) {
+      router.replace('/(tabs)')
+    } else if (result.payload?.pending_link) {
+      Alert.alert(
+        t('auth.telegram_pending_title'),
+        t('auth.telegram_pending_desc'),
+      )
+    } else if (result.payload?.detail === 'telegram_timeout') {
+      Alert.alert(t('auth.error_title'), t('auth.telegram_timeout'))
     }
   }
 
@@ -96,6 +110,15 @@ export default function LoginScreen() {
           <Text style={styles.googleBtnText}>{t('auth.google_btn')}</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.telegramBtn}
+          onPress={handleTelegramLogin}
+          disabled={isLoading}
+        >
+          <Text style={styles.telegramIcon}>✈</Text>
+          <Text style={styles.telegramBtnText}>{t('auth.telegram_btn')}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => router.push('/auth/register')}>
           <Text style={styles.link}>{t('auth.no_account')}</Text>
         </TouchableOpacity>
@@ -140,10 +163,23 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 14,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   googleIcon: { fontSize: 18, fontWeight: '900', color: '#4285F4' },
   googleBtnText: { fontSize: 15, fontWeight: '600', color: COLORS.text },
+
+  telegramBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#2AABEE',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 20,
+  },
+  telegramIcon: { fontSize: 18, color: COLORS.white },
+  telegramBtnText: { fontSize: 15, fontWeight: '600', color: COLORS.white },
 
   link: { color: COLORS.white, textAlign: 'center', opacity: 0.8, textDecorationLine: 'underline' },
 })
