@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert,
+  StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Modal,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,6 +12,7 @@ import { COLORS } from '../../src/constants/colors'
 export default function LoginScreen() {
   const [phone, setPhone] = useState('+998')
   const [password, setPassword] = useState('')
+  const [tgWaiting, setTgWaiting] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
   const { t } = useTranslation()
@@ -41,14 +42,13 @@ export default function LoginScreen() {
   }
 
   const handleTelegramLogin = async () => {
+    setTgWaiting(true)
     const result = await dispatch(telegramLogin())
+    setTgWaiting(false)
     if (telegramLogin.fulfilled.match(result)) {
       router.replace('/(tabs)')
     } else if (result.payload?.pending_link) {
-      Alert.alert(
-        t('auth.telegram_pending_title'),
-        t('auth.telegram_pending_desc'),
-      )
+      Alert.alert(t('auth.telegram_pending_title'), t('auth.telegram_pending_desc'))
     } else if (result.payload?.detail === 'telegram_timeout') {
       Alert.alert(t('auth.error_title'), t('auth.telegram_timeout'))
     }
@@ -123,6 +123,20 @@ export default function LoginScreen() {
           <Text style={styles.link}>{t('auth.no_account')}</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={tgWaiting} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalEmoji}>✈️</Text>
+            <Text style={styles.modalTitle}>{t('auth.tg_waiting_title')}</Text>
+            <Text style={styles.modalDesc}>{t('auth.tg_waiting_desc')}</Text>
+            <ActivityIndicator color={COLORS.primary} style={{ marginTop: 16 }} />
+            <TouchableOpacity style={styles.modalCancel} onPress={() => setTgWaiting(false)}>
+              <Text style={styles.modalCancelText}>{t('auth.tg_waiting_cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   )
 }
@@ -182,4 +196,12 @@ const styles = StyleSheet.create({
   telegramBtnText: { fontSize: 15, fontWeight: '600', color: COLORS.white },
 
   link: { color: COLORS.white, textAlign: 'center', opacity: 0.8, textDecorationLine: 'underline' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 32 },
+  modalBox: { backgroundColor: COLORS.white, borderRadius: 20, padding: 28, alignItems: 'center', width: '100%' },
+  modalEmoji: { fontSize: 48, marginBottom: 12 },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: COLORS.text, textAlign: 'center', marginBottom: 10 },
+  modalDesc: { fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 21 },
+  modalCancel: { marginTop: 20, padding: 10 },
+  modalCancelText: { fontSize: 14, color: COLORS.textSecondary },
 })

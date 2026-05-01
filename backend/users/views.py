@@ -1172,11 +1172,33 @@ def telegram_bot_webhook(request, webhook_token):
     ):
         return Response({'ok': True})
 
+    import requests as _requests
+
+    def send_bot_message(chat_id, text):
+        try:
+            _requests.post(
+                f'https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage',
+                json={'chat_id': chat_id, 'text': text},
+                timeout=5,
+            )
+        except Exception:
+            pass
+
     update = request.data
     message = update.get('message', {})
     text = message.get('text', '')
+    tg_user = message.get('from', {})
+    telegram_id = tg_user.get('id')
+    chat_id = message.get('chat', {}).get('id') or telegram_id
 
-    # Обрабатываем только /start mobile_auth_<state>
+    if not text or not telegram_id:
+        return Response({'ok': True})
+
+    # Пользователь открыл бота без параметра — подсказываем
+    if text == '/start' or (text.startswith('/start') and 'mobile_auth_' not in text):
+        send_bot_message(chat_id, '👋 Для входа в Fit Evolution откройте приложение и нажмите «Войти через Telegram».')
+        return Response({'ok': True})
+
     if not text.startswith('/start mobile_auth_'):
         return Response({'ok': True})
 
@@ -1187,12 +1209,7 @@ def telegram_bot_webhook(request, webhook_token):
     cache_key = f'tg_mobile_{state}'
     cached = cache.get(cache_key)
     if cached is None:
-        # Сессия истекла или не существует — игнорируем
-        return Response({'ok': True})
-
-    tg_user = message.get('from', {})
-    telegram_id = tg_user.get('id')
-    if not telegram_id:
+        send_bot_message(chat_id, '⏱ Время сессии истекло. Попробуйте войти снова через приложение.')
         return Response({'ok': True})
 
     first_name = tg_user.get('first_name', '')
@@ -1200,7 +1217,6 @@ def telegram_bot_webhook(request, webhook_token):
 
     try:
         user = User.objects.get(telegram_id=telegram_id)
-        # Обновляем имя если изменилось
         updated = False
         if first_name and user.first_name != first_name:
             user.first_name = first_name
@@ -1218,20 +1234,19 @@ def telegram_bot_webhook(request, webhook_token):
             'refresh': tokens['refresh'],
             'user': UserProfileSerializer(user).data,
         }, timeout=300)
+        send_bot_message(chat_id, f'✅ {first_name}, вы успешно авторизованы! Вернитесь в приложение Fit Evolution.')
     except User.DoesNotExist:
         social_token = create_social_token(
             provider='telegram',
             social_id=telegram_id,
-            extra_data={
-                'first_name': first_name,
-                'last_name': last_name,
-            },
+            extra_data={'first_name': first_name, 'last_name': last_name},
         )
         cache.set(cache_key, {
             'status': 'pending_link',
             'social_token': social_token,
             'social_name': first_name,
         }, timeout=300)
+        send_bot_message(chat_id, '⚠️ Ваш Telegram не привязан к аккаунту. Зарегистрируйтесь по номеру телефона в Fit Evolution.')
 
     return Response({'ok': True})
 

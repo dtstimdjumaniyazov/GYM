@@ -100,7 +100,10 @@
     "telegram_btn": "Войти через Telegram",
     "telegram_pending_title": "Аккаунт не найден",
     "telegram_pending_desc": "Этот Telegram аккаунт не привязан. Сначала зарегистрируйтесь по номеру телефона.",
-    "telegram_timeout": "Время ожидания истекло. Попробуйте снова."
+    "telegram_timeout": "Время ожидания истекло. Попробуйте снова.",
+    "tg_waiting_title": "Откройте Telegram",
+    "tg_waiting_desc": "В боте Fit_evolution нажмите кнопку START для подтверждения входа, затем вернитесь в приложение.",
+    "tg_waiting_cancel": "Отмена"
   },
   "register": {
     "title": "Регистрация",

@@ -100,7 +100,10 @@
     "telegram_btn": "Telegram orqali kirish",
     "telegram_pending_title": "Hisob topilmadi",
     "telegram_pending_desc": "Bu Telegram hisob bog'lanmagan. Avval telefon raqami orqali ro'yxatdan o'ting.",
-    "telegram_timeout": "Kutish vaqti tugadi. Qaytadan urinib ko'ring."
+    "telegram_timeout": "Kutish vaqti tugadi. Qaytadan urinib ko'ring.",
+    "tg_waiting_title": "Telegramni oching",
+    "tg_waiting_desc": "Fit_evolution botida START tugmasini bosib kirişni tasdiqlang, keyin ilovaga qayting.",
+    "tg_waiting_cancel": "Bekor qilish"
   },
   "register": {
     "title": "Ro'yxatdan o'tish",
