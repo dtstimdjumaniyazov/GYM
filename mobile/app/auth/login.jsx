@@ -6,7 +6,7 @@ import {
 import { useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { login, clearError } from '../../src/store/authSlice'
+import { login, googleLogin, clearError } from '../../src/store/authSlice'
 import { COLORS } from '../../src/constants/colors'
 
 export default function LoginScreen() {
@@ -28,6 +28,18 @@ export default function LoginScreen() {
     }
   }
 
+  const handleGoogleLogin = async () => {
+    const result = await dispatch(googleLogin())
+    if (googleLogin.fulfilled.match(result)) {
+      router.replace('/(tabs)')
+    } else if (result.payload?.pending_link) {
+      Alert.alert(
+        t('auth.google_pending_title'),
+        t('auth.google_pending_desc'),
+      )
+    }
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -37,7 +49,7 @@ export default function LoginScreen() {
         <Text style={styles.title}>Fit Evolution</Text>
         <Text style={styles.subtitle}>{t('auth.subtitle')}</Text>
 
-        {error && (
+        {error && !error.pending_link && (
           <Text style={styles.error}>
             {error.detail || t('auth.wrong_credentials')}
           </Text>
@@ -67,6 +79,21 @@ export default function LoginScreen() {
             ? <ActivityIndicator color={COLORS.white} />
             : <Text style={styles.buttonText}>{t('auth.login_btn')}</Text>
           }
+        </TouchableOpacity>
+
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>{t('auth.or')}</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <TouchableOpacity
+          style={styles.googleBtn}
+          onPress={handleGoogleLogin}
+          disabled={isLoading}
+        >
+          <Text style={styles.googleIcon}>G</Text>
+          <Text style={styles.googleBtnText}>{t('auth.google_btn')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push('/auth/register')}>
@@ -100,5 +127,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   buttonText: { color: COLORS.white, fontSize: 16, fontWeight: '600' },
+
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 10 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.25)' },
+  dividerText: { color: 'rgba(255,255,255,0.6)', fontSize: 13 },
+
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 20,
+  },
+  googleIcon: { fontSize: 18, fontWeight: '900', color: '#4285F4' },
+  googleBtnText: { fontSize: 15, fontWeight: '600', color: COLORS.text },
+
   link: { color: COLORS.white, textAlign: 'center', opacity: 0.8, textDecorationLine: 'underline' },
 })

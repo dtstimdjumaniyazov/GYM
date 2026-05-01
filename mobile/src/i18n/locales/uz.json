@@ -92,7 +92,11 @@
     "wrong_credentials": "Noto'g'ri telefon yoki parol",
     "password_placeholder": "Parol",
     "login_btn": "Kirish",
-    "no_account": "Hisobingiz yo'qmi? Ro'yxatdan o'tish"
+    "no_account": "Hisobingiz yo'qmi? Ro'yxatdan o'tish",
+    "or": "yoki",
+    "google_btn": "Google orqali kirish",
+    "google_pending_title": "Hisob topilmadi",
+    "google_pending_desc": "Bu Google hisob hech bir foydalanuvchiga bog'lanmagan. Avval telefon raqami orqali ro'yxatdan o'ting."
   },
   "register": {
     "title": "Ro'yxatdan o'tish",
