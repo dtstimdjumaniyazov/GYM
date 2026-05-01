@@ -66,7 +66,13 @@ export const telegramLogin = createAsyncThunk('auth/telegramLogin', async (_, { 
     const { data } = await api.post(ENDPOINTS.TELEGRAM_MOBILE_INIT)
     const { state, bot_url } = data
 
-    await Linking.openURL(bot_url)
+    // Try native Telegram app first, fall back to web
+    const urlObj = new URL(bot_url)
+    const startParam = urlObj.searchParams.get('start')
+    const botUsername = urlObj.pathname.replace('/', '')
+    const tgDeepLink = `tg://resolve?domain=${botUsername}&start=${startParam}`
+    const canOpen = await Linking.canOpenURL(tgDeepLink)
+    await Linking.openURL(canOpen ? tgDeepLink : bot_url)
 
     const result = await pollTelegramAuth(state)
 
