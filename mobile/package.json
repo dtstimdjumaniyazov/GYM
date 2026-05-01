@@ -31,5 +31,10 @@
     "react-native-webview": "^13.15.0",
     "react-redux": "^9.2.0"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "install": {
+      "exclude": ["@react-navigation/native"]
+    }
+  }
 }

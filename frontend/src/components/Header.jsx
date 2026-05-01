@@ -94,7 +94,7 @@ function Header() {
       <div className="w-full flex items-center justify-between px-4 py-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity shrink-0">
-          <img src="/logo_v2.svg" alt="Fit Evolution" className="h-9 sm:h-10" />
+          <img src="/logo_v2-1.png" alt="Fit Evolution" className="h-9 sm:h-10" />
         </Link>
 
         {/* Desktop navigation */}
@@ -183,14 +183,6 @@ function Header() {
               {t('lang.ru')}
             </option>
           </select>
-
-          {/* Cart */}
-          <button className="relative hover:text-link-hover transition-colors cursor-pointer p-1">
-            <ShoppingCart size={22} />
-            <span className="absolute -top-1 -right-1 bg-link-hover text-bg-header text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              0
-            </span>
-          </button>
 
           {/* Notification bell */}
           {user && (
