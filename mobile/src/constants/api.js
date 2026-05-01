@@ -9,6 +9,8 @@ export const ENDPOINTS = {
   GOOGLE_AUTH: '/users/auth/google/',
   TELEGRAM_MOBILE_INIT: '/users/auth/telegram/mobile-init/',
   TELEGRAM_MOBILE_POLL: (state) => `/users/auth/telegram/mobile-poll/${state}/`,
+  SOCIAL_LINK: '/users/auth/link/',
+  SOCIAL_REGISTER: '/users/auth/social-register/',
 
   // Profile
   PROFILE: '/users/profile/',

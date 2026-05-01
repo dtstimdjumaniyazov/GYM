@@ -34,10 +34,14 @@ export default function LoginScreen() {
     if (googleLogin.fulfilled.match(result)) {
       router.replace('/(tabs)')
     } else if (result.payload?.pending_link) {
-      Alert.alert(
-        t('auth.google_pending_title'),
-        t('auth.google_pending_desc'),
-      )
+      router.push({
+        pathname: '/auth/social-link',
+        params: {
+          socialToken: result.payload.social_token,
+          provider: 'google',
+          socialName: result.payload.social_name || '',
+        },
+      })
     }
   }
 
@@ -48,7 +52,14 @@ export default function LoginScreen() {
     if (telegramLogin.fulfilled.match(result)) {
       router.replace('/(tabs)')
     } else if (result.payload?.pending_link) {
-      Alert.alert(t('auth.telegram_pending_title'), t('auth.telegram_pending_desc'))
+      router.push({
+        pathname: '/auth/social-link',
+        params: {
+          socialToken: result.payload.social_token,
+          provider: 'telegram',
+          socialName: result.payload.social_name || '',
+        },
+      })
     } else if (result.payload?.detail === 'telegram_timeout') {
       Alert.alert(t('auth.error_title'), t('auth.telegram_timeout'))
     }

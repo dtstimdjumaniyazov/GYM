@@ -20,6 +20,16 @@ export const login = createAsyncThunk('auth/login', async ({ phone, password }, 
   }
 })
 
+export const register = createAsyncThunk('auth/register', async (formData, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post(ENDPOINTS.REGISTER, formData)
+    await storage.setTokens(data.access, data.refresh)
+    return data
+  } catch (e) {
+    return rejectWithValue(e.response?.data || { detail: 'Ошибка регистрации' })
+  }
+})
+
 export const googleLogin = createAsyncThunk('auth/googleLogin', async (_, { rejectWithValue }) => {
   try {
     await GoogleSignin.hasPlayServices()
@@ -89,6 +99,32 @@ export const telegramLogin = createAsyncThunk('auth/telegramLogin', async (_, { 
   }
 })
 
+export const socialLink = createAsyncThunk('auth/socialLink', async ({ socialToken, phone, password }, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post(ENDPOINTS.SOCIAL_LINK, { social_token: socialToken, phone, password })
+    await storage.setTokens(data.access, data.refresh)
+    return data
+  } catch (e) {
+    return rejectWithValue(e.response?.data || { detail: 'Ошибка привязки аккаунта' })
+  }
+})
+
+export const socialRegister = createAsyncThunk('auth/socialRegister', async ({ socialToken, phone, password, firstName, lastName }, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post(ENDPOINTS.SOCIAL_REGISTER, {
+      social_token: socialToken,
+      phone,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+    })
+    await storage.setTokens(data.access, data.refresh)
+    return data
+  } catch (e) {
+    return rejectWithValue(e.response?.data || { detail: 'Ошибка регистрации' })
+  }
+})
+
 export const loadProfile = createAsyncThunk('auth/loadProfile', async (_, { rejectWithValue }) => {
   try {
     const { data } = await api.get(ENDPOINTS.PROFILE)
@@ -119,6 +155,10 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
       .addCase(login.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
 
+      .addCase(register.pending, (state) => { state.isLoading = true; state.error = null })
+      .addCase(register.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
+      .addCase(register.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
+
       .addCase(googleLogin.pending, (state) => { state.isLoading = true; state.error = null })
       .addCase(googleLogin.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
       .addCase(googleLogin.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
@@ -126,6 +166,14 @@ const authSlice = createSlice({
       .addCase(telegramLogin.pending, (state) => { state.isLoading = true; state.error = null })
       .addCase(telegramLogin.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
       .addCase(telegramLogin.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
+
+      .addCase(socialLink.pending, (state) => { state.isLoading = true; state.error = null })
+      .addCase(socialLink.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
+      .addCase(socialLink.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
+
+      .addCase(socialRegister.pending, (state) => { state.isLoading = true; state.error = null })
+      .addCase(socialRegister.fulfilled, (state) => { state.isLoading = false; state.isAuthenticated = true })
+      .addCase(socialRegister.rejected, (state, action) => { state.isLoading = false; state.error = action.payload })
 
       .addCase(loadProfile.fulfilled, (state, action) => { state.user = action.payload; state.isAuthenticated = true })
       .addCase(loadProfile.rejected, (state) => { state.isAuthenticated = false; state.user = null })
