@@ -46,7 +46,6 @@ const DAY_LABELS_UZ = {
 function CourseLessons() {
   const { t, i18n } = useTranslation()
   const { id } = useParams()
-  const { data: profile } = useGetUserProfileQuery()
   const { data: course, isLoading: courseLoading } = useGetCourseQuery(id, { refetchOnMountOrArgChange: true })
   const { data: lessonsData, isLoading: lessonsLoading } = useGetCourseLessonsQuery(id, { refetchOnMountOrArgChange: true })
   const { data: trainingData, isLoading: trainingLoading } = useGetTrainingScheduleQuery(id, { refetchOnMountOrArgChange: true })
@@ -335,6 +334,8 @@ function CourseLessons() {
 
 function VideoPlayerPanel({ activeVideo, onClose, onTimeUpdate, onVideoEnded }) {
   const { t } = useTranslation()
+  const { data: profile } = useGetUserProfileQuery()
+  const watermark = profile?.phone || profile?.first_name || ''
   if (!activeVideo) return null
 
   return (
@@ -345,7 +346,7 @@ function VideoPlayerPanel({ activeVideo, onClose, onTimeUpdate, onVideoEnded }) 
           autoplay
           onTimeUpdate={onTimeUpdate}
           onEnded={onVideoEnded}
-          watermark={profile?.phone || profile?.first_name || ''}
+          watermark={watermark}
         />
         <div className="p-4 flex items-center justify-between">
           <h3 className="font-bold text-text-header">{activeVideo.title}</h3>
