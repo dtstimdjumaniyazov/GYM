@@ -19,6 +19,7 @@
     "expo-file-system": "~19.0.22",
     "expo-linking": "~8.0.12",
     "expo-router": "~6.0.23",
+    "expo-screen-capture": "~8.0.9",
     "expo-screen-orientation": "~9.0.9",
     "expo-sharing": "~14.0.8",
     "expo-status-bar": "~3.0.9",
@@ -34,7 +35,9 @@
   "private": true,
   "expo": {
     "install": {
-      "exclude": ["@react-navigation/native"]
+      "exclude": [
+        "@react-navigation/native"
+      ]
     }
   }
 }

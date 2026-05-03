@@ -3,6 +3,7 @@ import {
   View, Text, Image, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Modal, Alert, useWindowDimensions, Platform,
 } from 'react-native'
+import { usePreventScreenCapture } from 'expo-screen-capture'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
@@ -72,6 +73,7 @@ const DAY_SHORT_KEYS = { 1: 'day_mon', 2: 'day_tue', 3: 'day_wed', 4: 'day_thu',
 const DAY_FULL_KEYS = { 1: 'day_full_mon', 2: 'day_full_tue', 3: 'day_full_wed', 4: 'day_full_thu', 5: 'day_full_fri', 6: 'day_full_sat', 7: 'day_full_sun' }
 
 export default function LessonsScreen() {
+  usePreventScreenCapture()
   const { id } = useLocalSearchParams()
   const router = useRouter()
   const insets = useSafeAreaInsets()

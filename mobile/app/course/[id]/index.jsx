@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Image, ActivityIndicator, Linking, Alert,
 } from 'react-native'
+import { usePreventScreenCapture } from 'expo-screen-capture'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
@@ -20,6 +21,7 @@ function toDirectUrl(url) {
 }
 
 export default function CourseDetailScreen() {
+  usePreventScreenCapture()
   const { id } = useLocalSearchParams()
   const router = useRouter()
   const insets = useSafeAreaInsets()
