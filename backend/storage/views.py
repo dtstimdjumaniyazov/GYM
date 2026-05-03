@@ -19,10 +19,23 @@ from storage.serializers import (
 
 
 def _get_drive_service():
-    """Строит авторизованный Google Drive клиент через OAuth2 refresh token."""
-    from google.oauth2.credentials import Credentials
+    """Строит авторизованный Google Drive клиент.
+    Приоритет: Service Account JSON (не истекает) → OAuth2 refresh token (fallback).
+    """
     from googleapiclient.discovery import build
 
+    if settings.GDRIVE_SERVICE_ACCOUNT_JSON:
+        import json
+        from google.oauth2.service_account import Credentials
+        info = json.loads(settings.GDRIVE_SERVICE_ACCOUNT_JSON)
+        credentials = Credentials.from_service_account_info(
+            info,
+            scopes=['https://www.googleapis.com/auth/drive'],
+        )
+        return build('drive', 'v3', credentials=credentials)
+
+    # Fallback: OAuth2 refresh token
+    from google.oauth2.credentials import Credentials
     credentials = Credentials(
         token=None,
         refresh_token=settings.GDRIVE_REFRESH_TOKEN,
