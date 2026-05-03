@@ -12,6 +12,7 @@ import VimeoPlayer from '../components/VimeoPlayer'
 import FileViewerModal from '../components/FileViewerModal'
 import Loader from '../components/Loader'
 import { useTranslation } from 'react-i18next'
+import { useGetUserProfileQuery } from '../app/api/usersApi'
 
 const MODULE_ICONS = {
   training: '💪',
@@ -45,6 +46,7 @@ const DAY_LABELS_UZ = {
 function CourseLessons() {
   const { t, i18n } = useTranslation()
   const { id } = useParams()
+  const { data: profile } = useGetUserProfileQuery()
   const { data: course, isLoading: courseLoading } = useGetCourseQuery(id, { refetchOnMountOrArgChange: true })
   const { data: lessonsData, isLoading: lessonsLoading } = useGetCourseLessonsQuery(id, { refetchOnMountOrArgChange: true })
   const { data: trainingData, isLoading: trainingLoading } = useGetTrainingScheduleQuery(id, { refetchOnMountOrArgChange: true })
@@ -343,6 +345,7 @@ function VideoPlayerPanel({ activeVideo, onClose, onTimeUpdate, onVideoEnded }) 
           autoplay
           onTimeUpdate={onTimeUpdate}
           onEnded={onVideoEnded}
+          watermark={profile?.phone || profile?.first_name || ''}
         />
         <div className="p-4 flex items-center justify-between">
           <h3 className="font-bold text-text-header">{activeVideo.title}</h3>
