@@ -192,6 +192,7 @@ export default function CourseCreate() {
     if (parsed.courseId) setCourseId(parsed.courseId)
     if (parsed.step1Data) setStep1Data(parsed.step1Data)
     if (parsed.variants) setVariants(parsed.variants)
+    if (parsed.moduleContents) setModuleContents(parsed.moduleContents)
     if (parsed.step) setStep(parsed.step)
   }
 
@@ -204,8 +205,8 @@ export default function CourseCreate() {
   // Persist draft to localStorage on every change (only for new courses, after banner resolved)
   useEffect(() => {
     if (editId || showDraftBanner) return
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants, step, courseId }))
-  }, [step1Data, variants, step, courseId, editId, showDraftBanner])
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants, step, courseId, moduleContents }))
+  }, [step1Data, variants, step, courseId, moduleContents, editId, showDraftBanner])
 
   // Warn on browser refresh / tab close
   useEffect(() => {
@@ -381,7 +382,7 @@ export default function CourseCreate() {
         setVariants(savedVariants)
       }
       // Save to localStorage with correct savedIds so user can resume the draft
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants: savedVariants, step, courseId }))
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants: savedVariants, step, courseId, moduleContents }))
       navigate('/profile')
     } catch (err) {
       setGlobalError(err?.data?.detail || JSON.stringify(err?.data) || t('create.error_save'))
