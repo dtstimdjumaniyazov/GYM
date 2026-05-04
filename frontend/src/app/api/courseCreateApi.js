@@ -42,6 +42,16 @@ export const courseCreateApi = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, { id }) => [{ type: 'Course', id }],
     }),
 
+    // PUT /api/courses/trainer/:id/modules/content/ — save extra module content
+    saveModuleContents: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/courses/trainer/${id}/modules/content/`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Course', id }],
+    }),
+
     // POST /api/courses/trainer/:id/publish/ — publish/unpublish
     publishCourse: builder.mutation({
       query: ({ id, action }) => ({
@@ -225,6 +235,7 @@ export const {
   useUpdateCourseMutation,
   usePublishCourseMutation,
   useGetTrainerCoursesQuery,
+  useSaveModuleContentsMutation,
   useInitVimeoUploadMutation,
   useUpdateVimeoStatusMutation,
   useDeleteVimeoVideoMutation,

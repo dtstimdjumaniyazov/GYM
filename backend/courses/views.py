@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Exists, OuterRef, Q
 
-from courses.models import Category, Course, CourseModule, Favorite
+from courses.models import Category, Course, CourseModule, ModuleContent, Favorite
 from courses.permissions import IsTrainer
 from courses.serializers import (
     CategoryCardSerializer,
@@ -298,3 +298,76 @@ class CoursePublishView(APIView):
             )
 
         return Response({'status': course.status})
+
+
+class CourseModuleContentView(APIView):
+    """
+    PUT /api/courses/trainer/<uuid:pk>/modules/content/
+    Сохраняет контент дополнительных модулей (теория, питание, восстановление и др.).
+    Payload: { "theory": [{vimeo_video_id, gdrive_file_id, title, content_type}], ... }
+    Полностью заменяет содержимое каждого переданного модуля.
+    """
+    permission_classes = [IsAuthenticated, IsTrainer]
+
+    VALID_TYPES = {'theory', 'nutrition', 'recovery', 'sports_nutrition', 'training_nuances'}
+
+    def put(self, request, pk):
+        from storage.models import VimeoVideo, GoogleDriveFile
+
+        trainer = request.user.trainer_profile
+        try:
+            course = Course.objects.get(pk=pk, trainer=trainer)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Курс не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+        if not isinstance(data, dict):
+            return Response({'detail': 'Ожидается объект с типами модулей.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        for module_type, items in data.items():
+            if module_type not in self.VALID_TYPES:
+                continue
+            if not isinstance(items, list):
+                continue
+
+            try:
+                module = course.modules.get(type=module_type)
+            except CourseModule.DoesNotExist:
+                continue
+
+            module.contents.all().delete()
+
+            for order, item in enumerate(items, start=1):
+                vimeo_video = None
+                gdrive_file = None
+
+                vid_id = item.get('vimeo_video_id')
+                file_id = item.get('gdrive_file_id')
+
+                if vid_id:
+                    try:
+                        vimeo_video = VimeoVideo.objects.get(pk=vid_id)
+                    except (VimeoVideo.DoesNotExist, Exception):
+                        continue
+                elif file_id:
+                    try:
+                        gdrive_file = GoogleDriveFile.objects.get(pk=file_id)
+                    except (GoogleDriveFile.DoesNotExist, Exception):
+                        continue
+                else:
+                    continue
+
+                ct = item.get('content_type', 'video')
+                if ct not in ('video', 'pdf', 'image'):
+                    ct = 'video' if vimeo_video else 'pdf'
+
+                ModuleContent.objects.create(
+                    module=module,
+                    vimeo_video=vimeo_video,
+                    gdrive_file=gdrive_file,
+                    title=item.get('title', '')[:255],
+                    order=order,
+                    content_type=ct,
+                )
+
+        return Response({'status': 'ok'})

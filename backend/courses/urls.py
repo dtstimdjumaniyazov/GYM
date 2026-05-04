@@ -11,6 +11,7 @@ from courses.views import (
     CourseCreateView,
     CourseUpdateView,
     CoursePublishView,
+    CourseModuleContentView,
 )
 
 app_name = 'courses'
@@ -24,6 +25,7 @@ urlpatterns = [
     path('trainer/', CourseCreateView.as_view(), name='trainer-course-create'),
     path('trainer/<uuid:pk>/', CourseUpdateView.as_view(), name='trainer-course-update'),
     path('trainer/<uuid:pk>/publish/', CoursePublishView.as_view(), name='trainer-course-publish'),
+    path('trainer/<uuid:pk>/modules/content/', CourseModuleContentView.as_view(), name='trainer-module-content'),
     # Public
     path('', CourseListView.as_view(), name='course-list'),
     path('<uuid:pk>/', CourseDetailView.as_view(), name='course-detail'),

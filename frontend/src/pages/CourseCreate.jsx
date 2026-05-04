@@ -14,6 +14,7 @@ import {
   useSaveTrainingVariantMutation,
   useUpdateTrainingVariantMutation,
   useGetCategoriesQuery,
+  useSaveModuleContentsMutation,
   useGetTrainerCourseQuery,
 } from '../app/api/courseCreateApi'
 
@@ -112,6 +113,20 @@ function buildVariantsFromApi(apiVariants) {
     }
   })
   return result
+}
+
+function buildModuleContentsPayload(moduleContents) {
+  const payload = {}
+  for (const [type, items] of Object.entries(moduleContents)) {
+    if (!items?.length) continue
+    payload[type] = items.map((item) => ({
+      title: item.title || item.filename || '',
+      content_type: item.type === 'video' ? 'video' : (item.mime_type === 'application/pdf' ? 'pdf' : 'image'),
+      vimeo_video_id: item.vimeo_video_id || null,
+      gdrive_file_id: item.gdrive_file_id || null,
+    }))
+  }
+  return payload
 }
 
 function parseVariantError(data) {
@@ -248,6 +263,7 @@ export default function CourseCreate() {
   const [createCourse] = useCreateCourseMutation()
   const [updateCourse] = useUpdateCourseMutation()
   const [publishCourse] = usePublishCourseMutation()
+  const [saveModuleContents] = useSaveModuleContentsMutation()
   const [saveVariant] = useSaveTrainingVariantMutation()
   const [updateVariant] = useUpdateTrainingVariantMutation()
 
@@ -346,6 +362,10 @@ export default function CourseCreate() {
     setSaving(true)
     setGlobalError('')
     try {
+      const modulePayload = buildModuleContentsPayload(moduleContents)
+      if (Object.keys(modulePayload).length > 0) {
+        await saveModuleContents({ id: courseId, ...modulePayload }).unwrap()
+      }
       await publishCourse({ id: courseId, action: 'publish' }).unwrap()
       localStorage.removeItem(DRAFT_KEY)
       navigate('/profile?submitted=1')
@@ -382,6 +402,10 @@ export default function CourseCreate() {
         setVariants(savedVariants)
       }
       // Save to localStorage with correct savedIds so user can resume the draft
+      const modulePayload = buildModuleContentsPayload(moduleContents)
+      if (Object.keys(modulePayload).length > 0) {
+        await saveModuleContents({ id: courseId, ...modulePayload }).unwrap()
+      }
       localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants: savedVariants, step, courseId, moduleContents }))
       navigate('/profile')
     } catch (err) {
