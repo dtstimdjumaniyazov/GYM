@@ -114,6 +114,38 @@ function buildVariantsFromApi(apiVariants) {
   return result
 }
 
+function parseVariantError(data) {
+  if (!data) return null
+  if (data.detail) return data.detail
+  // Parse nested week/day/content errors
+  const weeks = data.weeks
+  if (Array.isArray(weeks)) {
+    for (let wi = 0; wi < weeks.length; wi++) {
+      const week = weeks[wi]
+      if (!week || typeof week !== 'object') continue
+      const days = week.days
+      if (Array.isArray(days)) {
+        for (let di = 0; di < days.length; di++) {
+          const day = days[di]
+          if (!day || typeof day !== 'object') continue
+          const contents = day.contents
+          if (Array.isArray(contents)) {
+            for (let ci = 0; ci < contents.length; ci++) {
+              const content = contents[ci]
+              if (!content || typeof content !== 'object') continue
+              const msg = content.vimeo_video?.[0] || content.gdrive_file?.[0] || content.non_field_errors?.[0]
+              if (msg) return `Неделя ${wi + 1}, День ${di + 1}, файл #${ci + 1}: ${msg}`
+            }
+          }
+          const dayMsg = day.non_field_errors?.[0] || day.contents?.[0]
+          if (typeof dayMsg === 'string') return `Неделя ${wi + 1}, День ${di + 1}: ${dayMsg}`
+        }
+      }
+    }
+  }
+  return JSON.stringify(data)
+}
+
 export default function CourseCreate() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -300,9 +332,7 @@ export default function CourseCreate() {
       }
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
-      setGlobalError(
-        err?.data?.detail || JSON.stringify(err?.data) || t('create.error_variants')
-      )
+      setGlobalError(parseVariantError(err?.data) || t('create.error_variants'))
     } finally {
       setSaving(false)
     }
