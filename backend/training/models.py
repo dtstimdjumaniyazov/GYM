@@ -183,8 +183,8 @@ class DayContent(models.Model):
     
     order = models.PositiveSmallIntegerField(
         'Порядок',
-        validators=[MinValueValidator(1), MaxValueValidator(10)],
-        help_text='Порядок отображения (1-10)'
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        help_text='Порядок отображения (1-100)'
     )
     title = models.CharField('Название', max_length=255)
     content_type = models.CharField(
