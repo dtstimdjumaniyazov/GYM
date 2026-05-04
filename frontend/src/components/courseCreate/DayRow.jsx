@@ -1,23 +1,41 @@
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import VideoUploader from './VideoUploader'
 import FileUploader from './FileUploader'
-import { useDeleteGDriveFileMutation, useDeleteVimeoVideoMutation } from '../../app/api/courseCreateApi'
+import {
+  useDeleteGDriveFileMutation,
+  useDeleteVimeoVideoMutation,
+  useInitVimeoUploadMutation,
+  useUpdateVimeoStatusMutation,
+  uploadVideoViaTus,
+  uploadFileToGDrive,
+} from '../../app/api/courseCreateApi'
 
 const MAX_FILES = 5
+const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png']
 
 export default function DayRow({ day, onChange, week1Videos }) {
   const { t } = useTranslation()
   const [deleteGDriveFile] = useDeleteGDriveFileMutation()
   const [deleteVimeoVideo] = useDeleteVimeoVideoMutation()
+  const [initVimeoUpload] = useInitVimeoUploadMutation()
+  const [updateVimeoStatus] = useUpdateVimeoStatusMutation()
+
+  const videoInputRef = useRef(null)
+  const fileInputRef = useRef(null)
+  // Stores abort fns and remote IDs keyed by uid, outside React state to avoid stale closures
+  const uploadsRef = useRef({})
+
+  const [uploadingVideos, setUploadingVideos] = useState([]) // { uid, filename, progress, error }
+  const [uploadingFiles, setUploadingFiles] = useState([])
+
+  // Keep a live ref to day so async upload callbacks always see the latest value
+  const dayRef = useRef(day)
+  dayRef.current = day
 
   const DAY_NAMES = {
-    1: t('create.day_mon'),
-    2: t('create.day_tue'),
-    3: t('create.day_wed'),
-    4: t('create.day_thu'),
-    5: t('create.day_fri'),
-    6: t('create.day_sat'),
-    7: t('create.day_sun'),
+    1: t('create.day_mon'), 2: t('create.day_tue'), 3: t('create.day_wed'),
+    4: t('create.day_thu'), 5: t('create.day_fri'), 6: t('create.day_sat'), 7: t('create.day_sun'),
   }
 
   const videos = day.videos || []
@@ -28,7 +46,8 @@ export default function DayRow({ day, onChange, week1Videos }) {
   }
 
   function addVideo(vimeoVideoId, title) {
-    onChange({ ...day, videos: [...videos, { vimeo_video_id: vimeoVideoId, title }] })
+    const d = dayRef.current
+    onChange({ ...d, videos: [...(d.videos || []), { vimeo_video_id: vimeoVideoId, title }] })
   }
 
   function updateVideoTitle(idx, title) {
@@ -44,8 +63,9 @@ export default function DayRow({ day, onChange, week1Videos }) {
   }
 
   function addFile(gdriveFileId, filename, mimeType) {
-    if (files.length >= MAX_FILES) return
-    onChange({ ...day, files: [...files, { gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }] })
+    const d = dayRef.current
+    if ((d.files || []).length >= MAX_FILES) return
+    onChange({ ...d, files: [...(d.files || []), { gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }] })
   }
 
   async function removeFile(idx) {
@@ -55,6 +75,109 @@ export default function DayRow({ day, onChange, week1Videos }) {
     }
     onChange({ ...day, files: files.filter((_, i) => i !== idx) })
   }
+
+  // ── Video multi-upload ────────────────────────────────────────
+  async function handleVideoFiles(e) {
+    const selected = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!selected.length) return
+
+    const entries = selected.map(f => ({
+      uid: crypto.randomUUID(),
+      filename: f.name.replace(/\.[^.]+$/, ''),
+      progress: 0,
+      error: null,
+    }))
+    setUploadingVideos(prev => [...prev, ...entries])
+
+    selected.forEach(async (file, i) => {
+      const { uid, filename } = entries[i]
+      uploadsRef.current[uid] = {}
+
+      const upd = patch => setUploadingVideos(prev => prev.map(u => u.uid === uid ? { ...u, ...patch } : u))
+      const done = () => { setUploadingVideos(prev => prev.filter(u => u.uid !== uid)); delete uploadsRef.current[uid] }
+
+      try {
+        const { vimeo_video_id, upload_url } = await initVimeoUpload({ title: filename, file_size: file.size }).unwrap()
+        uploadsRef.current[uid].vimeoId = vimeo_video_id
+
+        await uploadVideoViaTus({
+          uploadUrl: upload_url,
+          file,
+          onProgress: p => upd({ progress: p }),
+          onError: err => { throw err },
+          onAbort: fn => { uploadsRef.current[uid].abort = fn },
+        })
+
+        await updateVimeoStatus({ id: vimeo_video_id, status: 'processing' }).unwrap()
+        addVideo(vimeo_video_id, filename)
+        done()
+      } catch (err) {
+        if (err?.name === 'AbortError') { done(); return }
+        upd({ error: err?.data?.detail || err?.message || t('create.upload_error_video') })
+      }
+    })
+  }
+
+  async function cancelVideoUpload(uid) {
+    const ref = uploadsRef.current[uid] || {}
+    ref.abort?.()
+    if (ref.vimeoId) try { await deleteVimeoVideo(ref.vimeoId) } catch {}
+    delete uploadsRef.current[uid]
+    setUploadingVideos(prev => prev.filter(u => u.uid !== uid))
+  }
+
+  // ── File multi-upload ─────────────────────────────────────────
+  async function handleFileFiles(e) {
+    const selected = Array.from(e.target.files || []).filter(f => ALLOWED_FILE_TYPES.includes(f.type))
+    e.target.value = ''
+    if (!selected.length) return
+
+    const slots = MAX_FILES - (dayRef.current.files || []).length - uploadingFiles.length
+    const toUpload = selected.slice(0, Math.max(0, slots))
+    if (!toUpload.length) return
+
+    const entries = toUpload.map(f => ({
+      uid: crypto.randomUUID(),
+      filename: f.name,
+      progress: 0,
+      error: null,
+    }))
+    setUploadingFiles(prev => [...prev, ...entries])
+
+    toUpload.forEach(async (file, i) => {
+      const { uid } = entries[i]
+      uploadsRef.current[uid] = {}
+
+      const upd = patch => setUploadingFiles(prev => prev.map(u => u.uid === uid ? { ...u, ...patch } : u))
+      const done = () => { setUploadingFiles(prev => prev.filter(u => u.uid !== uid)); delete uploadsRef.current[uid] }
+
+      try {
+        const token = localStorage.getItem('access_token')
+        const result = await uploadFileToGDrive({
+          file,
+          onProgress: p => upd({ progress: p }),
+          accessToken: token,
+          onAbort: fn => { uploadsRef.current[uid].abort = fn },
+        })
+        addFile(result.id, file.name, file.type)
+        done()
+      } catch (err) {
+        if (err?.name === 'AbortError') { done(); return }
+        upd({ error: err?.detail || t('create.upload_error_file') })
+      }
+    })
+  }
+
+  async function cancelFileUpload(uid) {
+    const ref = uploadsRef.current[uid] || {}
+    ref.abort?.()
+    if (ref.gdriveId) try { await deleteGDriveFile(ref.gdriveId) } catch {}
+    delete uploadsRef.current[uid]
+    setUploadingFiles(prev => prev.filter(u => u.uid !== uid))
+  }
+
+  const totalFiles = files.length + uploadingFiles.length
 
   return (
     <div className="border-b border-white/10 last:border-0">
@@ -79,9 +202,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
           >
             <span
               className={`absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all duration-200 ${
-                day.is_rest_day
-                  ? 'bg-white left-5.5'
-                  : 'bg-white/90 left-0.5'
+                day.is_rest_day ? 'bg-white left-5.5' : 'bg-white/90 left-0.5'
               }`}
             />
           </button>
@@ -97,14 +218,35 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   index={i + 1}
                   uploadedVideo={v}
                   onRemove={() => removeVideo(i)}
-                  onTitleChange={(title) => updateVideoTitle(i, title)}
+                  onTitleChange={title => updateVideoTitle(i, title)}
                 />
               ))}
-              <VideoUploader
-                index={videos.length + 1}
-                onUploaded={addVideo}
-              />
-              {week1Videos?.length > 0 && videos.length === 0 && (
+
+              {uploadingVideos.map((u, i) => (
+                <UploadProgress
+                  key={u.uid}
+                  index={videos.length + i + 1}
+                  filename={u.filename}
+                  progress={u.progress}
+                  error={u.error}
+                  onCancel={() => cancelVideoUpload(u.uid)}
+                  onDismiss={() => setUploadingVideos(prev => prev.filter(x => x.uid !== u.uid))}
+                />
+              ))}
+
+              <input ref={videoInputRef} type="file" accept="video/*" multiple className="hidden" onChange={handleVideoFiles} />
+              <button
+                type="button"
+                onClick={() => videoInputRef.current?.click()}
+                className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+              >
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                {t('create.select_video')}
+              </button>
+
+              {week1Videos?.length > 0 && videos.length === 0 && uploadingVideos.length === 0 && (
                 <button
                   type="button"
                   onClick={() => onChange({ ...day, videos: [...week1Videos] })}
@@ -118,7 +260,8 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   {t('create.copy_week1')}
                 </button>
               )}
-              {videos.length === 0 && (
+
+              {videos.length === 0 && uploadingVideos.length === 0 && (
                 <p className="text-xs text-white/25 italic px-1">{t('create.no_videos')}</p>
               )}
             </>
@@ -139,13 +282,36 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   onRemove={() => removeFile(i)}
                 />
               ))}
-              {files.length < MAX_FILES && (
-                <FileUploader
-                  index={files.length + 1}
-                  onUploaded={addFile}
+
+              {uploadingFiles.map((u, i) => (
+                <UploadProgress
+                  key={u.uid}
+                  index={files.length + i + 1}
+                  filename={u.filename}
+                  progress={u.progress}
+                  error={u.error}
+                  onCancel={() => cancelFileUpload(u.uid)}
+                  onDismiss={() => setUploadingFiles(prev => prev.filter(x => x.uid !== u.uid))}
                 />
+              ))}
+
+              {totalFiles < MAX_FILES && (
+                <>
+                  <input ref={fileInputRef} type="file" accept=".pdf,image/jpeg,image/png" multiple className="hidden" onChange={handleFileFiles} />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+                  >
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    {t('create.select_file')}
+                  </button>
+                </>
               )}
-              {files.length === 0 && (
+
+              {files.length === 0 && uploadingFiles.length === 0 && (
                 <p className="text-xs text-white/25 italic px-1">{t('create.no_files')}</p>
               )}
             </>
@@ -153,6 +319,49 @@ export default function DayRow({ day, onChange, week1Videos }) {
             <p className="text-xs text-white/25 italic px-1 pt-1">—</p>
           )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function UploadProgress({ index, filename, progress, error, onCancel, onDismiss }) {
+  if (error) {
+    return (
+      <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-xs text-white/60 truncate">
+            <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+          </p>
+          <p className="text-red-400 text-xs mt-0.5">{error}</p>
+        </div>
+        <button type="button" onClick={onDismiss} className="text-white/30 hover:text-red-400 transition-colors shrink-0 mt-0.5">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white/5 border border-white/15 rounded-lg px-3 py-2">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-white/60 truncate flex-1 mr-2">
+          <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs text-main font-mono">{progress}%</span>
+          {progress < 100 && (
+            <button type="button" onClick={onCancel} className="text-white/30 hover:text-red-400 transition-colors">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-full bg-main transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
       </div>
     </div>
   )
