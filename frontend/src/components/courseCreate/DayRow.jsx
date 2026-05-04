@@ -5,7 +5,7 @@ import { useDeleteGDriveFileMutation, useDeleteVimeoVideoMutation } from '../../
 
 const MAX_FILES = 5
 
-export default function DayRow({ day, onChange }) {
+export default function DayRow({ day, onChange, week1Videos }) {
   const { t } = useTranslation()
   const [deleteGDriveFile] = useDeleteGDriveFileMutation()
   const [deleteVimeoVideo] = useDeleteVimeoVideoMutation()
@@ -104,6 +104,20 @@ export default function DayRow({ day, onChange }) {
                 index={videos.length + 1}
                 onUploaded={addVideo}
               />
+              {week1Videos?.length > 0 && videos.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...day, videos: [...week1Videos] })}
+                  className="flex items-center gap-1.5 text-xs text-link-hover hover:text-white transition-colors px-1 py-0.5"
+                  title={t('create.copy_week1_tooltip')}
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  {t('create.copy_week1')}
+                </button>
+              )}
               {videos.length === 0 && (
                 <p className="text-xs text-white/25 italic px-1">{t('create.no_videos')}</p>
               )}

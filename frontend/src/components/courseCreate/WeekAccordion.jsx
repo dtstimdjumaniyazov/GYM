@@ -16,7 +16,7 @@ export function makeDefaultWeek(weekNumber) {
   }
 }
 
-export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpen }) {
+export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpen, week1Days }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(defaultOpen ?? true)
 
@@ -75,6 +75,7 @@ export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpe
               key={day.day_of_week}
               day={day}
               onChange={(updated) => updateDay(idx, updated)}
+              week1Videos={week1Days?.[idx]?.videos}
             />
           ))}
         </div>

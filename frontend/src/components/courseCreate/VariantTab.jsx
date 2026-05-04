@@ -69,6 +69,7 @@ export default function VariantTab({ variant, onChange, isFirst }) {
             onWeekChange={(updated) => updateWeek(idx, updated)}
             onDelete={() => deleteWeek(idx)}
             defaultOpen={idx === variant.weeks.length - 1}
+            week1Days={idx > 0 ? variant.weeks[0]?.days : null}
           />
         ))}
 
