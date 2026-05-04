@@ -85,6 +85,18 @@ function ModuleSection({ label, items, onItemsChange }) {
     onItemsChange(items.map((item, i) => (i === idx ? { ...item, title } : item)))
   }
 
+  function moveItem(idx, dir) {
+    const next = idx + dir
+    if (next < 0 || next >= items.length) return
+    const reordered = [...items]
+    ;[reordered[idx], reordered[next]] = [reordered[next], reordered[idx]]
+    onItemsChange(reordered)
+  }
+
+  function sortByName() {
+    onItemsChange([...items].sort((a, b) => a.title.localeCompare(b.title)))
+  }
+
   async function removeItem(idx) {
     const item = items[idx]
     if (item?.vimeo_video_id) try { await deleteVimeoVideo(item.vimeo_video_id) } catch {}
@@ -200,8 +212,33 @@ function ModuleSection({ label, items, onItemsChange }) {
 
       <div className="space-y-2">
         {items.map((item, idx) => (
-          <div key={item._key ?? idx} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+          <div key={item._key ?? idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
             <span className="text-white/30 text-xs font-mono shrink-0">#{idx + 1}</span>
+
+            {/* Move up/down */}
+            <div className="flex flex-col shrink-0">
+              <button
+                type="button"
+                onClick={() => moveItem(idx, -1)}
+                disabled={idx === 0}
+                className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => moveItem(idx, 1)}
+                disabled={idx === items.length - 1}
+                className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+
             {item.type === 'video' ? (
               <svg className="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -227,6 +264,19 @@ function ModuleSection({ label, items, onItemsChange }) {
             </button>
           </div>
         ))}
+
+        {items.length > 1 && (
+          <button
+            type="button"
+            onClick={sortByName}
+            className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-1 py-0.5"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            Сортировать по названию
+          </button>
+        )}
 
         {uploadingVideos.map((u, i) => (
           <UploadProgress
