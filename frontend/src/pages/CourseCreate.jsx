@@ -115,6 +115,23 @@ function buildVariantsFromApi(apiVariants) {
   return result
 }
 
+function buildModuleContentsFromApi(modules) {
+  const result = {}
+  for (const mod of (modules || [])) {
+    if (mod.type === 'training' || !mod.contents?.length) continue
+    result[mod.type] = mod.contents.map((c, i) => ({
+      _key: i,
+      type: c.content_type === 'video' ? 'video' : 'file',
+      title: c.title,
+      vimeo_video_id: c.vimeo_video?.id || null,
+      gdrive_file_id: c.gdrive_file?.id || null,
+      filename: c.gdrive_file?.filename || '',
+      mime_type: c.gdrive_file?.mime_type || '',
+    }))
+  }
+  return result
+}
+
 function buildModuleContentsPayload(moduleContents) {
   const payload = {}
   for (const [type, items] of Object.entries(moduleContents)) {
@@ -255,6 +272,10 @@ export default function CourseCreate() {
     const hasVariants = existingCourse.training_variants?.length > 0
     if (hasVariants) {
       setVariants(buildVariantsFromApi(existingCourse.training_variants))
+    }
+    const moduleContentsFromApi = buildModuleContentsFromApi(existingCourse.modules)
+    if (Object.keys(moduleContentsFromApi).length > 0) {
+      setModuleContents(moduleContentsFromApi)
     }
     const hasExtra = moduleTypes.some((m) => m !== 'training')
     setStep(hasVariants && hasExtra ? 3 : 2)
