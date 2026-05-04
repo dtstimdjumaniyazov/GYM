@@ -19,9 +19,11 @@ const MODULE_ICONS = {
   theory: '🧠',
   nutrition: '🥗',
   recovery: '🧘',
+  sports_nutrition: '💊',
+  training_nuances: '🎯',
 }
 
-const MODULE_ORDER = ['training', 'theory', 'nutrition', 'recovery']
+const MODULE_ORDER = ['training', 'theory', 'nutrition', 'recovery', 'sports_nutrition', 'training_nuances']
 
 const DAY_LABELS = {
   1: 'Понедельник',
@@ -71,6 +73,8 @@ function CourseLessons() {
     theory: t('course.module_theory'),
     nutrition: t('course.module_nutrition'),
     recovery: t('course.module_recovery'),
+    sports_nutrition: t('course.module_sports_nutrition'),
+    training_nuances: t('course.module_training_nuances'),
   }
 
   const dayLabels = i18n.language === 'uz' ? DAY_LABELS_UZ : DAY_LABELS
