@@ -88,10 +88,7 @@ class DayScheduleWriteSerializer(WritableNestedModelSerializer):
         fields = ['id', 'day_of_week', 'is_rest_day', 'contents']
 
     def validate_contents(self, value):
-        videos = [c for c in value if c.get('content_type') == 'video']
         files = [c for c in value if c.get('content_type') in ('pdf', 'image')]
-        if len(videos) > 5:
-            raise serializers.ValidationError('Максимум 5 видео на день.')
         if len(files) > 5:
             raise serializers.ValidationError('Максимум 5 файлов (PDF/JPEG) на день.')
         return value
