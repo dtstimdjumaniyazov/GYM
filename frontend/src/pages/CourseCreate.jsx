@@ -184,13 +184,20 @@ export default function CourseCreate() {
 
   function applyDraft() {
     const parsed = pendingDraftRef.current
-    if (!parsed) return
-    if (parsed.step1Data) setStep1Data(parsed.step1Data)
-    if (parsed.variants) setVariants(parsed.variants)
-    if (parsed.step) setStep(parsed.step)
-    if (parsed.courseId) setCourseId(parsed.courseId)
     pendingDraftRef.current = null
     setShowDraftBanner(false)
+    if (!parsed) return
+
+    if (parsed.courseId) {
+      // Navigate to edit route — backend is the source of truth, no stale local data
+      localStorage.removeItem(DRAFT_KEY)
+      navigate(`/courses/${parsed.courseId}/edit`)
+    } else {
+      // Step 1 not saved yet — restore from localStorage
+      if (parsed.step1Data) setStep1Data(parsed.step1Data)
+      if (parsed.variants) setVariants(parsed.variants)
+      if (parsed.step) setStep(parsed.step)
+    }
   }
 
   function discardDraft() {
