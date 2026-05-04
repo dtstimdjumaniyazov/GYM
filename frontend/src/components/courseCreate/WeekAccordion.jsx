@@ -63,7 +63,7 @@ export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpe
             <span className="text-xs text-white/40 font-medium">{t('create.col_day')}</span>
             <span className="text-xs text-white/40 font-medium">{t('create.col_rest')}</span>
             <span className="text-xs text-white/40 font-medium">
-              {t('create.col_video')} <span className="text-white/25">{t('create.col_max')}</span>
+              {t('create.col_video')}
             </span>
             <span className="text-xs text-white/40 font-medium">
               {t('create.col_files')} <span className="text-white/25">{t('create.col_max')}</span>
