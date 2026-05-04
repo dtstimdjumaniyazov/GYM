@@ -54,6 +54,19 @@ export default function DayRow({ day, onChange, week1Videos }) {
     onChange({ ...day, videos: videos.map((v, i) => i === idx ? { ...v, title } : v) })
   }
 
+  function moveVideo(idx, dir) {
+    const next = idx + dir
+    if (next < 0 || next >= videos.length) return
+    const reordered = [...videos]
+    ;[reordered[idx], reordered[next]] = [reordered[next], reordered[idx]]
+    onChange({ ...day, videos: reordered })
+  }
+
+  function sortVideosByName() {
+    const sorted = [...videos].sort((a, b) => a.title.localeCompare(b.title))
+    onChange({ ...day, videos: sorted })
+  }
+
   async function removeVideo(idx) {
     const video = videos[idx]
     if (video?.vimeo_video_id) {
@@ -219,8 +232,24 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   uploadedVideo={v}
                   onRemove={() => removeVideo(i)}
                   onTitleChange={title => updateVideoTitle(i, title)}
+                  onMoveUp={i > 0 ? () => moveVideo(i, -1) : null}
+                  onMoveDown={i < videos.length - 1 ? () => moveVideo(i, 1) : null}
                 />
               ))}
+
+              {videos.length > 1 && (
+                <button
+                  type="button"
+                  onClick={sortVideosByName}
+                  className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-1 py-0.5"
+                  title="Сортировать по названию"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                  </svg>
+                  Сортировать по названию
+                </button>
+              )}
 
               {uploadingVideos.map((u, i) => (
                 <UploadProgress
