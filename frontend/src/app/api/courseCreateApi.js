@@ -1,4 +1,5 @@
 import { apiSlice } from './apiSlice'
+import { Upload as TusUpload } from 'tus-js-client'
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
@@ -144,11 +145,9 @@ export const courseCreateApi = apiSlice.injectEndpoints({
 // ── Raw Vimeo TUS upload (uses tus-js-client directly) ────────
 // Called outside RTK Query because tus-js-client needs full control over the request
 
-export async function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, onSuccess, onAbort }) {
-  const { Upload } = await import('tus-js-client')
-
+export function uploadVideoViaTus({ uploadUrl, file, onProgress, onError, onSuccess, onAbort }) {
   return new Promise((resolve, reject) => {
-    const upload = new Upload(file, {
+    const upload = new TusUpload(file, {
       uploadUrl,
       headers: {
         Accept: 'application/vnd.vimeo.*+json;version=3.4',
