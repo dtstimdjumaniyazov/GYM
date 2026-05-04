@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import StepIndicator from '../components/courseCreate/StepIndicator'
@@ -16,6 +16,8 @@ import {
   useGetCategoriesQuery,
   useGetTrainerCourseQuery,
 } from '../app/api/courseCreateApi'
+
+const DRAFT_KEY = 'course_create_draft'
 
 const INITIAL_STEP1 = {
   category: '',
@@ -125,6 +127,58 @@ export default function CourseCreate() {
   const [step1Errors, setStep1Errors] = useState({})
   const [globalError, setGlobalError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [showDraftBanner, setShowDraftBanner] = useState(false)
+  const pendingDraftRef = useRef(null)
+
+  // Check for existing draft on mount (only for new courses)
+  useEffect(() => {
+    if (editId) return
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY)
+      if (!saved) return
+      const parsed = JSON.parse(saved)
+      // Only offer restore if there's meaningful data (not just defaults)
+      const hasData = parsed.courseId || parsed.step1Data?.title?.trim()
+      if (hasData) {
+        pendingDraftRef.current = parsed
+        setShowDraftBanner(true)
+      } else {
+        localStorage.removeItem(DRAFT_KEY)
+      }
+    } catch {
+      localStorage.removeItem(DRAFT_KEY)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function applyDraft() {
+    const parsed = pendingDraftRef.current
+    if (!parsed) return
+    if (parsed.step1Data) setStep1Data(parsed.step1Data)
+    if (parsed.variants) setVariants(parsed.variants)
+    if (parsed.step) setStep(parsed.step)
+    if (parsed.courseId) setCourseId(parsed.courseId)
+    pendingDraftRef.current = null
+    setShowDraftBanner(false)
+  }
+
+  function discardDraft() {
+    localStorage.removeItem(DRAFT_KEY)
+    pendingDraftRef.current = null
+    setShowDraftBanner(false)
+  }
+
+  // Persist draft to localStorage on every change (only for new courses, after banner resolved)
+  useEffect(() => {
+    if (editId || showDraftBanner) return
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants, step, courseId }))
+  }, [step1Data, variants, step, courseId, editId, showDraftBanner])
+
+  // Warn on browser refresh / tab close
+  useEffect(() => {
+    const handler = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [])
 
   const { data: categories = [] } = useGetCategoriesQuery()
   const { data: existingCourse } = useGetTrainerCourseQuery(editId, { skip: !editId })
@@ -260,6 +314,7 @@ export default function CourseCreate() {
     setGlobalError('')
     try {
       await publishCourse({ id: courseId, action: 'publish' }).unwrap()
+      localStorage.removeItem(DRAFT_KEY)
       navigate('/profile?submitted=1')
     } catch (err) {
       setGlobalError(err?.data?.detail || t('create.error_publish'))
@@ -295,6 +350,7 @@ export default function CourseCreate() {
           }
         }
       }
+      localStorage.removeItem(DRAFT_KEY)
       navigate('/profile')
     } catch (err) {
       setGlobalError(err?.data?.detail || JSON.stringify(err?.data) || t('create.error_save'))
@@ -320,6 +376,28 @@ export default function CourseCreate() {
           Инструкция
         </Link>
       </div>
+
+      {showDraftBanner && (
+        <div className="mb-5 flex items-center justify-between gap-4 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+          <p className="text-sm text-amber-300">Найден незаконченный черновик. Продолжить с того места?</p>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={applyDraft}
+              className="px-3 py-1.5 text-xs font-medium bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg transition-colors"
+            >
+              Продолжить
+            </button>
+            <button
+              type="button"
+              onClick={discardDraft}
+              className="px-3 py-1.5 text-xs font-medium text-white/40 hover:text-white/70 transition-colors"
+            >
+              Начать заново
+            </button>
+          </div>
+        </div>
+      )}
 
       <StepIndicator currentStep={step} totalSteps={totalSteps} />
 
