@@ -328,8 +328,9 @@ export default function CourseCreate() {
     setSaving(true)
     setGlobalError('')
     try {
+      let savedVariants = [...variants]
       if (step === 2) {
-        const activeVariants = variants.filter((v) => v.active)
+        const activeVariants = savedVariants.filter((v) => v.active)
         for (const variant of activeVariants) {
           const draftVariant = {
             ...variant,
@@ -340,17 +341,15 @@ export default function CourseCreate() {
             await updateVariant({ id: variant.savedId, ...payload }).unwrap()
           } else {
             const result = await saveVariant(payload).unwrap()
-            setVariants((prev) =>
-              prev.map((v) =>
-                v.variant_number === variant.variant_number
-                  ? { ...v, savedId: result.id }
-                  : v
-              )
+            savedVariants = savedVariants.map((v) =>
+              v.variant_number === variant.variant_number ? { ...v, savedId: result.id } : v
             )
           }
         }
+        setVariants(savedVariants)
       }
-      localStorage.removeItem(DRAFT_KEY)
+      // Save to localStorage with correct savedIds so user can resume the draft
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants: savedVariants, step, courseId }))
       navigate('/profile')
     } catch (err) {
       setGlobalError(err?.data?.detail || JSON.stringify(err?.data) || t('create.error_save'))

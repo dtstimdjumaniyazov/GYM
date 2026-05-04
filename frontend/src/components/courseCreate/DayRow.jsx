@@ -29,10 +29,6 @@ export default function DayRow({ day, onChange, week1Videos }) {
   const [uploadingVideos, setUploadingVideos] = useState([]) // { uid, filename, progress, error }
   const [uploadingFiles, setUploadingFiles] = useState([])
 
-  // Keep a live ref to day so async upload callbacks always see the latest value
-  const dayRef = useRef(day)
-  dayRef.current = day
-
   const DAY_NAMES = {
     1: t('create.day_mon'), 2: t('create.day_tue'), 3: t('create.day_wed'),
     4: t('create.day_thu'), 5: t('create.day_fri'), 6: t('create.day_sat'), 7: t('create.day_sun'),
@@ -46,8 +42,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
   }
 
   function addVideo(vimeoVideoId, title) {
-    const d = dayRef.current
-    onChange({ ...d, videos: [...(d.videos || []), { vimeo_video_id: vimeoVideoId, title }] })
+    onChange(d => ({ ...d, videos: [...(d.videos || []), { vimeo_video_id: vimeoVideoId, title }] }))
   }
 
   function updateVideoTitle(idx, title) {
@@ -76,9 +71,10 @@ export default function DayRow({ day, onChange, week1Videos }) {
   }
 
   function addFile(gdriveFileId, filename, mimeType) {
-    const d = dayRef.current
-    if ((d.files || []).length >= MAX_FILES) return
-    onChange({ ...d, files: [...(d.files || []), { gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }] })
+    onChange(d => {
+      if ((d.files || []).length >= MAX_FILES) return d
+      return { ...d, files: [...(d.files || []), { gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }] }
+    })
   }
 
   async function removeFile(idx) {

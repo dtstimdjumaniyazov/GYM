@@ -23,8 +23,8 @@ export default function Step2Training({ variants, onChange }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState(0)
 
-  function updateVariant(idx, updated) {
-    onChange(variants.map((v, i) => (i === idx ? updated : v)))
+  function updateVariant(idx, updater) {
+    onChange(prev => prev.map((v, i) => i === idx ? (typeof updater === 'function' ? updater(v) : updater) : v))
   }
 
   function toggleVariantActive(idx) {

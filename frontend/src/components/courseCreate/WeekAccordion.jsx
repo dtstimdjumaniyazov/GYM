@@ -20,9 +20,11 @@ export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpe
   const { t } = useTranslation()
   const [open, setOpen] = useState(defaultOpen ?? true)
 
-  function updateDay(dayIndex, updatedDay) {
-    const newDays = week.days.map((d, i) => (i === dayIndex ? updatedDay : d))
-    onWeekChange({ ...week, days: newDays })
+  function updateDay(dayIndex, updater) {
+    onWeekChange(w => ({
+      ...w,
+      days: w.days.map((d, i) => i === dayIndex ? (typeof updater === 'function' ? updater(d) : updater) : d),
+    }))
   }
 
   return (

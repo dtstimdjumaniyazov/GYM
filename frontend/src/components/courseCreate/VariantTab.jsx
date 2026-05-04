@@ -18,9 +18,11 @@ export default function VariantTab({ variant, onChange, isFirst }) {
     onChange({ ...variant, weeks: [...variant.weeks, makeDefaultWeek(nextNum)] })
   }
 
-  function updateWeek(idx, updated) {
-    const weeks = variant.weeks.map((w, i) => (i === idx ? updated : w))
-    onChange({ ...variant, weeks })
+  function updateWeek(idx, updater) {
+    onChange(v => ({
+      ...v,
+      weeks: v.weeks.map((w, i) => i === idx ? (typeof updater === 'function' ? updater(w) : updater) : w),
+    }))
   }
 
   function deleteWeek(idx) {
