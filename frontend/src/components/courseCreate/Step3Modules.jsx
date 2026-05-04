@@ -35,7 +35,12 @@ export default function Step3Modules({ selectedModuleTypes, modules, onChange })
   }
 
   function getItems(type) { return modules[type] || [] }
-  function setItems(type, items) { onChange({ ...modules, [type]: items }) }
+  function setItems(type, updater) {
+    onChange(prev => ({
+      ...prev,
+      [type]: typeof updater === 'function' ? updater(prev[type] || []) : updater,
+    }))
+  }
 
   return (
     <div className="space-y-8">
@@ -66,12 +71,14 @@ function ModuleSection({ label, items, onItemsChange }) {
   const [uploadingFiles, setUploadingFiles] = useState([])
 
   function addVideo(vimeoVideoId, title) {
-    onItemsChange([...items, { _key: Date.now(), type: 'video', title, vimeo_video_id: vimeoVideoId }])
+    onItemsChange(prev => [...prev, { _key: Date.now(), type: 'video', title, vimeo_video_id: vimeoVideoId }])
   }
 
   function addFile(gdriveFileId, filename, mimeType) {
-    if (items.length >= MAX_ITEMS) return
-    onItemsChange([...items, { _key: Date.now(), type: 'file', title: filename, gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }])
+    onItemsChange(prev => {
+      if (prev.length >= MAX_ITEMS) return prev
+      return [...prev, { _key: Date.now(), type: 'file', title: filename, gdrive_file_id: gdriveFileId, filename, mime_type: mimeType }]
+    })
   }
 
   function updateTitle(idx, title) {
