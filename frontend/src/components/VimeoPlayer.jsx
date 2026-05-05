@@ -37,6 +37,8 @@ function VimeoPlayer({ vimeoId, autoplay = false, watermark, onEnded, onTimeUpda
       title: false,
       byline: false,
       portrait: false,
+      like: false,
+      share: false,
     })
 
     let destroyed = false
@@ -91,10 +93,8 @@ function VimeoPlayer({ vimeoId, autoplay = false, watermark, onEnded, onTimeUpda
           className="absolute inset-0 pointer-events-none select-none overflow-hidden"
           aria-hidden="true"
         >
-          {/* Три экземпляра в разных углах для надёжности */}
-          <span style={wmStyle(15, 20, -20)}>{watermark}</span>
-          <span style={wmStyle(45, 55, -20)}>{watermark}</span>
-          <span style={wmStyle(70, 10, -20)}>{watermark}</span>
+          <span style={wmStyle(5, 3, -15)}>{watermark}</span>
+          <span style={wmStyle(78, 58, -15)}>{watermark}</span>
         </div>
       )}
     </div>
@@ -108,9 +108,9 @@ function wmStyle(top, left, rotate) {
     left: `${left}%`,
     transform: `rotate(${rotate}deg)`,
     color: 'white',
-    fontSize: '13px',
+    fontSize: '11px',
     fontWeight: '500',
-    opacity: 0.18,
+    opacity: 0.12,
     whiteSpace: 'nowrap',
     letterSpacing: '0.05em',
     textShadow: '0 1px 3px rgba(0,0,0,0.5)',

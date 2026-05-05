@@ -82,7 +82,7 @@ class VimeoInitUploadView(APIView):
                 },
                 'name': data['title'],
                 'description': data.get('description', ''),
-                'privacy': {'view': 'disable'},
+                'privacy': {'view': 'disable', 'embed': 'whitelist'},
             },
             timeout=30,
         )

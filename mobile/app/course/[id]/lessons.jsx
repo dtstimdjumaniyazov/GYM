@@ -31,7 +31,7 @@ const buildVimeoHtml = (vimeoId) => `<!DOCTYPE html>
 <body>
   <div class="wrap">
     <iframe id="vp"
-      src="https://player.vimeo.com/video/${vimeoId}?autoplay=1&color=5365CA&title=0&byline=0&portrait=0&dnt=1&transparent=0&api=1"
+      src="https://player.vimeo.com/video/${vimeoId}?autoplay=1&color=5365CA&title=0&byline=0&portrait=0&like=0&share=0&dnt=1&transparent=0&api=1"
       frameborder="0"
       allow="autoplay; fullscreen; picture-in-picture"
       allowfullscreen
@@ -437,7 +437,7 @@ export default function LessonsScreen() {
         <View style={[styles.videoModal, { width: winW, height: winH }]}>
           {activeVideo?.vimeoId && (
             <WebView
-              source={{ html: buildVimeoHtml(activeVideo.vimeoId) }}
+              source={{ html: buildVimeoHtml(activeVideo.vimeoId), baseUrl: 'https://fitevolution.uz' }}
               style={StyleSheet.absoluteFill}
               allowsFullscreenVideo
               allowsInlineMediaPlayback
