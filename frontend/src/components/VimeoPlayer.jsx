@@ -1,16 +1,8 @@
 import { useRef, useEffect, useState } from 'react'
 import Player from '@vimeo/player'
 
-/**
- * Vimeo Player — обёртка над @vimeo/player SDK.
- *
- * @param {string|number} vimeoId      — ID видео на Vimeo (обязательно)
- * @param {boolean}       autoplay     — автовоспроизведение
- * @param {string}        watermark    — текст водяного знака (телефон/имя пользователя)
- * @param {Function}      onEnded      — коллбэк по окончании видео
- * @param {Function}      onTimeUpdate — коллбэк с { seconds, percent, duration }
- */
 function VimeoPlayer({ vimeoId, autoplay = false, watermark, onEnded, onTimeUpdate }) {
+  const outerRef = useRef(null)
   const containerRef = useRef(null)
   const playerRef = useRef(null)
   const onEndedRef = useRef(onEnded)
@@ -70,6 +62,34 @@ function VimeoPlayer({ vimeoId, autoplay = false, watermark, onEnded, onTimeUpda
     }
   }, [vimeoId])
 
+  // When Vimeo's iframe goes fullscreen, intercept and make our outer container
+  // go fullscreen instead — so the watermark overlay is included.
+  useEffect(() => {
+    const outer = outerRef.current
+    if (!outer) return
+    let busy = false
+
+    const onFSChange = async () => {
+      if (busy) return
+      const fs = document.fullscreenElement ?? document.webkitFullscreenElement
+      if (fs && fs !== outer) {
+        busy = true
+        try {
+          await (document.exitFullscreen ?? document.webkitExitFullscreen?.bind(document))?.()
+          await (outer.requestFullscreen ?? outer.webkitRequestFullscreen?.bind(outer))?.()
+        } catch { /* ignore permission errors */ }
+        busy = false
+      }
+    }
+
+    document.addEventListener('fullscreenchange', onFSChange)
+    document.addEventListener('webkitfullscreenchange', onFSChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFSChange)
+      document.removeEventListener('webkitfullscreenchange', onFSChange)
+    }
+  }, [])
+
   if (error) {
     return (
       <div className="aspect-video bg-bg-header/60 rounded-xl flex items-center justify-center">
@@ -79,25 +99,41 @@ function VimeoPlayer({ vimeoId, autoplay = false, watermark, onEnded, onTimeUpda
   }
 
   return (
-    <div className="relative rounded-xl overflow-hidden">
-      {!ready && (
-        <div className="aspect-video bg-bg-header/60 flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-link-hover/30 border-t-link-hover rounded-full animate-spin" />
+    <>
+      <style>{`
+        .vp-wrap:fullscreen, .vp-wrap:-webkit-full-screen {
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 0 !important;
+        }
+        .vp-wrap:fullscreen .vp-inner,
+        .vp-wrap:-webkit-full-screen .vp-inner {
+          width: 100%;
+        }
+      `}</style>
+      <div ref={outerRef} className="vp-wrap relative rounded-xl overflow-hidden">
+        {!ready && (
+          <div className="aspect-video bg-bg-header/60 flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-link-hover/30 border-t-link-hover rounded-full animate-spin" />
+          </div>
+        )}
+        <div className="vp-inner">
+          <div ref={containerRef} />
         </div>
-      )}
-      <div ref={containerRef} />
 
-      {/* Watermark overlay — pointer-events:none чтобы не мешать управлению плеером */}
-      {watermark && ready && (
-        <div
-          className="absolute inset-0 pointer-events-none select-none overflow-hidden"
-          aria-hidden="true"
-        >
-          <span style={wmStyle(5, 3, -15)}>{watermark}</span>
-          <span style={wmStyle(78, 58, -15)}>{watermark}</span>
-        </div>
-      )}
-    </div>
+        {watermark && ready && (
+          <div
+            className="absolute inset-0 pointer-events-none select-none overflow-hidden"
+            aria-hidden="true"
+          >
+            <span style={wmStyle(5, 3, -15)}>{watermark}</span>
+            <span style={wmStyle(78, 58, -15)}>{watermark}</span>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 
