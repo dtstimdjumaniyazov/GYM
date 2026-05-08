@@ -50,6 +50,8 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
     gender: profile.gender || '',
     weight: profile.weight || '',
     career_start_year: trainerProfile?.career_start_year || '',
+    short_description: trainerProfile?.short_description || '',
+    bio: trainerProfile?.bio || '',
   })
   const [error, setError] = useState(null)
   const isLoading = savingUser || savingTrainer
@@ -80,6 +82,8 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
       if (isTrainer) {
         await updateTrainer({
           career_start_year: form.career_start_year ? Number(form.career_start_year) : null,
+          short_description: form.short_description,
+          bio: form.bio,
         }).unwrap()
       }
       onClose()
@@ -159,20 +163,45 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
           </label>
 
           {isTrainer && (
-            <label className="flex flex-col gap-1">
-              <span className="text-sm text-text-primary">{t('register.career_start_year')}</span>
-              <select
-                name="career_start_year"
-                value={form.career_start_year}
-                onChange={handleChange}
-                className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
-              >
-                <option value="">{t('register.career_start_year_placeholder')}</option>
-                {Array.from({ length: new Date().getFullYear() - 1959 }, (_, i) => new Date().getFullYear() - i).map((year) => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </label>
+            <>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-text-primary">{t('register.career_start_year')}</span>
+                <select
+                  name="career_start_year"
+                  value={form.career_start_year}
+                  onChange={handleChange}
+                  className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
+                >
+                  <option value="">{t('register.career_start_year_placeholder')}</option>
+                  {Array.from({ length: new Date().getFullYear() - 1959 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-text-primary">{t('register.short_description')}</span>
+                <input
+                  name="short_description"
+                  value={form.short_description}
+                  onChange={handleChange}
+                  placeholder={t('register.short_desc_placeholder')}
+                  className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-text-primary">{t('register.about_me')}</span>
+                <textarea
+                  name="bio"
+                  value={form.bio}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder={t('register.bio_placeholder')}
+                  className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50 resize-none"
+                />
+              </label>
+            </>
           )}
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
