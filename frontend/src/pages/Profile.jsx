@@ -710,6 +710,9 @@ function ProfileTab({ profile, onEdit, onEditCerts, onEditTrainerLinks }) {
     { label: t('profile.age'), value: profile.age ? t('profile.age_years', { age: profile.age }) : '—' },
     { label: t('profile.gender'), value: GENDER_LABELS[profile.gender] || '—' },
     { label: t('profile.weight_kg'), value: profile.weight ? t('profile.weight_value', { weight: profile.weight }) : '—' },
+    ...(isTrainer && trainerProfile ? [
+      { label: t('register.short_description'), value: trainerProfile.short_description || '—' },
+    ] : []),
   ]
 
   return (
@@ -723,6 +726,13 @@ function ProfileTab({ profile, onEdit, onEditCerts, onEditTrainerLinks }) {
             </div>
           ))}
         </div>
+        {isTrainer && trainerProfile?.bio && (
+          <div className="mt-4 pt-4 border-t border-text-header/10">
+            <span className="text-text-primary text-sm block mb-1">{t('register.about_me')}</span>
+            <p className="text-text-header text-sm leading-relaxed whitespace-pre-line">{trainerProfile.bio}</p>
+          </div>
+        )}
+
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             onClick={onEdit}
