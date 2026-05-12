@@ -66,8 +66,8 @@ const buildVimeoHtml = (vimeoId) => `<!DOCTYPE html>
 </body>
 </html>`
 
-const MODULE_ICONS = { training: '💪', theory: '🧠', nutrition: '🥗', recovery: '🧘' }
-const MODULE_ORDER = ['training', 'theory', 'nutrition', 'recovery']
+const MODULE_ICONS = { training: '💪', theory: '🧠', nutrition: '🥗', recovery: '🧘', sports_nutrition: '🥤', training_nuances: '📌' }
+const MODULE_ORDER = ['training', 'theory', 'nutrition', 'recovery', 'sports_nutrition', 'training_nuances']
 
 const DAY_SHORT_KEYS = { 1: 'day_mon', 2: 'day_tue', 3: 'day_wed', 4: 'day_thu', 5: 'day_fri', 6: 'day_sat', 7: 'day_sun' }
 const DAY_FULL_KEYS = { 1: 'day_full_mon', 2: 'day_full_tue', 3: 'day_full_wed', 4: 'day_full_thu', 5: 'day_full_fri', 6: 'day_full_sat', 7: 'day_full_sun' }
