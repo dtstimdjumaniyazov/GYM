@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, TouchableOpacity, Alert,
   ScrollView, Image, ActivityIndicator, Linking,
+  Modal, TextInput, KeyboardAvoidingView, Platform,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter, useFocusEffect } from 'expo-router'
@@ -112,7 +113,7 @@ export default function ProfileScreen() {
 
       <View style={styles.body}>
         {isTrainer
-          ? <TrainerSection trainer={trainer} dashboard={dashboard} />
+          ? <TrainerSection trainer={trainer} dashboard={dashboard} onReload={() => dispatch(loadProfile())} />
           : <StudentSection user={user} />
         }
 
@@ -177,10 +178,133 @@ export default function ProfileScreen() {
   )
 }
 
+/* ─── Edit Trainer Modal ───────────────────────────────── */
+
+function EditTrainerModal({ trainer, onClose, onSaved }) {
+  const { t } = useTranslation()
+  const [form, setForm] = useState({
+    short_description: trainer?.short_description || '',
+    bio: trainer?.bio || '',
+    specialization: trainer?.specialization || '',
+  })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError(null)
+    try {
+      await api.patch(ENDPOINTS.TRAINER_PROFILE_UPDATE, {
+        short_description: form.short_description,
+        bio: form.bio,
+        specialization: form.specialization,
+      })
+      onSaved()
+      onClose()
+    } catch {
+      setError(t('profile.save_error'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={editStyles.overlay}
+      >
+        <View style={editStyles.sheet}>
+          <View style={editStyles.header}>
+            <Text style={editStyles.title}>{t('profile.edit_profile')}</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="close" size={22} color={COLORS.text} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text style={editStyles.label}>{t('profile.specialization')}</Text>
+            <TextInput
+              style={editStyles.input}
+              value={form.specialization}
+              onChangeText={(v) => setForm({ ...form, specialization: v })}
+              placeholder={t('profile.specialization')}
+              placeholderTextColor={COLORS.textSecondary}
+            />
+
+            <Text style={editStyles.label}>{t('profile.trainer_section_desc')}</Text>
+            <TextInput
+              style={editStyles.input}
+              value={form.short_description}
+              onChangeText={(v) => setForm({ ...form, short_description: v })}
+              placeholder={t('profile.trainer_section_desc')}
+              placeholderTextColor={COLORS.textSecondary}
+            />
+
+            <Text style={editStyles.label}>{t('profile.trainer_section_about')}</Text>
+            <TextInput
+              style={[editStyles.input, editStyles.textarea]}
+              value={form.bio}
+              onChangeText={(v) => setForm({ ...form, bio: v })}
+              placeholder={t('profile.trainer_section_about')}
+              placeholderTextColor={COLORS.textSecondary}
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+            />
+
+            {error ? <Text style={editStyles.error}>{error}</Text> : null}
+
+            <View style={editStyles.btns}>
+              <TouchableOpacity
+                style={[editStyles.btn, editStyles.btnPrimary, saving && { opacity: 0.6 }]}
+                onPress={handleSave}
+                disabled={saving}
+              >
+                {saving
+                  ? <ActivityIndicator color={COLORS.white} />
+                  : <Text style={editStyles.btnPrimaryText}>{t('common.save')}</Text>
+                }
+              </TouchableOpacity>
+              <TouchableOpacity style={[editStyles.btn, editStyles.btnSecondary]} onPress={onClose}>
+                <Text style={editStyles.btnSecondaryText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  )
+}
+
+const editStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: {
+    backgroundColor: COLORS.white, borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: 24, paddingBottom: 40, maxHeight: '90%',
+  },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  title: { fontSize: 18, fontWeight: '700', color: COLORS.text },
+  label: { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary, marginBottom: 6, marginTop: 14 },
+  input: {
+    backgroundColor: COLORS.background, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
+    fontSize: 15, color: COLORS.text, borderWidth: 1, borderColor: COLORS.border,
+  },
+  textarea: { minHeight: 100, paddingTop: 12 },
+  error: { color: COLORS.error, fontSize: 13, marginTop: 10 },
+  btns: { flexDirection: 'row', gap: 12, marginTop: 24 },
+  btn: { flex: 1, paddingVertical: 14, borderRadius: 14, alignItems: 'center' },
+  btnPrimary: { backgroundColor: COLORS.primary },
+  btnPrimaryText: { color: COLORS.white, fontWeight: '700', fontSize: 15 },
+  btnSecondary: { backgroundColor: COLORS.lightGray },
+  btnSecondaryText: { color: COLORS.text, fontWeight: '700', fontSize: 15 },
+})
+
 /* ─── Trainer Section ──────────────────────────────────── */
 
-function TrainerSection({ trainer, dashboard }) {
+function TrainerSection({ trainer, dashboard, onReload }) {
   const { t } = useTranslation()
+  const [showEdit, setShowEdit] = useState(false)
   if (!trainer) return null
 
   const infoItems = [
@@ -221,14 +345,29 @@ function TrainerSection({ trainer, dashboard }) {
         </View>
       )}
 
-      {trainer.short_description ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.trainer_section_desc')}</Text>
-          <View style={styles.bioCard}>
-            <Text style={styles.bioText}>{trainer.short_description}</Text>
-          </View>
+      {/* Short description + bio + edit button */}
+      <View style={styles.section}>
+        <View style={styles.sectionTitleRow}>
+          <Text style={styles.sectionTitle}>{t('profile.trainer_section_about')}</Text>
+          <TouchableOpacity onPress={() => setShowEdit(true)} style={styles.editBtn}>
+            <Ionicons name="pencil-outline" size={15} color={COLORS.primary} />
+            <Text style={styles.editBtnText}>{t('common.edit')}</Text>
+          </TouchableOpacity>
         </View>
-      ) : null}
+        <View style={styles.bioCard}>
+          {trainer.short_description ? (
+            <Text style={[styles.bioText, { fontWeight: '600', marginBottom: trainer.bio ? 8 : 0 }]}>
+              {trainer.short_description}
+            </Text>
+          ) : null}
+          {trainer.bio ? (
+            <Text style={styles.bioText}>{trainer.bio}</Text>
+          ) : null}
+          {!trainer.short_description && !trainer.bio ? (
+            <Text style={[styles.bioText, { color: COLORS.textSecondary }]}>{t('profile.no_bio')}</Text>
+          ) : null}
+        </View>
+      </View>
 
       {trainer.instagram_url ? (
         <View style={styles.section}>
@@ -247,6 +386,14 @@ function TrainerSection({ trainer, dashboard }) {
           </View>
         </View>
       ) : null}
+
+      {showEdit && (
+        <EditTrainerModal
+          trainer={trainer}
+          onClose={() => setShowEdit(false)}
+          onSaved={onReload}
+        />
+      )}
     </>
   )
 }
@@ -397,6 +544,10 @@ const styles = StyleSheet.create({
     elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4,
   },
   bioText: { fontSize: 14, color: COLORS.text, lineHeight: 22 },
+
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingHorizontal: 4 },
+  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  editBtnText: { fontSize: 13, color: COLORS.primary, fontWeight: '600' },
 
   dashGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   dashCard: {

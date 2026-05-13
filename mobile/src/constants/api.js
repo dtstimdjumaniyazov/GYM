@@ -38,6 +38,7 @@ export const ENDPOINTS = {
   TRAINER_DETAIL: (id) => `/users/trainers/${id}/`,
   TRAINER_DASHBOARD: '/users/trainer/dashboard/',
   TRAINER_COURSES: '/users/trainer/courses/',
+  TRAINER_PROFILE_UPDATE: '/users/trainer/profile/update/',
 
   // Notifications
   NOTIFICATIONS: '/notifications/',
