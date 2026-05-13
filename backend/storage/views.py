@@ -143,6 +143,27 @@ class VimeoStatusView(APIView):
             video.duration_seconds = data['duration_seconds']
         video.save()
 
+        # Fetch duration from Vimeo API if still unknown
+        if not video.duration_seconds and video.vimeo_id:
+            token = settings.VIMEO_ACCESS_TOKEN
+            if token:
+                try:
+                    vimeo_resp = requests.get(
+                        f'https://api.vimeo.com/videos/{video.vimeo_id}',
+                        headers={
+                            'Authorization': f'bearer {token}',
+                            'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+                        },
+                        timeout=10,
+                    )
+                    if vimeo_resp.status_code == 200:
+                        duration = vimeo_resp.json().get('duration')
+                        if duration:
+                            video.duration_seconds = duration
+                            video.save(update_fields=['duration_seconds', 'updated_at'])
+                except Exception:
+                    pass
+
         return Response(VimeoVideoReadSerializer(video).data)
 
 
