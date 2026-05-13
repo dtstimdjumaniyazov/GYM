@@ -368,6 +368,7 @@ class CourseModuleContentView(APIView):
                     title=item.get('title', '')[:255],
                     order=order,
                     content_type=ct,
+                    is_preview=bool(item.get('is_preview', False)),
                 )
 
         return Response({'status': 'ok'})

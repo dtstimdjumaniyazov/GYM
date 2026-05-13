@@ -71,7 +71,7 @@ function ModuleSection({ label, items, onItemsChange }) {
   const [uploadingFiles, setUploadingFiles] = useState([])
 
   function addVideo(vimeoVideoId, title) {
-    onItemsChange(prev => [...prev, { _key: Date.now(), type: 'video', title, vimeo_video_id: vimeoVideoId }])
+    onItemsChange(prev => [...prev, { _key: Date.now(), type: 'video', title, vimeo_video_id: vimeoVideoId, is_preview: false }])
   }
 
   function addFile(gdriveFileId, filename, mimeType) {
@@ -83,6 +83,10 @@ function ModuleSection({ label, items, onItemsChange }) {
 
   function updateTitle(idx, title) {
     onItemsChange(items.map((item, i) => (i === idx ? { ...item, title } : item)))
+  }
+
+  function togglePreview(idx) {
+    onItemsChange(items.map((item, i) => (i === idx ? { ...item, is_preview: !item.is_preview } : item)))
   }
 
   function moveItem(idx, dir) {
@@ -257,6 +261,23 @@ function ModuleSection({ label, items, onItemsChange }) {
               placeholder={t('create.item_title_placeholder')}
               className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
             />
+            {item.type === 'video' && (
+              <button
+                type="button"
+                onClick={() => togglePreview(idx)}
+                title={t('create.preview_toggle_hint')}
+                className={`shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-xs transition-colors ${
+                  item.is_preview
+                    ? 'bg-main/30 text-main border border-main/40'
+                    : 'text-white/25 hover:text-white/60'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M4 6h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                </svg>
+                {item.is_preview && <span>{t('create.preview_label')}</span>}
+              </button>
+            )}
             <button type="button" onClick={() => removeItem(idx)} className="text-white/25 hover:text-red-400 transition-colors">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

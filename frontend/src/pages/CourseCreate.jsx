@@ -127,6 +127,7 @@ function buildModuleContentsFromApi(modules) {
       gdrive_file_id: c.gdrive_file?.id || null,
       filename: c.gdrive_file?.filename || '',
       mime_type: c.gdrive_file?.mime_type || '',
+      is_preview: c.is_preview || false,
     }))
   }
   return result
@@ -141,6 +142,7 @@ function buildModuleContentsPayload(moduleContents) {
       content_type: item.type === 'video' ? 'video' : (item.mime_type === 'application/pdf' ? 'pdf' : 'image'),
       vimeo_video_id: item.vimeo_video_id || null,
       gdrive_file_id: item.gdrive_file_id || null,
+      is_preview: item.is_preview || false,
     }))
   }
   return payload

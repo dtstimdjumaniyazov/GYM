@@ -425,6 +425,8 @@
     "no_extra_modules_hint": "1-qadamga qayting va Nazariya, Ovqatlanish yoki Tiklanishni tanlang.",
     "items_count": "{{count}} ta",
     "item_title_placeholder": "Nom",
+    "preview_label": "Oldindan ko'rish",
+    "preview_toggle_hint": "Sotib olmasdan ko'rish mumkin — xaridorlar kursni sotib olishdan oldin bu videoni ko'rishi mumkin",
     "day_mon": "Dushanba",
     "day_tue": "Seshanba",
     "day_wed": "Chorshanba",

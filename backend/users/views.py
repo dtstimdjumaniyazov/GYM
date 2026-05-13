@@ -811,7 +811,7 @@ def trainer_course_delete_request(request, pk):
     return Response({'detail': 'Запрос на удаление отправлен администратору'})
 
 
-@api_view(['PUT'])
+@api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def trainer_profile_update(request):
     """Обновить профиль тренера (сертификаты, био и т.д.)."""

@@ -70,10 +70,6 @@ function TrainerDetail() {
           <div className="flex flex-col gap-3 text-center sm:text-left">
             <h1 className="text-3xl font-bold text-text-header">{fullName}</h1>
 
-            {trainer.short_description && (
-              <p className="text-text-primary text-lg">{trainer.short_description}</p>
-            )}
-
             {trainer.specialization && (
               <p className="text-link-hover">{trainer.specialization}</p>
             )}
@@ -114,11 +110,16 @@ function TrainerDetail() {
       </section>
 
       {/* ─── About ──────────────────────────────────── */}
-      {trainer.bio && (
+      {(trainer.bio || trainer.short_description) && (
         <section>
           <h2 className="text-xl font-bold text-text-header mb-4">{t('trainer.about')}</h2>
-          <div className="bg-bg-header/60 rounded-2xl p-6">
-            <p className="text-text-primary whitespace-pre-line leading-relaxed">{trainer.bio}</p>
+          <div className="bg-bg-header/60 rounded-2xl p-6 flex flex-col gap-3">
+            {trainer.short_description && (
+              <p className="text-text-header font-medium leading-relaxed">{trainer.short_description}</p>
+            )}
+            {trainer.bio && (
+              <p className="text-text-primary whitespace-pre-line leading-relaxed">{trainer.bio}</p>
+            )}
           </div>
         </section>
       )}
