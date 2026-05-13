@@ -73,6 +73,8 @@
     "intro_video": "Видео о себе",
     "certificates": "Сертификаты",
     "invalid_year": "Некорректный год",
+    "edit_profile": "Редактировать профиль",
+    "save_error": "Не удалось сохранить",
     "dashboard_courses": "Курсов",
     "dashboard_students": "Учеников",
     "dashboard_active": "Активных",
