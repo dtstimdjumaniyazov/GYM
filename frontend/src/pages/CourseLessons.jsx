@@ -89,6 +89,7 @@ function CourseLessons() {
 
   const lastSavedPercentRef = useRef(0)
   const latestPercentRef = useRef(0)
+  const autoplayListRef = useRef([])
 
   const saveProgress = useCallback(
     (watchPercent) => {
@@ -120,7 +121,21 @@ function CourseLessons() {
 
   const handleVideoEnded = useCallback(() => {
     saveProgress(100)
-  }, [saveProgress])
+    const list = autoplayListRef.current
+    if (!list.length || !activeVideo) return
+    const idx = list.findIndex((c) => c.id === activeVideo.id)
+    if (idx >= 0 && idx < list.length - 1) {
+      const next = list[idx + 1]
+      lastSavedPercentRef.current = 0
+      latestPercentRef.current = 0
+      setActiveVideo({
+        id: next.id,
+        title: next.title,
+        vimeoId: next.vimeo_video.vimeo_id,
+        contentType: activeVideo.contentType,
+      })
+    }
+  }, [saveProgress, activeVideo])
 
   const handleCloseVideo = useCallback(() => {
     if (activeVideo && isPurchased && latestPercentRef.current > lastSavedPercentRef.current) {
@@ -133,6 +148,7 @@ function CourseLessons() {
     }
     latestPercentRef.current = 0
     lastSavedPercentRef.current = 0
+    autoplayListRef.current = []
     setActiveVideo(null)
   }, [activeVideo, isPurchased, id, updateProgress])
 
@@ -160,8 +176,9 @@ function CourseLessons() {
 
   const needsVariantSelection = isPurchased && !isVariantLocked && course.training_variants?.length > 0
 
-  const handlePlayVideo = (content, contentType) => {
+  const handlePlayVideo = (content, contentType, playlist = []) => {
     if (!content.vimeo_video) return
+    autoplayListRef.current = playlist
     lastSavedPercentRef.current = progressMap[content.id]?.watch_percent || 0
     setActiveVideo({
       id: content.id,
@@ -274,7 +291,7 @@ function CourseLessons() {
           isVariantLocked={isVariantLocked}
           activeVideo={activeVideo}
           progressMap={progressMap}
-          onPlayVideo={(c) => handlePlayVideo(c, 'day_content')}
+          onPlayVideo={(c, playlist) => handlePlayVideo(c, 'day_content', playlist)}
           onOpenFile={(c) => handleOpenFile(c, 'day_content')}
           onCloseVideo={handleCloseVideo}
           onTimeUpdate={handleTimeUpdate}
@@ -289,7 +306,7 @@ function CourseLessons() {
           isPurchased={isPurchased}
           activeVideo={activeVideo}
           progressMap={progressMap}
-          onPlayVideo={(c) => handlePlayVideo(c, 'module_content')}
+          onPlayVideo={(c, playlist) => handlePlayVideo(c, 'module_content', playlist)}
           onOpenFile={(c) => handleOpenFile(c, 'module_content')}
           onCloseVideo={handleCloseVideo}
           onTimeUpdate={handleTimeUpdate}
@@ -495,7 +512,12 @@ function TrainingTabContent({
                                 content={content}
                                 isActive={activeVideo?.id === content.id}
                                 progress={progressMap[content.id]}
-                                onPlayVideo={onPlayVideo}
+                                onPlayVideo={(c) => {
+                                  const playlist = (day.contents || []).filter(
+                                    (item) => item.content_type === 'video' && item.vimeo_video?.vimeo_id,
+                                  )
+                                  onPlayVideo(c, playlist)
+                                }}
                                 onOpenFile={onOpenFile}
                               />
                             ))}
@@ -556,7 +578,12 @@ function ModuleTabContent({
                 isPurchased={isPurchased}
                 isActive={activeVideo?.id === content.id}
                 progress={progressMap[content.id]}
-                onPlayVideo={onPlayVideo}
+                onPlayVideo={(c) => {
+                  const playlist = (module.contents || []).filter(
+                    (item) => item.content_type === 'video' && item.vimeo_video?.vimeo_id,
+                  )
+                  onPlayVideo(c, playlist)
+                }}
                 onOpenFile={onOpenFile}
               />
             ))}
