@@ -200,9 +200,9 @@ class GDriveUploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not settings.GDRIVE_REFRESH_TOKEN:
+        if not settings.GDRIVE_SERVICE_ACCOUNT_JSON and not settings.GDRIVE_REFRESH_TOKEN:
             return Response(
-                {'detail': 'Google Drive не настроен. Укажите GDRIVE_REFRESH_TOKEN в .env'},
+                {'detail': 'Google Drive не настроен. Укажите GDRIVE_SERVICE_ACCOUNT_JSON в .env'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
@@ -264,7 +264,7 @@ class GDriveDeleteView(APIView):
         except GoogleDriveFile.DoesNotExist:
             return Response({'detail': 'Файл не найден'}, status=status.HTTP_404_NOT_FOUND)
 
-        if settings.GDRIVE_REFRESH_TOKEN:
+        if settings.GDRIVE_SERVICE_ACCOUNT_JSON or settings.GDRIVE_REFRESH_TOKEN:
             try:
                 drive_service = _get_drive_service()
                 drive_service.files().delete(fileId=gdrive_file.gdrive_id).execute()
@@ -289,7 +289,7 @@ class GDriveFileProxyView(APIView):
         except GoogleDriveFile.DoesNotExist:
             return Response({'detail': 'Файл не найден'}, status=status.HTTP_404_NOT_FOUND)
 
-        if not settings.GDRIVE_REFRESH_TOKEN:
+        if not settings.GDRIVE_SERVICE_ACCOUNT_JSON and not settings.GDRIVE_REFRESH_TOKEN:
             return Response(
                 {'detail': 'Google Drive не настроен'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
