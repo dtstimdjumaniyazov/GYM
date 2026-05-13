@@ -182,22 +182,34 @@ export default function ProfileScreen() {
 
 function EditTrainerModal({ trainer, onClose, onSaved }) {
   const { t } = useTranslation()
+  const currentYear = new Date().getFullYear()
   const [form, setForm] = useState({
+    specialization: trainer?.specialization || '',
     short_description: trainer?.short_description || '',
     bio: trainer?.bio || '',
-    specialization: trainer?.specialization || '',
+    career_start_year: trainer?.career_start_year ? String(trainer.career_start_year) : '',
+    instagram_url: trainer?.instagram_url || '',
+    intro_video_url: trainer?.intro_video_url || '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
   const handleSave = async () => {
+    const year = form.career_start_year ? Number(form.career_start_year) : null
+    if (year && (year < 1960 || year > currentYear)) {
+      setError(t('profile.invalid_year'))
+      return
+    }
     setSaving(true)
     setError(null)
     try {
       await api.patch(ENDPOINTS.TRAINER_PROFILE_UPDATE, {
+        specialization: form.specialization,
         short_description: form.short_description,
         bio: form.bio,
-        specialization: form.specialization,
+        career_start_year: year,
+        instagram_url: form.instagram_url.trim(),
+        intro_video_url: form.intro_video_url.trim(),
       })
       onSaved()
       onClose()
@@ -228,7 +240,6 @@ function EditTrainerModal({ trainer, onClose, onSaved }) {
               style={editStyles.input}
               value={form.specialization}
               onChangeText={(v) => setForm({ ...form, specialization: v })}
-              placeholder={t('profile.specialization')}
               placeholderTextColor={COLORS.textSecondary}
             />
 
@@ -237,7 +248,6 @@ function EditTrainerModal({ trainer, onClose, onSaved }) {
               style={editStyles.input}
               value={form.short_description}
               onChangeText={(v) => setForm({ ...form, short_description: v })}
-              placeholder={t('profile.trainer_section_desc')}
               placeholderTextColor={COLORS.textSecondary}
             />
 
@@ -246,11 +256,43 @@ function EditTrainerModal({ trainer, onClose, onSaved }) {
               style={[editStyles.input, editStyles.textarea]}
               value={form.bio}
               onChangeText={(v) => setForm({ ...form, bio: v })}
-              placeholder={t('profile.trainer_section_about')}
               placeholderTextColor={COLORS.textSecondary}
               multiline
               numberOfLines={5}
               textAlignVertical="top"
+            />
+
+            <Text style={editStyles.label}>{t('profile.career_start_year')}</Text>
+            <TextInput
+              style={editStyles.input}
+              value={form.career_start_year}
+              onChangeText={(v) => setForm({ ...form, career_start_year: v })}
+              keyboardType="number-pad"
+              maxLength={4}
+              placeholder={String(currentYear)}
+              placeholderTextColor={COLORS.textSecondary}
+            />
+
+            <Text style={editStyles.label}>{t('profile.instagram_link')}</Text>
+            <TextInput
+              style={editStyles.input}
+              value={form.instagram_url}
+              onChangeText={(v) => setForm({ ...form, instagram_url: v })}
+              autoCapitalize="none"
+              keyboardType="url"
+              placeholder="https://instagram.com/username"
+              placeholderTextColor={COLORS.textSecondary}
+            />
+
+            <Text style={editStyles.label}>{t('profile.intro_video')}</Text>
+            <TextInput
+              style={editStyles.input}
+              value={form.intro_video_url}
+              onChangeText={(v) => setForm({ ...form, intro_video_url: v })}
+              autoCapitalize="none"
+              keyboardType="url"
+              placeholder="https://youtu.be/..."
+              placeholderTextColor={COLORS.textSecondary}
             />
 
             {error ? <Text style={editStyles.error}>{error}</Text> : null}
@@ -369,20 +411,52 @@ function TrainerSection({ trainer, dashboard, onReload }) {
         </View>
       </View>
 
-      {trainer.instagram_url ? (
+      {/* Certificates */}
+      {trainer.certificates?.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('profile.certificates')}</Text>
+          <View style={styles.bioCard}>
+            {trainer.certificates.map((cert, i) => (
+              <View key={i} style={styles.certRow}>
+                <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                <Text style={styles.certText}>{cert}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Social + intro video */}
+      {(trainer.instagram_url || trainer.intro_video_url) ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.trainer_section_social')}</Text>
           <View style={styles.infoCard}>
-            <TouchableOpacity
-              style={styles.infoRow}
-              onPress={() => Linking.openURL(trainer.instagram_url)}
-            >
-              <View style={styles.infoIconWrap}>
-                <Ionicons name="logo-instagram" size={18} color={COLORS.primary} />
-              </View>
-              <Text style={[styles.infoValue, { color: COLORS.primary }]}>Instagram</Text>
-              <Ionicons name="open-outline" size={16} color={COLORS.primary} />
-            </TouchableOpacity>
+            {trainer.instagram_url ? (
+              <TouchableOpacity
+                style={[styles.infoRow, trainer.intro_video_url && styles.infoRowBorder]}
+                onPress={() => Linking.openURL(trainer.instagram_url)}
+              >
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="logo-instagram" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={[styles.infoValue, { color: COLORS.primary }]}>Instagram</Text>
+                <Ionicons name="open-outline" size={16} color={COLORS.primary} />
+              </TouchableOpacity>
+            ) : null}
+            {trainer.intro_video_url ? (
+              <TouchableOpacity
+                style={styles.infoRow}
+                onPress={() => Linking.openURL(trainer.intro_video_url)}
+              >
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="play-circle-outline" size={18} color={COLORS.primary} />
+                </View>
+                <Text style={[styles.infoValue, { color: COLORS.primary, flex: 1 }]} numberOfLines={1}>
+                  {t('profile.intro_video')}
+                </Text>
+                <Ionicons name="open-outline" size={16} color={COLORS.primary} />
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
       ) : null}
@@ -548,6 +622,9 @@ const styles = StyleSheet.create({
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingHorizontal: 4 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   editBtnText: { fontSize: 13, color: COLORS.primary, fontWeight: '600' },
+
+  certRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6 },
+  certText: { flex: 1, fontSize: 14, color: COLORS.text, lineHeight: 20 },
 
   dashGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   dashCard: {

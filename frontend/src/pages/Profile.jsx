@@ -50,6 +50,7 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
     gender: profile.gender || '',
     weight: profile.weight || '',
     career_start_year: trainerProfile?.career_start_year || '',
+    specialization: trainerProfile?.specialization || '',
     short_description: trainerProfile?.short_description || '',
     bio: trainerProfile?.bio || '',
   })
@@ -82,6 +83,7 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
       if (isTrainer) {
         await updateTrainer({
           career_start_year: form.career_start_year ? Number(form.career_start_year) : null,
+          specialization: form.specialization,
           short_description: form.short_description,
           bio: form.bio,
         }).unwrap()
@@ -177,6 +179,17 @@ function EditProfileModal({ profile, trainerProfile, onClose }) {
                     <option key={year} value={year}>{year}</option>
                   ))}
                 </select>
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-text-primary">{t('profile.specialization')}</span>
+                <input
+                  name="specialization"
+                  value={form.specialization}
+                  onChange={handleChange}
+                  placeholder={t('profile.specialization')}
+                  className="bg-bg-main/30 text-text-header rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-link-hover/50"
+                />
               </label>
 
               <label className="flex flex-col gap-1">
@@ -711,7 +724,9 @@ function ProfileTab({ profile, onEdit, onEditCerts, onEditTrainerLinks }) {
     { label: t('profile.gender'), value: GENDER_LABELS[profile.gender] || '—' },
     { label: t('profile.weight_kg'), value: profile.weight ? t('profile.weight_value', { weight: profile.weight }) : '—' },
     ...(isTrainer && trainerProfile ? [
+      { label: t('profile.specialization'), value: trainerProfile.specialization || '—' },
       { label: t('register.short_description'), value: trainerProfile.short_description || '—' },
+      { label: t('profile.experience_years'), value: trainerProfile.experience_years != null ? `${trainerProfile.experience_years} ${t('profile.years_short')}` : '—' },
     ] : []),
   ]
 
