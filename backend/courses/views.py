@@ -17,8 +17,11 @@ from courses.serializers import (
 
 
 class CategoryListView(generics.ListAPIView):
-    """Список всех активных категорий."""
-    queryset = Category.objects.filter(is_active=True).order_by('order', 'title')
+    """Список активных категорий, в которых есть хотя бы один опубликованный курс."""
+    queryset = Category.objects.filter(
+        is_active=True,
+        courses__status=Course.Status.PUBLISHED,
+    ).distinct().order_by('order', 'title')
     serializer_class = CategoryCardSerializer
     pagination_class = None
 
