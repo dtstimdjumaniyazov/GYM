@@ -23,10 +23,9 @@ export default function DayRow({ day, onChange, week1Videos }) {
 
   const videoInputRef = useRef(null)
   const fileInputRef = useRef(null)
-  // Stores abort fns and remote IDs keyed by uid, outside React state to avoid stale closures
   const uploadsRef = useRef({})
 
-  const [uploadingVideos, setUploadingVideos] = useState([]) // { uid, filename, progress, error }
+  const [uploadingVideos, setUploadingVideos] = useState([])
   const [uploadingFiles, setUploadingFiles] = useState([])
 
   const DAY_NAMES = {
@@ -85,7 +84,6 @@ export default function DayRow({ day, onChange, week1Videos }) {
     onChange({ ...day, files: files.filter((_, i) => i !== idx) })
   }
 
-  // ── Video multi-upload ────────────────────────────────────────
   async function handleVideoFiles(e) {
     const selected = Array.from(e.target.files || [])
     e.target.value = ''
@@ -136,13 +134,12 @@ export default function DayRow({ day, onChange, week1Videos }) {
     setUploadingVideos(prev => prev.filter(u => u.uid !== uid))
   }
 
-  // ── File multi-upload ─────────────────────────────────────────
   async function handleFileFiles(e) {
     const selected = Array.from(e.target.files || []).filter(f => ALLOWED_FILE_TYPES.includes(f.type))
     e.target.value = ''
     if (!selected.length) return
 
-    const slots = MAX_FILES - (dayRef.current.files || []).length - uploadingFiles.length
+    const slots = MAX_FILES - (day.files || []).length - uploadingFiles.length
     const toUpload = selected.slice(0, Math.max(0, slots))
     if (!toUpload.length) return
 
@@ -189,12 +186,12 @@ export default function DayRow({ day, onChange, week1Videos }) {
   const totalFiles = files.length + uploadingFiles.length
 
   return (
-    <div className="border-b border-white/10 last:border-0">
+    <div className="border-b border-gray-100 last:border-0">
       <div className="grid grid-cols-[140px_80px_1fr_1fr] gap-3 py-3 items-start">
 
         {/* Day name */}
         <div className="pt-1">
-          <span className="text-sm font-medium text-white">{DAY_NAMES[day.day_of_week]}</span>
+          <span className="text-sm font-medium text-gray-800">{DAY_NAMES[day.day_of_week]}</span>
         </div>
 
         {/* Rest day toggle */}
@@ -205,13 +202,13 @@ export default function DayRow({ day, onChange, week1Videos }) {
             title={day.is_rest_day ? t('create.rest_tooltip') : t('create.workout_tooltip')}
             className={`relative w-10 h-5 rounded-full overflow-hidden transition-all duration-200 cursor-pointer ${
               day.is_rest_day
-                ? 'bg-main ring-1 ring-inset ring-white/20'
-                : 'bg-white/10 ring-1 ring-inset ring-white/30'
+                ? 'bg-bg-main ring-1 ring-inset ring-white/20'
+                : 'bg-gray-200 ring-1 ring-inset ring-gray-300'
             }`}
           >
             <span
               className={`absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all duration-200 ${
-                day.is_rest_day ? 'bg-white left-5.5' : 'bg-white/90 left-0.5'
+                day.is_rest_day ? 'bg-white left-5.5' : 'bg-gray-400 left-0.5'
               }`}
             />
           </button>
@@ -237,7 +234,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
                 <button
                   type="button"
                   onClick={sortVideosByName}
-                  className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-1 py-0.5"
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors px-1 py-0.5"
                   title="Сортировать по названию"
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -263,7 +260,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
               <button
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
-                className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+                className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -275,7 +272,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
                 <button
                   type="button"
                   onClick={() => onChange({ ...day, videos: [...week1Videos] })}
-                  className="flex items-center gap-1.5 text-xs text-link-hover hover:text-white transition-colors px-1 py-0.5"
+                  className="flex items-center gap-1.5 text-xs text-bg-main hover:text-bg-main/70 transition-colors px-1 py-0.5"
                   title={t('create.copy_week1_tooltip')}
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,11 +284,11 @@ export default function DayRow({ day, onChange, week1Videos }) {
               )}
 
               {videos.length === 0 && uploadingVideos.length === 0 && (
-                <p className="text-xs text-white/25 italic px-1">{t('create.no_videos')}</p>
+                <p className="text-xs text-gray-400 italic px-1">{t('create.no_videos')}</p>
               )}
             </>
           ) : (
-            <p className="text-xs text-white/25 italic px-1 pt-1">—</p>
+            <p className="text-xs text-gray-400 italic px-1 pt-1">—</p>
           )}
         </div>
 
@@ -326,7 +323,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+                    className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
                   >
                     <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -337,11 +334,11 @@ export default function DayRow({ day, onChange, week1Videos }) {
               )}
 
               {files.length === 0 && uploadingFiles.length === 0 && (
-                <p className="text-xs text-white/25 italic px-1">{t('create.no_files')}</p>
+                <p className="text-xs text-gray-400 italic px-1">{t('create.no_files')}</p>
               )}
             </>
           ) : (
-            <p className="text-xs text-white/25 italic px-1 pt-1">—</p>
+            <p className="text-xs text-gray-400 italic px-1 pt-1">—</p>
           )}
         </div>
       </div>
@@ -352,14 +349,14 @@ export default function DayRow({ day, onChange, week1Videos }) {
 function UploadProgress({ index, filename, progress, error, onCancel, onDismiss }) {
   if (error) {
     return (
-      <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
+      <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs text-white/60 truncate">
-            <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+          <p className="text-xs text-gray-600 truncate">
+            <span className="text-gray-400 font-mono mr-1.5">#{index}</span>{filename}
           </p>
-          <p className="text-red-400 text-xs mt-0.5">{error}</p>
+          <p className="text-red-600 text-xs mt-0.5">{error}</p>
         </div>
-        <button type="button" onClick={onDismiss} className="text-white/30 hover:text-red-400 transition-colors shrink-0 mt-0.5">
+        <button type="button" onClick={onDismiss} className="text-gray-400 hover:text-red-600 transition-colors shrink-0 mt-0.5">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -369,15 +366,15 @@ function UploadProgress({ index, filename, progress, error, onCancel, onDismiss 
   }
 
   return (
-    <div className="bg-white/5 border border-white/15 rounded-lg px-3 py-2">
+    <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-white/60 truncate flex-1 mr-2">
-          <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+        <span className="text-xs text-gray-600 truncate flex-1 mr-2">
+          <span className="text-gray-400 font-mono mr-1.5">#{index}</span>{filename}
         </span>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-main font-mono">{progress}%</span>
+          <span className="text-xs text-bg-main font-mono">{progress}%</span>
           {progress < 100 && (
-            <button type="button" onClick={onCancel} className="text-white/30 hover:text-red-400 transition-colors">
+            <button type="button" onClick={onCancel} className="text-gray-400 hover:text-red-500 transition-colors">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -385,8 +382,8 @@ function UploadProgress({ index, filename, progress, error, onCancel, onDismiss 
           )}
         </div>
       </div>
-      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-main transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
+      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-full bg-bg-main transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
       </div>
     </div>
   )

@@ -60,7 +60,7 @@ function CourseCard({ course }) {
   return (
     <Link
       to={`/courses/${course.id}`}
-      className="bg-bg-header/80 rounded-2xl overflow-hidden flex flex-col hover:ring-2 hover:ring-link-hover/40 transition-all"
+      className="bg-bg-header/90 rounded-2xl overflow-hidden flex flex-col hover:ring-2 hover:ring-link-hover/40 transition-all"
     >
       <div className="relative aspect-video bg-bg-header">
         {coverSrc && (

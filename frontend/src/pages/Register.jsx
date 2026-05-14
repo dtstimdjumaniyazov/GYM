@@ -107,7 +107,7 @@ function Register() {
   }
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-xl bg-bg-header/40 text-text-header placeholder:text-text-primary/40 border border-bg-header/60 focus:outline-none focus:border-link-hover focus:bg-bg-header/60 transition-colors'
+    'w-full px-4 py-2.5 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 focus:outline-none focus:border-bg-main focus:ring-2 focus:ring-bg-main/10 transition-colors'
 
   const canSubmit = consents.terms && consents.privacy && (role !== 'trainer' || consents.trainer_agreement)
 
@@ -115,8 +115,8 @@ function Register() {
     <div className="flex flex-col items-center justify-center px-4 py-10">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-header mb-2">{t('register.title')}</h1>
-          <p className="text-text-primary/70">{t('register.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('register.title')}</h1>
+          <p className="text-gray-500">{t('register.subtitle')}</p>
         </div>
 
         {/* Role Tabs */}
@@ -128,15 +128,15 @@ function Register() {
               onClick={() => setRole(r.key)}
               className={`flex-1 flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all cursor-pointer ${
                 role === r.key
-                  ? 'border-link-hover bg-link-hover/10'
-                  : 'border-bg-header/40 bg-bg-header/20 hover:border-bg-header/60'
+                  ? 'border-bg-main bg-bg-main/8 shadow-sm'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
               <span className="text-2xl">{r.icon}</span>
-              <span className={`font-medium text-sm ${role === r.key ? 'text-link-hover' : 'text-text-header'}`}>
+              <span className={`font-medium text-sm ${role === r.key ? 'text-bg-main' : 'text-gray-700'}`}>
                 {r.label}
               </span>
-              <span className="text-xs text-text-primary/50 text-center">{r.desc}</span>
+              <span className="text-xs text-gray-400 text-center">{r.desc}</span>
             </button>
           ))}
         </div>
@@ -145,7 +145,7 @@ function Register() {
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-text-header mb-1.5">{t('register.first_name')}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('register.first_name')}</label>
               <input
                 type="text"
                 name="first_name"
@@ -156,7 +156,7 @@ function Register() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-text-header mb-1.5">{t('register.last_name')}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('register.last_name')}</label>
               <input
                 type="text"
                 name="last_name"
@@ -171,8 +171,8 @@ function Register() {
           {role === 'trainer' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-text-header mb-1.5">
-                  {t('register.specialization')} <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  {t('register.specialization')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -186,8 +186,8 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-header mb-1.5">
-                  {t('register.career_start_year')} <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  {t('register.career_start_year')} <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="career_start_year"
@@ -204,8 +204,8 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-header mb-1.5">
-                  {t('register.short_description')} <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  {t('register.short_description')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -220,7 +220,7 @@ function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-header mb-1.5">{t('register.about_me')}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('register.about_me')}</label>
                 <textarea
                   name="bio"
                   value={formData.bio}
@@ -234,8 +234,8 @@ function Register() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-text-header mb-1.5">
-              {t('register.phone')} <span className="text-red-400">*</span>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              {t('register.phone')} <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -249,8 +249,8 @@ function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-header mb-1.5">
-              {t('register.password')} <span className="text-red-400">*</span>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              {t('register.password')} <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -264,8 +264,8 @@ function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-header mb-1.5">
-              {t('register.confirm_password')} <span className="text-red-400">*</span>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              {t('register.confirm_password')} <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -279,7 +279,7 @@ function Register() {
           </div>
 
           {/* Consent Checkboxes */}
-          <div className="space-y-3 pt-2 border-t border-bg-header/30">
+          <div className="space-y-3 pt-2 border-t border-gray-100">
             {role === 'trainer' && (
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input
@@ -287,15 +287,15 @@ function Register() {
                   name="trainer_agreement"
                   checked={consents.trainer_agreement}
                   onChange={handleConsentChange}
-                  className="mt-0.5 w-4 h-4 accent-link-hover shrink-0"
+                  className="mt-0.5 w-4 h-4 accent-bg-main shrink-0"
                 />
-                <span className="text-xs text-text-primary/80 leading-relaxed">
+                <span className="text-xs text-gray-600 leading-relaxed">
                   <Trans i18nKey="register.trainer_agreement_text">
                     Я ознакомлен(-а) и принимаю условия{' '}
-                    <Link to="/trainer-agreement" target="_blank" className="text-link-hover hover:underline">Договора-оферты для тренеров</Link>.
+                    <Link to="/trainer-agreement" target="_blank" className="text-bg-main hover:underline">Договора-оферты для тренеров</Link>.
                     Подтверждаю право на публикацию учебных материалов.
                   </Trans>
-                  {' '}<span className="text-red-400">*</span>
+                  {' '}<span className="text-red-500">*</span>
                 </span>
               </label>
             )}
@@ -306,17 +306,17 @@ function Register() {
                 name="terms"
                 checked={consents.terms}
                 onChange={handleConsentChange}
-                className="mt-0.5 w-4 h-4 accent-link-hover shrink-0"
+                className="mt-0.5 w-4 h-4 accent-bg-main shrink-0"
               />
-              <span className="text-xs text-text-primary/80 leading-relaxed">
+              <span className="text-xs text-gray-600 leading-relaxed">
                 <Trans i18nKey="register.terms_text">
                   Я ознакомлен(-а) и согласен(-на) с{' '}
-                  <Link to="/terms" target="_blank" className="text-link-hover hover:underline">Пользовательским соглашением</Link>
+                  <Link to="/terms" target="_blank" className="text-bg-main hover:underline">Пользовательским соглашением</Link>
                   {' '}и{' '}
-                  <Link to="/privacy" target="_blank" className="text-link-hover hover:underline">Политикой конфиденциальности</Link>.
+                  <Link to="/privacy" target="_blank" className="text-bg-main hover:underline">Политикой конфиденциальности</Link>.
                   Подтверждаю, что мне исполнилось 16 лет.
                 </Trans>
-                {' '}<span className="text-red-400">*</span>
+                {' '}<span className="text-red-500">*</span>
               </span>
             </label>
 
@@ -326,10 +326,10 @@ function Register() {
                 name="privacy"
                 checked={consents.privacy}
                 onChange={handleConsentChange}
-                className="mt-0.5 w-4 h-4 accent-link-hover shrink-0"
+                className="mt-0.5 w-4 h-4 accent-bg-main shrink-0"
               />
-              <span className="text-xs text-text-primary/80 leading-relaxed">
-                {t('register.privacy_text')} <span className="text-red-400">*</span>
+              <span className="text-xs text-gray-600 leading-relaxed">
+                {t('register.privacy_text')} <span className="text-red-500">*</span>
               </span>
             </label>
 
@@ -339,17 +339,17 @@ function Register() {
                 name="marketing"
                 checked={consents.marketing}
                 onChange={handleConsentChange}
-                className="mt-0.5 w-4 h-4 accent-link-hover shrink-0"
+                className="mt-0.5 w-4 h-4 accent-bg-main shrink-0"
               />
-              <span className="text-xs text-text-primary/60 leading-relaxed">
+              <span className="text-xs text-gray-500 leading-relaxed">
                 {t('register.marketing_text')}{' '}
-                <span className="text-text-primary/40">({t('register.optional')})</span>
+                <span className="text-gray-400">({t('register.optional')})</span>
               </span>
             </label>
           </div>
 
           {error && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
               {error}
             </div>
           )}
@@ -357,22 +357,22 @@ function Register() {
           <button
             type="submit"
             disabled={loading || !canSubmit}
-            className="w-full bg-link-hover text-bg-header py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full bg-bg-main text-white py-3 rounded-xl font-bold hover:bg-bg-main/90 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? t('register.registering') : t('register.register_button')}
           </button>
         </form>
 
         <div className="text-center">
-          <span className="text-text-primary/70">{t('register.already_have_account')} </span>
-          <Link to="/login" className="text-link-hover hover:underline font-medium">
+          <span className="text-gray-500">{t('register.already_have_account')} </span>
+          <Link to="/login" className="text-bg-main hover:underline font-medium">
             {t('auth.login')}
           </Link>
         </div>
 
         <Link
           to="/"
-          className="block text-center text-text-primary/50 hover:text-text-primary/70 text-sm mt-6"
+          className="block text-center text-gray-400 hover:text-gray-600 text-sm mt-6"
         >
           {t('common.back_to_home')}
         </Link>

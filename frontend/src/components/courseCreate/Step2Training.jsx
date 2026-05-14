@@ -40,12 +40,12 @@ export default function Step2Training({ variants, onChange }) {
 
   return (
     <div>
-      <p className="text-white/50 text-sm mb-4">
+      <p className="text-gray-500 text-sm mb-4">
         {t('create.step2_desc')}
       </p>
 
       {/* Variant tabs */}
-      <div className="flex gap-1 mb-6 border-b border-white/10 pb-0">
+      <div className="flex gap-1 mb-6 border-b border-gray-200 pb-0">
         {variants.map((v, idx) => (
           <button
             key={idx}
@@ -53,21 +53,21 @@ export default function Step2Training({ variants, onChange }) {
             onClick={() => setActiveTab(idx)}
             className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors relative ${
               activeTab === idx
-                ? 'bg-white/10 text-white'
-                : 'text-white/40 hover:text-white/70'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-400 hover:text-gray-700'
             }`}
           >
             <span
               className={`mr-1.5 inline-block w-2 h-2 rounded-full ${
-                v.active ? 'bg-main' : 'bg-white/20'
+                v.active ? 'bg-bg-main' : 'bg-gray-300'
               }`}
             />
             {t('create.variant_tab', { number: idx + 1 })}
             {idx === 0 && (
-              <span className="ml-1 text-[10px] text-white/40">{t('create.variant_required')}</span>
+              <span className="ml-1 text-[10px] text-gray-400">{t('create.variant_required')}</span>
             )}
             {activeTab === idx && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-main rounded-t" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-bg-main rounded-t" />
             )}
           </button>
         ))}
@@ -79,31 +79,31 @@ export default function Step2Training({ variants, onChange }) {
         return (
           <div key={idx}>
             {idx > 0 && (
-              <div className="flex items-center gap-3 mb-5 p-4 bg-bg-main/20 rounded-xl border border-white/10">
+              <div className="flex items-center gap-3 mb-5 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <button
                   type="button"
                   onClick={() => toggleVariantActive(idx)}
                   className={`relative w-10 h-5 rounded-full overflow-hidden transition-all duration-200 shrink-0 cursor-pointer ${
                     variant.active
-                      ? 'bg-main ring-1 ring-inset ring-white/20'
-                      : 'bg-white/10 ring-1 ring-inset ring-white/30'
+                      ? 'bg-bg-main ring-1 ring-inset ring-white/20'
+                      : 'bg-gray-200 ring-1 ring-inset ring-gray-300'
                   }`}
                 >
                   <span
                     className={`absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all duration-200 ${
                       variant.active
                         ? 'bg-white left-5.5'
-                        : 'bg-white/90 left-0.5'
+                        : 'bg-gray-400 left-0.5'
                     }`}
                   />
                 </button>
                 <div>
-                  <p className="text-sm text-white font-medium">
+                  <p className="text-sm text-gray-900 font-medium">
                     {variant.active
                       ? t('create.variant_active', { number: idx + 1 })
                       : t('create.variant_fill', { number: idx + 1 })}
                   </p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-gray-500">
                     {variant.active
                       ? t('create.variant_active_desc')
                       : t('create.variant_inactive_desc')}
@@ -119,7 +119,7 @@ export default function Step2Training({ variants, onChange }) {
                 isFirst={idx === 0}
               />
             ) : (
-              <div className="flex items-center justify-center h-32 text-white/30 text-sm border border-dashed border-white/15 rounded-xl">
+              <div className="flex items-center justify-center h-32 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
                 {t('create.variant_not_activated')}
               </div>
             )}

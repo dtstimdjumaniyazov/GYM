@@ -27,9 +27,9 @@ export default function Step3Modules({ selectedModuleTypes, modules, onChange })
 
   if (activeTypes.length === 0) {
     return (
-      <div className="text-white/40 text-sm text-center py-10 border border-dashed border-white/15 rounded-xl">
+      <div className="text-gray-400 text-sm text-center py-10 border border-dashed border-gray-200 rounded-xl">
         {t('create.no_extra_modules')}<br />
-        <span className="text-white/25 text-xs">{t('create.no_extra_modules_hint')}</span>
+        <span className="text-gray-400 text-xs">{t('create.no_extra_modules_hint')}</span>
       </div>
     )
   }
@@ -44,7 +44,7 @@ export default function Step3Modules({ selectedModuleTypes, modules, onChange })
 
   return (
     <div className="space-y-8">
-      <p className="text-white/50 text-sm">{t('create.step3_desc')}</p>
+      <p className="text-gray-500 text-sm">{t('create.step3_desc')}</p>
       {activeTypes.map((type) => (
         <ModuleSection
           key={type}
@@ -209,15 +209,15 @@ function ModuleSection({ label, items, onItemsChange }) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-semibold text-white flex items-center gap-2">
+      <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
         {label}
-        <span className="text-xs text-white/30 font-normal">{t('create.items_count', { count: items.length })}</span>
+        <span className="text-xs text-gray-400 font-normal">{t('create.items_count', { count: items.length })}</span>
       </h3>
 
       <div className="space-y-2">
         {items.map((item, idx) => (
-          <div key={item._key ?? idx} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-            <span className="text-white/30 text-xs font-mono shrink-0">#{idx + 1}</span>
+          <div key={item._key ?? idx} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+            <span className="text-gray-400 text-xs font-mono shrink-0">#{idx + 1}</span>
 
             {/* Move up/down */}
             <div className="flex flex-col shrink-0">
@@ -225,7 +225,7 @@ function ModuleSection({ label, items, onItemsChange }) {
                 type="button"
                 onClick={() => moveItem(idx, -1)}
                 disabled={idx === 0}
-                className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
+                className="text-gray-300 hover:text-gray-600 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -235,7 +235,7 @@ function ModuleSection({ label, items, onItemsChange }) {
                 type="button"
                 onClick={() => moveItem(idx, 1)}
                 disabled={idx === items.length - 1}
-                className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
+                className="text-gray-300 hover:text-gray-600 disabled:opacity-0 disabled:cursor-default transition-colors leading-none"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -244,12 +244,12 @@ function ModuleSection({ label, items, onItemsChange }) {
             </div>
 
             {item.type === 'video' ? (
-              <svg className="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M4 6h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
               </svg>
             ) : (
-              <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
@@ -259,7 +259,7 @@ function ModuleSection({ label, items, onItemsChange }) {
               value={item.title}
               onChange={(e) => updateTitle(idx, e.target.value)}
               placeholder={t('create.item_title_placeholder')}
-              className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
             />
             {item.type === 'video' && (
               <button
@@ -268,8 +268,8 @@ function ModuleSection({ label, items, onItemsChange }) {
                 title={t('create.preview_toggle_hint')}
                 className={`shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-xs transition-colors ${
                   item.is_preview
-                    ? 'bg-main/30 text-main border border-main/40'
-                    : 'text-white/25 hover:text-white/60'
+                    ? 'bg-bg-main/10 text-bg-main border border-bg-main/30'
+                    : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -278,7 +278,7 @@ function ModuleSection({ label, items, onItemsChange }) {
                 {item.is_preview && <span>{t('create.preview_label')}</span>}
               </button>
             )}
-            <button type="button" onClick={() => removeItem(idx)} className="text-white/25 hover:text-red-400 transition-colors">
+            <button type="button" onClick={() => removeItem(idx)} className="text-gray-300 hover:text-red-500 transition-colors">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -290,7 +290,7 @@ function ModuleSection({ label, items, onItemsChange }) {
           <button
             type="button"
             onClick={sortByName}
-            className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 transition-colors px-1 py-0.5"
+            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors px-1 py-0.5"
           >
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -331,7 +331,7 @@ function ModuleSection({ label, items, onItemsChange }) {
             <button
               type="button"
               onClick={() => videoInputRef.current?.click()}
-              className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2.5 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+              className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
             >
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -344,7 +344,7 @@ function ModuleSection({ label, items, onItemsChange }) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 w-full border border-dashed border-white/25 rounded-lg px-3 py-2.5 text-sm text-white/50 hover:border-main hover:text-white/80 transition-colors"
+              className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
             >
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -361,14 +361,14 @@ function ModuleSection({ label, items, onItemsChange }) {
 function UploadProgress({ index, filename, progress, error, onCancel, onDismiss }) {
   if (error) {
     return (
-      <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
+      <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs text-white/60 truncate">
-            <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+          <p className="text-xs text-gray-600 truncate">
+            <span className="text-gray-400 font-mono mr-1.5">#{index}</span>{filename}
           </p>
-          <p className="text-red-400 text-xs mt-0.5">{error}</p>
+          <p className="text-red-600 text-xs mt-0.5">{error}</p>
         </div>
-        <button type="button" onClick={onDismiss} className="text-white/30 hover:text-red-400 transition-colors shrink-0 mt-0.5">
+        <button type="button" onClick={onDismiss} className="text-gray-400 hover:text-red-600 transition-colors shrink-0 mt-0.5">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -378,15 +378,15 @@ function UploadProgress({ index, filename, progress, error, onCancel, onDismiss 
   }
 
   return (
-    <div className="bg-white/5 border border-white/15 rounded-lg px-3 py-2">
+    <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-white/60 truncate flex-1 mr-2">
-          <span className="text-white/30 font-mono mr-1.5">#{index}</span>{filename}
+        <span className="text-xs text-gray-600 truncate flex-1 mr-2">
+          <span className="text-gray-400 font-mono mr-1.5">#{index}</span>{filename}
         </span>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-main font-mono">{progress}%</span>
+          <span className="text-xs text-bg-main font-mono">{progress}%</span>
           {progress < 100 && (
-            <button type="button" onClick={onCancel} className="text-white/30 hover:text-red-400 transition-colors">
+            <button type="button" onClick={onCancel} className="text-gray-400 hover:text-red-500 transition-colors">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -394,8 +394,8 @@ function UploadProgress({ index, filename, progress, error, onCancel, onDismiss 
           )}
         </div>
       </div>
-      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-main transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
+      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-full bg-bg-main transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
       </div>
     </div>
   )

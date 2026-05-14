@@ -59,8 +59,8 @@ function CourseDetail() {
   if (error || !course) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <h2 className="text-2xl font-bold mb-4">{t('course.not_found')}</h2>
-        <Link to="/" className="text-link-hover hover:underline">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('course.not_found')}</h2>
+        <Link to="/" className="text-bg-main hover:underline">
           {t('common.back_to_home')}
         </Link>
       </div>
@@ -110,7 +110,7 @@ function CourseDetail() {
       : t('course.variant_many', { count: variantCount })
 
   return (
-    <div className="flex flex-col gap-8 pb-10">
+    <div className="flex flex-col gap-6 pb-10">
       {/* ─── Hero Block ─────────────────────────────── */}
       <section className="relative">
         {coverSrc && (
@@ -120,27 +120,27 @@ function CourseDetail() {
               alt={course.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg-main/90 to-transparent rounded-2xl" />
+            <div className="absolute inset-0 bg-linear-to-t from-gray-900/85 to-transparent rounded-2xl" />
           </div>
         )}
 
-        <div className={`${coverSrc ? 'absolute bottom-0 left-0 right-0 p-6 md:p-10' : 'pt-6'}`}>
-          <h1 className="text-3xl md:text-4xl font-bold text-text-header mb-3">
+        <div className={`${coverSrc ? 'absolute bottom-0 left-0 right-0 p-6 md:p-10' : 'pt-4'}`}>
+          <h1 className={`text-3xl md:text-4xl font-bold mb-3 ${coverSrc ? 'text-white' : 'text-gray-900'}`}>
             {course.title}
           </h1>
-          <p className="text-lg text-text-primary/90 mb-4 max-w-2xl">
+          <p className={`text-lg mb-4 max-w-2xl ${coverSrc ? 'text-white/85' : 'text-gray-600'}`}>
             {course.short_description}
           </p>
 
           {primaryModule && (
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm text-text-primary/70">{t('course.primary_focus')}</span>
-              <span className="font-medium">{MODULE_LABELS[primaryModule.type]}</span>
+              <span className={`text-sm ${coverSrc ? 'text-white/70' : 'text-gray-500'}`}>{t('course.primary_focus')}</span>
+              <span className={`font-medium ${coverSrc ? 'text-white' : 'text-gray-800'}`}>{MODULE_LABELS[primaryModule.type]}</span>
             </div>
           )}
 
           <div className="flex items-center gap-4 mb-4">
-            <span className="text-sm text-text-primary/70">
+            <span className={`text-sm ${coverSrc ? 'text-white/70' : 'text-gray-500'}`}>
               {t('course.students_count', { count: course.purchases_count || 0 })}
             </span>
           </div>
@@ -148,28 +148,28 @@ function CourseDetail() {
       </section>
 
       {/* ─── Trainer + Meta + Actions ────────────────── */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 flex flex-col gap-6">
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 flex flex-col gap-5">
           {/* Trainer Card */}
-          <div className="bg-bg-header/60 rounded-2xl p-5 flex items-start gap-4">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-5 flex items-start gap-4">
             {trainerPhoto && (
               <img
                 src={trainerPhoto}
                 alt={course.trainer_name}
-                className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                className="w-16 h-16 rounded-full object-cover shrink-0"
               />
             )}
             <div>
               <Link
                 to={`/trainers/${course.trainer?.id}`}
-                className="font-bold text-text-header text-lg hover:text-link-hover transition-colors"
+                className="font-bold text-gray-900 text-lg hover:text-bg-main transition-colors"
               >
                 {course.trainer_name}
               </Link>
               {course.trainer?.specialization && (
-                <p className="text-sm text-text-primary/80">{course.trainer.specialization}</p>
+                <p className="text-sm text-gray-500">{course.trainer.specialization}</p>
               )}
-              <div className="flex flex-wrap gap-3 mt-2 text-sm text-text-primary/70">
+              <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
                 {course.trainer?.experience_years > 0 && (
                   <span>{t('course.experience', { years: course.trainer.experience_years })}</span>
                 )}
@@ -178,7 +178,7 @@ function CourseDetail() {
                 )}
               </div>
               {course.trainer?.short_description && (
-                <p className="text-sm text-text-primary/70 mt-2">
+                <p className="text-sm text-gray-500 mt-2">
                   {course.trainer.short_description}
                 </p>
               )}
@@ -186,7 +186,7 @@ function CourseDetail() {
           </div>
 
           {/* Meta Info Badges */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2.5">
             <Badge label={t('course.badge_level')} value={LEVEL_LABELS[course.level] || course.level} />
             <Badge label={t('course.badge_duration')} value={t('course.badge_duration_value', { weeks: course.duration_weeks })} />
             <Badge label={t('course.badge_format')} value={FORMAT_LABELS[course.format] || course.format} />
@@ -200,14 +200,14 @@ function CourseDetail() {
         </div>
 
         {/* Right Column: Price + Actions */}
-        <div className="bg-bg-header/80 rounded-2xl p-6 flex flex-col gap-4 h-fit lg:sticky lg:top-20">
-          <div className="text-3xl font-bold text-text-header">
+        <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-6 flex flex-col gap-4 h-fit lg:sticky lg:top-20">
+          <div className="text-3xl font-bold text-gray-900">
             {Number(course.price).toLocaleString('ru-RU')} UZS
           </div>
 
           {showPaymentPicker && !course.is_purchased ? (
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-text-primary/70 text-center">{t('course.select_payment')}</p>
+              <p className="text-sm text-gray-500 text-center">{t('course.select_payment')}</p>
               <button
                 onClick={() => handlePay('click')}
                 disabled={payLoading}
@@ -234,7 +234,7 @@ function CourseDetail() {
               <button
                 onClick={() => setShowPaymentPicker(false)}
                 disabled={payLoading}
-                className="text-sm text-text-primary/50 hover:text-text-primary transition-colors cursor-pointer text-center"
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors cursor-pointer text-center"
               >
                 {t('common.cancel')}
               </button>
@@ -243,14 +243,14 @@ function CourseDetail() {
             <button
               onClick={handleStartCourse}
               disabled={payLoading}
-              className="w-full py-3 px-6 rounded-xl font-bold text-lg transition-all cursor-pointer bg-link-hover text-bg-header hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full py-3 px-6 rounded-xl font-bold text-lg transition-all cursor-pointer bg-bg-main text-white hover:bg-bg-main/90 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {course.is_purchased ? t('course.continue_course') : t('course.start_course')}
             </button>
           )}
 
           {payError && (
-            <div className="text-red-400 text-sm text-center">
+            <div className="text-red-500 text-sm text-center">
               {payError}
             </div>
           )}
@@ -261,8 +261,8 @@ function CourseDetail() {
               disabled={favLoading}
               className={`w-full py-3 px-6 rounded-xl font-medium transition-all cursor-pointer border-2 ${
                 course.is_favorited
-                  ? 'border-red-400 text-red-400 hover:bg-red-400/10'
-                  : 'border-text-primary/30 text-text-primary hover:border-text-primary/60'
+                  ? 'border-red-400 text-red-500 hover:bg-red-50'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               {course.is_favorited ? t('course.in_favorites') : t('course.add_to_favorites')}
@@ -270,14 +270,14 @@ function CourseDetail() {
           ) : (
             <Link
               to="/login"
-              className="w-full py-3 px-6 rounded-xl font-medium transition-all border-2 border-text-primary/30 text-text-primary hover:border-text-primary/60 text-center block"
+              className="w-full py-3 px-6 rounded-xl font-medium transition-all border-2 border-gray-200 text-gray-600 hover:border-gray-300 text-center block"
             >
               {t('course.login_to_favorite')}
             </Link>
           ))}
 
           {course.is_purchased && (
-            <div className="text-center text-green-400 text-sm font-medium">
+            <div className="text-center text-green-600 text-sm font-medium">
               {t('course.purchased')}
             </div>
           )}
@@ -285,10 +285,10 @@ function CourseDetail() {
       </section>
 
       {/* ─── Hero Body ───────────────────────────────── */}
-      <section className="flex flex-col gap-8">
+      <section className="flex flex-col gap-5">
         {course.stats && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-4">{t('course.what_includes')}</h2>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('course.what_includes')}</h2>
             <div className="grid grid-cols-3 gap-4">
               <StatCard icon="🎬" label={t('course.stat_videos')} value={course.stats.video_count} />
               <StatCard icon="📄" label={t('course.stat_pdfs')} value={course.stats.pdf_count} />
@@ -298,8 +298,8 @@ function CourseDetail() {
         )}
 
         {course.modules?.length > 0 && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-4">{t('course.contents_title')}</h2>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('course.contents_title')}</h2>
             <div className="flex flex-col gap-3">
               {course.modules.map((module) => (
                 <ModuleTocItem key={module.id} module={module} moduleLabels={MODULE_LABELS} moduleIcons={MODULE_ICONS} previewBadge={t('course.preview_badge')} />
@@ -309,53 +309,53 @@ function CourseDetail() {
         )}
 
         {course.requirements && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-3">{t('course.requirements_title')}</h2>
-            <div className="text-text-primary/90 whitespace-pre-line">{course.requirements}</div>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">{t('course.requirements_title')}</h2>
+            <div className="text-gray-700 whitespace-pre-line">{course.requirements}</div>
           </div>
         )}
 
         {course.goals_text && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-3">{t('course.goals_title')}</h2>
-            <div className="text-text-primary/90 whitespace-pre-line">{course.goals_text}</div>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">{t('course.goals_title')}</h2>
+            <div className="text-gray-700 whitespace-pre-line">{course.goals_text}</div>
           </div>
         )}
 
         {course.full_description && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-3">{t('course.description_title')}</h2>
-            <div className="text-text-primary/90 whitespace-pre-line">{course.full_description}</div>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">{t('course.description_title')}</h2>
+            <div className="text-gray-700 whitespace-pre-line">{course.full_description}</div>
           </div>
         )}
 
         <PreviewSection modules={course.modules} previewTitle={t('course.preview_title')} />
 
-        {course.trainer?.bio && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-text-header mb-3">{t('course.about_trainer')}</h2>
+        {/* {course.trainer?.bio && (
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">{t('course.about_trainer')}</h2>
             <div className="flex items-start gap-4">
               {trainerPhoto && (
                 <img
                   src={trainerPhoto}
                   alt={course.trainer_name}
-                  className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+                  className="w-20 h-20 rounded-full object-cover shrink-0"
                 />
               )}
               <div>
                 <Link
                   to={`/trainers/${course.trainer?.id}`}
-                  className="font-bold text-lg text-text-header hover:text-link-hover transition-colors"
+                  className="font-bold text-lg text-gray-900 hover:text-bg-main transition-colors"
                 >
                   {course.trainer_name}
                 </Link>
-                <p className="text-text-primary/90 mt-2 whitespace-pre-line">
+                <p className="text-gray-600 mt-2 whitespace-pre-line">
                   {course.trainer.bio}
                 </p>
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </section>
     </div>
   )
@@ -370,20 +370,11 @@ function toDirectUrl(url) {
   return url
 }
 
-function StarRating({ rating, max = 5 }) {
-  return (
-    <span className="text-yellow-400">
-      {'★'.repeat(Math.round(rating || 0))}
-      {'☆'.repeat(max - Math.round(rating || 0))}
-    </span>
-  )
-}
-
 function Badge({ label, value }) {
   return (
-    <div className="bg-bg-header/60 rounded-xl px-4 py-2">
-      <span className="text-xs text-text-primary/60 block">{label}</span>
-      <span className="text-sm font-medium text-text-header">{value}</span>
+    <div className="bg-gray-100 rounded-xl px-4 py-2">
+      <span className="text-xs text-gray-500 block">{label}</span>
+      <span className="text-sm font-medium text-gray-800">{value}</span>
     </div>
   )
 }
@@ -393,8 +384,8 @@ function StatCard({ icon, label, value }) {
     <div className="flex items-center gap-3">
       <span className="text-2xl">{icon}</span>
       <div>
-        <div className="font-bold text-text-header">{value}</div>
-        <div className="text-xs text-text-primary/70">{label}</div>
+        <div className="font-bold text-gray-900">{value}</div>
+        <div className="text-xs text-gray-500">{label}</div>
       </div>
     </div>
   )
@@ -406,22 +397,22 @@ function ModuleTocItem({ module, moduleLabels, moduleIcons, previewBadge }) {
   const stars = '⭐'.repeat(module.priority)
 
   return (
-    <div className="bg-bg-header/30 rounded-xl p-4">
+    <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-lg">{icon}</span>
-          <span className="font-medium text-text-header">{label}</span>
+          <span className="font-medium text-gray-800">{label}</span>
         </div>
         <span className="text-sm">{stars}</span>
       </div>
       {module.contents?.length > 0 && (
-        <ul className="ml-8 text-sm text-text-primary/70 space-y-1">
+        <ul className="ml-8 text-sm text-gray-500 space-y-1">
           {module.contents.map((content) => (
             <li key={content.id} className="flex items-center gap-2">
               <span>{content.content_type === 'video' ? '🎥' : content.content_type === 'pdf' ? '📄' : '🖼️'}</span>
               <span>{content.title}</span>
               {content.is_preview && content.content_type === 'video' && (
-                <span className="text-xs bg-link-hover/20 text-link-hover px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-bg-main/10 text-bg-main px-2 py-0.5 rounded-full">
                   {previewBadge}
                 </span>
               )}
@@ -448,15 +439,15 @@ function PreviewSection({ modules, previewTitle }) {
   if (previewItems.length === 0) return null
 
   return (
-    <div className="bg-bg-header/40 rounded-2xl p-6">
-      <h2 className="text-xl font-bold text-text-header mb-4">{previewTitle}</h2>
+    <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+      <h2 className="text-xl font-bold text-gray-900 mb-4">{previewTitle}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {previewItems.map((item) => (
-          <div key={item.id} className="bg-bg-header/60 rounded-xl overflow-hidden">
+          <div key={item.id} className="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden">
             {item.vimeo_video?.vimeo_id ? (
               <VimeoPlayer vimeoId={item.vimeo_video.vimeo_id} />
             ) : item.vimeo_video?.thumbnail_url ? (
-              <div className="aspect-video bg-bg-header flex items-center justify-center relative">
+              <div className="aspect-video bg-gray-200 flex items-center justify-center relative">
                 <img
                   src={item.vimeo_video.thumbnail_url}
                   alt={item.title}
@@ -468,9 +459,9 @@ function PreviewSection({ modules, previewTitle }) {
               </div>
             ) : null}
             <div className="p-3">
-              <p className="text-sm font-medium text-text-header">{item.title}</p>
+              <p className="text-sm font-medium text-gray-800">{item.title}</p>
               {item.vimeo_video?.duration_formatted && (
-                <p className="text-xs text-text-primary/60">{item.vimeo_video.duration_formatted}</p>
+                <p className="text-xs text-gray-400">{item.vimeo_video.duration_formatted}</p>
               )}
             </div>
           </div>

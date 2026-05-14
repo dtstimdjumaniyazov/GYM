@@ -165,25 +165,25 @@ function Login() {
   }
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-xl bg-bg-header/40 text-text-header placeholder:text-text-primary/40 border border-bg-header/60 focus:outline-none focus:border-link-hover focus:bg-bg-header/60 transition-colors'
+    'w-full px-4 py-2.5 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 focus:outline-none focus:border-bg-main focus:ring-2 focus:ring-bg-main/10 transition-colors'
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-10">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-header mb-2">{t('auth.login_title')}</h1>
-          <p className="text-text-primary/70">{t('auth.login_subtitle')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('auth.login_title')}</h1>
+          <p className="text-gray-500">{t('auth.login_subtitle')}</p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm mb-6">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm mb-6">
             {error}
           </div>
         )}
 
         {/* Phone + Password */}
-        <div className="bg-bg-header/40 rounded-2xl p-6 mb-4">
-          <h3 className="font-bold text-text-header mb-4">{t('auth.phone_login')}</h3>
+        <div className="bg-white border border-gray-200 shadow-sm rounded-2xl p-6 mb-4">
+          <h3 className="font-bold text-gray-800 mb-4">{t('auth.phone_login')}</h3>
           <form onSubmit={handlePhoneLogin} className="flex flex-col gap-3">
             <input
               type="tel"
@@ -202,14 +202,14 @@ function Login() {
                 className={inputClass}
                 required
               />
-              <span className="text-text-primary/50 text-xs text-right">
+              <span className="text-gray-400 text-xs text-right">
                 {t('auth.forgot_password')}
               </span>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-link-hover text-bg-header py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+              className="w-full bg-bg-main text-white py-3 rounded-xl font-bold hover:bg-bg-main/90 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {loading ? t('auth.logging_in') : t('auth.login')}
             </button>
@@ -218,9 +218,9 @@ function Login() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-text-header/10" />
-          <span className="text-sm text-text-primary/50">{t('common.or')}</span>
-          <div className="flex-1 h-px bg-text-header/10" />
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-sm text-gray-400">{t('common.or')}</span>
+          <div className="flex-1 h-px bg-gray-200" />
         </div>
 
         {/* Social Login Buttons */}
@@ -250,15 +250,15 @@ function Login() {
         </div>
 
         <div className="text-center">
-          <span className="text-text-primary/70">{t('auth.no_account')} </span>
-          <Link to="/register" className="text-link-hover hover:underline font-medium">
+          <span className="text-gray-500">{t('auth.no_account')} </span>
+          <Link to="/register" className="text-bg-main hover:underline font-medium">
             {t('auth.register')}
           </Link>
         </div>
 
         <Link
           to="/"
-          className="block text-center text-text-primary/50 hover:text-text-primary/70 text-sm mt-6"
+          className="block text-center text-gray-400 hover:text-gray-600 text-sm mt-6"
         >
           {t('common.back_to_home')}
         </Link>

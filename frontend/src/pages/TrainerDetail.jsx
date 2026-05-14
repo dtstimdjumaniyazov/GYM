@@ -39,8 +39,8 @@ function TrainerDetail() {
   if (error || !trainer) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-text-header mb-4">{t('trainer.not_found')}</h2>
-        <Link to="/" className="text-link-hover hover:underline">{t('common.back_to_home')}</Link>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('trainer.not_found')}</h2>
+        <Link to="/" className="text-bg-main hover:underline">{t('common.back_to_home')}</Link>
       </div>
     )
   }
@@ -49,44 +49,42 @@ function TrainerDetail() {
   const fullName = `${trainer.first_name} ${trainer.last_name}`.trim()
 
   return (
-    <div className="flex flex-col gap-8 pb-10">
+    <div className="flex flex-col gap-6 pb-10">
       {/* ─── Hero Block ─────────────────────────────── */}
-      <section className="bg-bg-header/60 rounded-2xl p-6 md:p-8">
+      <section className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 md:p-8">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          {/* Photo */}
           {photoSrc ? (
             <img
               src={photoSrc}
               alt={fullName}
-              className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover shrink-0 ring-4 ring-link-hover/30"
+              className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover shrink-0 ring-4 ring-bg-main/20"
             />
           ) : (
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-bg-main/40 flex items-center justify-center text-5xl font-bold text-text-header shrink-0">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-bg-main/10 flex items-center justify-center text-5xl font-bold text-bg-main shrink-0">
               {trainer.first_name?.[0]?.toUpperCase() || '?'}
             </div>
           )}
 
-          {/* Info */}
           <div className="flex flex-col gap-3 text-center sm:text-left">
-            <h1 className="text-3xl font-bold text-text-header">{fullName}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{fullName}</h1>
 
             {trainer.specialization && (
-              <p className="text-link-hover">{trainer.specialization}</p>
+              <p className="text-bg-main font-medium">{trainer.specialization}</p>
             )}
 
-            <div className="flex flex-wrap gap-4 justify-center sm:justify-start text-sm">
+            <div className="flex flex-wrap gap-3 justify-center sm:justify-start text-sm">
               {trainer.experience_years > 0 && (
-                <span className="bg-bg-main/40 text-text-header px-3 py-1.5 rounded-full">
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
                   {t('trainer.experience', { years: trainer.experience_years })}
                 </span>
               )}
               {trainer.courses_count > 0 && (
-                <span className="bg-bg-main/40 text-text-header px-3 py-1.5 rounded-full">
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
                   {t('trainer.courses_count', { count: trainer.courses_count })}
                 </span>
               )}
               {trainer.certificates?.length > 0 && (
-                <span className="bg-bg-main/40 text-text-header px-3 py-1.5 rounded-full">
+                <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full">
                   {t('trainer.certificates_count', { count: trainer.certificates.length })}
                 </span>
               )}
@@ -97,7 +95,7 @@ function TrainerDetail() {
                 href={trainer.instagram_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 transition-colors text-sm w-fit"
+                className="inline-flex items-center gap-2 text-pink-500 hover:text-pink-600 transition-colors text-sm w-fit"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
@@ -112,13 +110,13 @@ function TrainerDetail() {
       {/* ─── About ──────────────────────────────────── */}
       {(trainer.bio || trainer.short_description) && (
         <section>
-          <h2 className="text-xl font-bold text-text-header mb-4">{t('trainer.about')}</h2>
-          <div className="bg-bg-header/60 rounded-2xl p-6 flex flex-col gap-3">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.about')}</h2>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 flex flex-col gap-3">
             {trainer.short_description && (
-              <p className="text-text-header font-medium leading-relaxed">{trainer.short_description}</p>
+              <p className="text-gray-800 font-medium leading-relaxed">{trainer.short_description}</p>
             )}
             {trainer.bio && (
-              <p className="text-text-primary whitespace-pre-line leading-relaxed">{trainer.bio}</p>
+              <p className="text-gray-600 whitespace-pre-line leading-relaxed">{trainer.bio}</p>
             )}
           </div>
         </section>
@@ -127,9 +125,9 @@ function TrainerDetail() {
       {/* ─── Intro Video ────────────────────────────── */}
       {trainer.intro_video_url && (
         <section>
-          <h2 className="text-xl font-bold text-text-header mb-4">{t('trainer.intro_video')}</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.intro_video')}</h2>
           {getEmbedUrl(trainer.intro_video_url) ? (
-            <div className="rounded-2xl overflow-hidden aspect-video">
+            <div className="rounded-2xl overflow-hidden aspect-video shadow-sm">
               <iframe
                 src={getEmbedUrl(trainer.intro_video_url)}
                 className="w-full h-full"
@@ -155,12 +153,12 @@ function TrainerDetail() {
       {/* ─── Certificates ───────────────────────────── */}
       {trainer.certificates?.length > 0 && (
         <section>
-          <h2 className="text-xl font-bold text-text-header mb-4">{t('trainer.certificates')}</h2>
-          <div className="bg-bg-header/60 rounded-2xl p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.certificates')}</h2>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
             <ul className="flex flex-col gap-2">
               {trainer.certificates.map((cert, i) => (
-                <li key={i} className="text-text-primary flex items-start gap-2">
-                  <span className="text-link-hover mt-0.5">&#10003;</span>
+                <li key={i} className="text-gray-700 flex items-start gap-2">
+                  <span className="text-bg-main mt-0.5">&#10003;</span>
                   <span>{cert}</span>
                 </li>
               ))}
@@ -171,10 +169,10 @@ function TrainerDetail() {
 
       {/* ─── Trainer's Courses ──────────────────────── */}
       <section>
-        <h2 className="text-xl font-bold text-text-header mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
           {t('trainer.courses')}
           {coursesData?.count > 0 && (
-            <span className="text-text-primary font-normal text-base ml-2">({coursesData.count})</span>
+            <span className="text-gray-400 font-normal text-base ml-2">({coursesData.count})</span>
           )}
         </h2>
 
@@ -194,8 +192,8 @@ function TrainerDetail() {
             />
           </>
         ) : (
-          <div className="bg-bg-header/60 rounded-2xl p-8 text-center">
-            <p className="text-text-primary">{t('trainer.no_courses')}</p>
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
+            <p className="text-gray-500">{t('trainer.no_courses')}</p>
           </div>
         )}
       </section>

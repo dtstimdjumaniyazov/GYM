@@ -13,7 +13,7 @@ function TrainerCard({ trainer }) {
   return (
     <Link
       to={`/trainers/${trainer.id}`}
-      className="bg-bg-header/80 rounded-2xl overflow-hidden w-44 sm:w-52 md:w-56 shrink-0 hover:ring-2 hover:ring-link-hover/40 transition-all"
+      className="bg-bg-header/90 rounded-2xl overflow-hidden w-44 sm:w-52 md:w-56 shrink-0 hover:ring-2 hover:ring-link-hover/40 transition-all"
     >
       <div className="h-44 sm:h-52 md:h-56 bg-bg-header flex items-center justify-center">
         {photoSrc ? (

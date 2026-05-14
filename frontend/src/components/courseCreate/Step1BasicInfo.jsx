@@ -3,16 +3,16 @@ import ReactMarkdown from 'react-markdown'
 import { useTranslation } from 'react-i18next'
 
 const inputCls =
-  'w-full bg-bg-main/30 border border-white/10 rounded-lg px-4 py-2.5 text-text-header placeholder-white/30 outline-none focus:ring-2 focus:ring-link-hover/50'
+  'w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-bg-main/20 focus:border-bg-main transition-colors'
 
 const selectCls =
-  'w-full bg-bg-main/30 border border-white/10 rounded-lg px-4 py-2.5 text-text-header outline-none focus:ring-2 focus:ring-link-hover/50'
+  'w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 outline-none focus:ring-2 focus:ring-bg-main/20 focus:border-bg-main transition-colors'
 
-const labelCls = 'block text-sm font-medium text-text-primary mb-1'
+const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
 
 function FieldError({ msg }) {
   if (!msg) return null
-  return <p className="mt-1 text-xs text-red-400">{msg}</p>
+  return <p className="mt-1 text-xs text-red-600">{msg}</p>
 }
 
 export default function Step1BasicInfo({ data, onChange, errors, categories = [] }) {
@@ -65,16 +65,16 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
       {/* Category */}
       <div>
         <label className={labelCls}>
-          {t('create.category')} <span className="text-red-400">*</span>
+          {t('create.category')} <span className="text-red-500">*</span>
         </label>
         <select
           value={data.category}
           onChange={(e) => field('category', e.target.value)}
           className={selectCls}
         >
-          <option value="" className="bg-bg-header">{t('create.category_placeholder')}</option>
+          <option value="">{t('create.category_placeholder')}</option>
           {categories.map((cat) => (
-            <option key={cat.id} value={cat.id} className="bg-bg-header">
+            <option key={cat.id} value={cat.id}>
               {cat.title}
             </option>
           ))}
@@ -85,7 +85,7 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
       {/* Title */}
       <div>
         <label className={labelCls}>
-          {t('create.course_title')} <span className="text-red-400">*</span>
+          {t('create.course_title')} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -101,8 +101,8 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
       {/* Short description */}
       <div>
         <label className={labelCls}>
-          {t('create.short_desc')} <span className="text-red-400">*</span>
-          <span className="text-white/40 font-normal ml-1">{t('create.short_desc_hint')}</span>
+          {t('create.short_desc')} <span className="text-red-500">*</span>
+          <span className="text-gray-400 font-normal ml-1">{t('create.short_desc_hint')}</span>
         </label>
         <textarea
           value={data.short_description}
@@ -114,14 +114,14 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
         />
         <div className="flex justify-between mt-0.5">
           <FieldError msg={errors?.short_description} />
-          <span className="text-xs text-white/30">{data.short_description.length}/500</span>
+          <span className="text-xs text-gray-400">{data.short_description.length}/500</span>
         </div>
       </div>
 
       {/* Modules */}
       <div>
         <label className={labelCls}>
-          {t('create.modules')} <span className="text-white/40 font-normal">{t('create.modules_hint')}</span>
+          {t('create.modules')} <span className="text-gray-400 font-normal">{t('create.modules_hint')}</span>
         </label>
         <div className="flex flex-wrap gap-3">
           {MODULE_OPTIONS.map((m) => {
@@ -134,12 +134,12 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
                 disabled={m.required}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
                   checked
-                    ? 'bg-main border-main text-white'
-                    : 'bg-bg-main/20 border-white/20 text-text-primary hover:border-white/40'
+                    ? 'bg-bg-main border-bg-main text-white'
+                    : 'bg-gray-100 border-gray-200 text-gray-600 hover:border-gray-400'
                 } ${m.required ? 'opacity-80 cursor-default' : 'cursor-pointer'}`}
               >
                 {m.label}
-                {m.required && <span className="ml-1 text-white/50 text-xs">{t('create.module_required')}</span>}
+                {m.required && <span className="ml-1 text-white/70 text-xs">{t('create.module_required')}</span>}
               </button>
             )
           })}
@@ -156,7 +156,7 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
             className={selectCls}
           >
             {LEVEL_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} className="bg-bg-header">
+              <option key={o.value} value={o.value}>
                 {o.label}
               </option>
             ))}
@@ -170,7 +170,7 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
             className={selectCls}
           >
             {FORMAT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} className="bg-bg-header">
+              <option key={o.value} value={o.value}>
                 {o.label}
               </option>
             ))}
@@ -184,7 +184,7 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
             className={selectCls}
           >
             {LANGUAGE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} className="bg-bg-header">
+              <option key={o.value} value={o.value}>
                 {o.label}
               </option>
             ))}
@@ -207,7 +207,7 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
         </div>
         <div>
           <label className={labelCls}>
-            {t('create.price_label')} <span className="text-red-400">*</span>
+            {t('create.price_label')} <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -235,24 +235,24 @@ export default function Step1BasicInfo({ data, onChange, errors, categories = []
       {/* Goals text (markdown) */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-medium text-text-primary">
+          <label className="text-sm font-medium text-gray-700">
             {t('create.goals')}
-            <span className="text-white/40 font-normal ml-1">{t('create.goals_md_hint')}</span>
+            <span className="text-gray-400 font-normal ml-1">{t('create.goals_md_hint')}</span>
           </label>
           <button
             type="button"
             onClick={() => setMdPreview((v) => !v)}
-            className="text-xs text-link-hover hover:underline"
+            className="text-xs text-bg-main hover:underline"
           >
             {mdPreview ? t('create.goals_edit') : t('create.goals_preview')}
           </button>
         </div>
         {mdPreview ? (
-          <div className="min-h-30 bg-bg-main/20 border border-white/10 rounded-lg px-4 py-3 prose prose-invert prose-sm max-w-none">
+          <div className="min-h-30 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 prose prose-sm max-w-none">
             {data.goals_text ? (
               <ReactMarkdown>{data.goals_text}</ReactMarkdown>
             ) : (
-              <p className="text-white/30 italic">{t('create.goals_empty')}</p>
+              <p className="text-gray-400 italic">{t('create.goals_empty')}</p>
             )}
           </div>
         ) : (

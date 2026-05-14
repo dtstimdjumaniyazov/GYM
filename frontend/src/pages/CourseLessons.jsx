@@ -158,8 +158,8 @@ function CourseLessons() {
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <h2 className="text-2xl font-bold mb-4">{t('lessons.not_found')}</h2>
-        <Link to="/" className="text-link-hover hover:underline">{t('common.back_to_home')}</Link>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('lessons.not_found')}</h2>
+        <Link to="/" className="text-bg-main hover:underline">{t('common.back_to_home')}</Link>
       </div>
     )
   }
@@ -220,17 +220,17 @@ function CourseLessons() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <Link to={`/courses/${id}`} className="text-link-hover text-sm hover:underline">
+          <Link to={`/courses/${id}`} className="text-bg-main text-sm hover:underline">
             {t('lessons.back_to_course')}
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-text-header mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-1">
             {course.title}
           </h1>
         </div>
         {isPurchased && !isVariantLocked && course.training_variants?.length > 0 && (
           <button
             onClick={() => setShowVariantModal(true)}
-            className="bg-link-hover text-bg-header px-4 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer"
+            className="bg-bg-main text-white px-4 py-2 rounded-xl font-medium hover:bg-bg-main/90 transition-colors cursor-pointer"
           >
             {t('lessons.select_program_btn')}
           </button>
@@ -239,16 +239,16 @@ function CourseLessons() {
 
       {/* Not purchased banner */}
       {!isPurchased && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-center">
-          <p className="text-yellow-300 font-medium mb-2">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+          <p className="text-amber-700 font-medium mb-2">
             {t('lessons.preview_banner_title')}
           </p>
-          <p className="text-sm text-text-primary/70 mb-3">
+          <p className="text-sm text-gray-600 mb-3">
             {t('lessons.preview_banner_desc')}
           </p>
           <Link
             to={`/courses/${id}`}
-            className="inline-block bg-link-hover text-bg-header px-6 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-bg-main text-white px-6 py-2 rounded-xl font-medium hover:bg-bg-main/90 transition-colors"
           >
             {t('lessons.buy_course')}
           </Link>
@@ -270,8 +270,8 @@ function CourseLessons() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-link-hover text-bg-header'
-                    : 'bg-bg-header/50 text-text-header hover:bg-bg-header/70'
+                    ? 'bg-bg-main text-white shadow-sm'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <span>{MODULE_ICONS[module.type]}</span>
@@ -313,7 +313,7 @@ function CourseLessons() {
           onVideoEnded={handleVideoEnded}
         />
       ) : (
-        <p className="text-text-primary/70 text-center py-10">
+        <p className="text-gray-500 text-center py-10">
           {t('lessons.select_module')}
         </p>
       )}
@@ -361,7 +361,7 @@ function VideoPlayerPanel({ activeVideo, onClose, onTimeUpdate, onVideoEnded }) 
 
   return (
     <div className="lg:w-2/3">
-      <div className="bg-bg-header/60 rounded-2xl overflow-hidden sticky top-20">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden sticky top-20">
         <VimeoPlayer
           vimeoId={activeVideo.vimeoId}
           autoplay
@@ -370,10 +370,10 @@ function VideoPlayerPanel({ activeVideo, onClose, onTimeUpdate, onVideoEnded }) 
           watermark={watermark}
         />
         <div className="p-4 flex items-center justify-between">
-          <h3 className="font-bold text-text-header">{activeVideo.title}</h3>
+          <h3 className="font-bold text-gray-900">{activeVideo.title}</h3>
           <button
             onClick={onClose}
-            className="text-sm text-link-hover hover:underline cursor-pointer"
+            className="text-sm text-bg-main hover:underline cursor-pointer"
           >
             {t('lessons.close_video')}
           </button>
@@ -406,12 +406,12 @@ function TrainingTabContent({
 
   if (!isPurchased) {
     return (
-      <div className="bg-bg-header/40 rounded-2xl p-8 text-center">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
         <span className="text-4xl mb-4 block">🔒</span>
-        <p className="text-text-header font-medium mb-2">
+        <p className="text-gray-900 font-medium mb-2">
           {t('lessons.training_locked_title')}
         </p>
-        <p className="text-sm text-text-primary/70">
+        <p className="text-sm text-gray-500">
           {t('lessons.training_locked_desc')}
         </p>
       </div>
@@ -420,17 +420,17 @@ function TrainingTabContent({
 
   if (needsVariantSelection || !isVariantLocked) {
     return (
-      <div className="bg-bg-header/40 rounded-2xl p-8 text-center">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
         <span className="text-4xl mb-4 block">📋</span>
-        <p className="text-text-header font-medium mb-2">
+        <p className="text-gray-900 font-medium mb-2">
           {t('lessons.select_variant_title')}
         </p>
-        <p className="text-sm text-text-primary/70 mb-4">
+        <p className="text-sm text-gray-500 mb-4">
           {t('lessons.select_variant_desc')}
         </p>
         <button
           onClick={onSelectVariant}
-          className="bg-link-hover text-bg-header px-6 py-2 rounded-xl font-medium hover:opacity-90 transition-opacity cursor-pointer"
+          className="bg-bg-main text-white px-6 py-2 rounded-xl font-medium hover:bg-bg-main/90 transition-colors cursor-pointer"
         >
           {t('lessons.select_program')}
         </button>
@@ -463,24 +463,24 @@ function TrainingTabContent({
 
       {/* Schedule Tree */}
       <div className={activeVideo ? 'lg:w-1/3' : 'w-full'}>
-        <div className="bg-bg-header/40 rounded-2xl p-4">
-          <h3 className="font-bold text-text-header mb-3">
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4">
+          <h3 className="font-bold text-gray-900 mb-3">
             {variant.name}
           </h3>
           {variant.description && (
-            <p className="text-sm text-text-primary/70 mb-4">{variant.description}</p>
+            <p className="text-sm text-gray-500 mb-4">{variant.description}</p>
           )}
           <div className="flex flex-col gap-2">
             {variant.weeks?.map((week) => (
               <div key={week.id}>
                 <button
                   onClick={() => toggleWeek(week.id)}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-bg-header/40 rounded-lg hover:bg-bg-header/60 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span className="font-medium text-text-header">
+                  <span className="font-medium text-gray-900">
                     {t('lessons.week_label', { number: week.week_number })}
                   </span>
-                  <span className={`transition-transform ${expandedWeeks[week.id] ? 'rotate-90' : ''}`}>
+                  <span className={`transition-transform text-gray-400 ${expandedWeeks[week.id] ? 'rotate-90' : ''}`}>
                     &#9654;
                   </span>
                 </button>
@@ -490,8 +490,8 @@ function TrainingTabContent({
                       <div key={day.id}>
                         <button
                           onClick={() => toggleDay(day.id)}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-bg-header/40 transition-colors cursor-pointer text-sm ${
-                            day.is_rest_day ? 'text-text-primary/50' : 'text-text-header'
+                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer text-sm ${
+                            day.is_rest_day ? 'text-gray-400' : 'text-gray-800'
                           }`}
                         >
                           <span>
@@ -499,7 +499,7 @@ function TrainingTabContent({
                             {day.is_rest_day && ` ${t('lessons.rest_day')}`}
                           </span>
                           {!day.is_rest_day && day.contents?.length > 0 && (
-                            <span className={`transition-transform ${expandedDays[day.id] ? 'rotate-90' : ''}`}>
+                            <span className={`transition-transform text-gray-400 ${expandedDays[day.id] ? 'rotate-90' : ''}`}>
                               &#9654;
                             </span>
                           )}
@@ -553,8 +553,8 @@ function ModuleTabContent({
 
   if (!module.contents || module.contents.length === 0) {
     return (
-      <div className="bg-bg-header/40 rounded-2xl p-8 text-center">
-        <p className="text-text-primary/70">{t('lessons.no_module_content')}</p>
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
+        <p className="text-gray-500">{t('lessons.no_module_content')}</p>
       </div>
     )
   }
@@ -569,7 +569,7 @@ function ModuleTabContent({
       />
 
       <div className={activeVideo ? 'lg:w-1/3' : 'w-full'}>
-        <div className="bg-bg-header/40 rounded-2xl p-4">
+        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4">
           <div className="flex flex-col gap-2">
             {module.contents.map((content) => (
               <ContentItem
@@ -631,25 +631,25 @@ function ContentItem({ content, isPurchased = true, isActive = false, progress, 
         isLocked
           ? 'opacity-50 cursor-not-allowed'
           : isActive
-            ? 'bg-link-hover/20 ring-1 ring-link-hover/40'
-            : 'hover:bg-bg-header/50'
+            ? 'bg-bg-main/10 ring-1 ring-bg-main/30'
+            : 'hover:bg-gray-50'
       }`}
     >
       <span>{icon}</span>
-      <span className={`flex-1 ${isLocked ? 'text-text-primary/50' : isActive ? 'text-link-hover font-medium' : 'text-text-header'}`}>
+      <span className={`flex-1 ${isLocked ? 'text-gray-400' : isActive ? 'text-bg-main font-medium' : 'text-gray-800'}`}>
         {content.title}
       </span>
       {content.is_preview && (
-        <span className="text-xs bg-link-hover/20 text-link-hover px-2 py-0.5 rounded-full">
+        <span className="text-xs bg-bg-main/10 text-bg-main px-2 py-0.5 rounded-full">
           {t('lessons.preview_badge')}
         </span>
       )}
       {isLocked && <span>🔒</span>}
       {!isLocked && !isCompleted && watchPercent > 0 && (
-        <span className="text-xs text-link-hover font-medium">{watchPercent}%</span>
+        <span className="text-xs text-bg-main font-medium">{watchPercent}%</span>
       )}
       {content.vimeo_video?.duration_formatted && (
-        <span className="text-xs text-text-primary/50">{content.vimeo_video.duration_formatted}</span>
+        <span className="text-xs text-gray-400">{content.vimeo_video.duration_formatted}</span>
       )}
     </button>
   )
@@ -662,10 +662,10 @@ function VariantSelectionModal({ variants, onSelect, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-bg-header rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
-        <h2 className="text-xl font-bold text-text-header mb-2">
+        <h2 className="text-xl font-bold text-white mb-2">
           {t('lessons.variant_modal_title')}
         </h2>
-        <p className="text-sm text-text-primary/70 mb-6">
+        <p className="text-sm text-white/60 mb-6">
           {t('lessons.variant_modal_desc')}
         </p>
         <h2 className="text-lg font-bold mb-2 text-red-400">{t('lessons.variant_warning')}</h2>
@@ -675,13 +675,13 @@ function VariantSelectionModal({ variants, onSelect, onClose }) {
             <button
               key={variant.id}
               onClick={() => onSelect(variant.id)}
-              className="w-full bg-bg-main/40 hover:bg-bg-main/60 rounded-xl p-4 text-left transition-colors cursor-pointer"
+              className="w-full bg-white/10 hover:bg-white/20 rounded-xl p-4 text-left transition-colors cursor-pointer"
             >
-              <div className="font-medium text-text-header">
+              <div className="font-medium text-white">
                 {variant.name}
               </div>
               {variant.description && (
-                <p className="text-sm text-text-primary/70 mt-1">{variant.description}</p>
+                <p className="text-sm text-white/60 mt-1">{variant.description}</p>
               )}
             </button>
           ))}
@@ -689,7 +689,7 @@ function VariantSelectionModal({ variants, onSelect, onClose }) {
 
         <button
           onClick={onClose}
-          className="w-full py-2 text-text-primary/70 hover:text-text-header transition-colors cursor-pointer"
+          className="w-full py-2 text-white/60 hover:text-white transition-colors cursor-pointer"
         >
           {t('common.cancel')}
         </button>
@@ -705,13 +705,13 @@ function ConfirmModal({ variant, isLoading, onConfirm, onCancel }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-bg-header rounded-2xl p-6 max-w-md w-full">
-        <h2 className="text-xl font-bold text-text-header mb-4">
+        <h2 className="text-xl font-bold text-white mb-4">
           {t('lessons.confirm_title')}
         </h2>
-        <p className="text-text-primary/90 mb-2">
+        <p className="text-white/80 mb-2">
           {t('lessons.confirm_desc')}
         </p>
-        <p className="font-bold text-text-header text-lg mb-4">
+        <p className="font-bold text-white text-lg mb-4">
           &laquo;{variant?.name}&raquo;?
         </p>
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 mb-6">
@@ -724,14 +724,14 @@ function ConfirmModal({ variant, isLoading, onConfirm, onCancel }) {
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 bg-link-hover text-bg-header py-3 rounded-xl font-bold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+            className="flex-1 bg-bg-main text-white py-3 rounded-xl font-bold hover:bg-bg-main/90 transition-colors cursor-pointer disabled:opacity-50"
           >
             {isLoading ? t('common.saving') : t('common.yes')}
           </button>
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 bg-bg-main/40 text-text-header py-3 rounded-xl font-bold hover:bg-bg-main/60 transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 bg-white/10 text-white py-3 rounded-xl font-bold hover:bg-white/20 transition-colors cursor-pointer disabled:opacity-50"
           >
             {t('common.no')}
           </button>

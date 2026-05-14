@@ -20,8 +20,8 @@ export default function StepIndicator({ currentStep, totalSteps }) {
                 currentStep > step.number
                   ? 'bg-green-500 text-white'
                   : currentStep === step.number
-                  ? 'bg-main text-white'
-                  : 'bg-white/10 text-white/50'
+                  ? 'bg-bg-main text-white'
+                  : 'bg-gray-100 text-gray-400'
               }`}
             >
               {currentStep > step.number ? (
@@ -34,7 +34,7 @@ export default function StepIndicator({ currentStep, totalSteps }) {
             </div>
             <span
               className={`mt-1 text-xs whitespace-nowrap ${
-                currentStep === step.number ? 'text-white font-medium' : 'text-white/50'
+                currentStep === step.number ? 'text-gray-900 font-medium' : 'text-gray-400'
               }`}
             >
               {step.label}
@@ -43,7 +43,7 @@ export default function StepIndicator({ currentStep, totalSteps }) {
           {idx < steps.length - 1 && (
             <div
               className={`h-0.5 w-16 mx-1 mb-4 transition-colors ${
-                currentStep > step.number ? 'bg-green-500' : 'bg-white/15'
+                currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
               }`}
             />
           )}

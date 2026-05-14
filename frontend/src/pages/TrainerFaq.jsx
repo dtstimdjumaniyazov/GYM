@@ -194,15 +194,15 @@ function AccordionItem({ q, a }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="border-b border-white/8 last:border-0">
+    <div className="border-b border-gray-100 last:border-0">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-start justify-between gap-4 py-4 text-left"
       >
-        <span className="text-sm font-medium text-white/90">{q}</span>
+        <span className="text-sm font-medium text-gray-800">{q}</span>
         <svg
-          className={`w-4 h-4 shrink-0 text-white/40 transition-transform mt-0.5 ${open ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 shrink-0 text-gray-400 transition-transform mt-0.5 ${open ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -214,22 +214,22 @@ function AccordionItem({ q, a }) {
             if (line.trim() === '') return <div key={i} className="h-2" />
             if (line.startsWith('• ')) {
               return (
-                <div key={i} className="flex gap-2 text-sm text-white/60 leading-relaxed">
-                  <span className="text-main shrink-0">•</span>
+                <div key={i} className="flex gap-2 text-sm text-gray-600 leading-relaxed">
+                  <span className="text-bg-main shrink-0">•</span>
                   <span>{line.slice(2)}</span>
                 </div>
               )
             }
             if (/^\d+\.\s/.test(line)) {
               return (
-                <div key={i} className="flex gap-2 text-sm text-white/60 leading-relaxed">
-                  <span className="text-main shrink-0 font-mono">{line.match(/^\d+/)[0]}.</span>
+                <div key={i} className="flex gap-2 text-sm text-gray-600 leading-relaxed">
+                  <span className="text-bg-main shrink-0 font-mono">{line.match(/^\d+/)[0]}.</span>
                   <span>{line.replace(/^\d+\.\s/, '')}</span>
                 </div>
               )
             }
             return (
-              <p key={i} className="text-sm text-white/60 leading-relaxed">{line}</p>
+              <p key={i} className="text-sm text-gray-600 leading-relaxed">{line}</p>
             )
           })}
         </div>
@@ -244,23 +244,23 @@ export default function TrainerFaq() {
       <div className="mb-8">
         <Link
           to="/courses/create"
-          className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors mb-4"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Вернуться к форме
         </Link>
-        <h1 className="text-2xl font-bold text-white mb-2">Инструкция по созданию курса</h1>
-        <p className="text-white/50 text-sm">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Инструкция по созданию курса</h1>
+        <p className="text-gray-500 text-sm">
           Пошаговое руководство для тренеров — от подготовки материалов до публикации.
         </p>
       </div>
 
       <div className="space-y-4">
         {SECTIONS.map((section) => (
-          <div key={section.title} className="bg-bg-header border border-white/10 rounded-2xl px-6 py-2">
-            <h2 className="text-base font-semibold text-white py-4 border-b border-white/8">
+          <div key={section.title} className="bg-white border border-gray-100 shadow-sm rounded-2xl px-6 py-2">
+            <h2 className="text-base font-semibold text-gray-900 py-4 border-b border-gray-100">
               {section.title}
             </h2>
             <div>
@@ -272,9 +272,9 @@ export default function TrainerFaq() {
         ))}
       </div>
 
-      <div className="mt-8 bg-main/10 border border-main/20 rounded-2xl px-6 py-5">
-        <h3 className="text-sm font-semibold text-white mb-2">Нужна помощь?</h3>
-        <p className="text-sm text-white/55 mb-3">
+      <div className="mt-8 bg-bg-main/8 border border-bg-main/20 rounded-2xl px-6 py-5">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Нужна помощь?</h3>
+        <p className="text-sm text-gray-600 mb-3">
           Если у вас остались вопросы — напишите в нашу группу поддержки в Telegram. Мы поможем разобраться с любым шагом создания курса.
         </p>
         <a

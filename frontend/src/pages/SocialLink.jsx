@@ -15,9 +15,7 @@ function SocialLink() {
   const [tab, setTab] = useState('link') // 'link' | 'register'
   const [error, setError] = useState('')
 
-  // Link form
   const [linkForm, setLinkForm] = useState({ phone: '', password: '' })
-  // Register form
   const [regForm, setRegForm] = useState({
     phone: '',
     password: '',
@@ -31,7 +29,6 @@ function SocialLink() {
 
   const loading = linkLoading || regLoading
 
-  // Если нет socialToken — редирект на login
   if (!socialToken) {
     navigate('/login', { replace: true })
     return null
@@ -101,23 +98,23 @@ function SocialLink() {
   }
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-xl bg-bg-header/40 text-text-header placeholder:text-text-primary/40 border border-bg-header/60 focus:outline-none focus:border-link-hover focus:bg-bg-header/60 transition-colors'
+    'w-full px-4 py-2.5 rounded-xl bg-white text-gray-900 placeholder:text-gray-400 border border-gray-200 focus:outline-none focus:border-bg-main focus:ring-2 focus:ring-bg-main/10 transition-colors'
 
   const tabClass = (active) =>
     `flex-1 py-2.5 text-center rounded-xl font-medium transition-colors cursor-pointer ${
       active
-        ? 'bg-link-hover text-bg-header'
-        : 'text-text-primary/70 hover:text-text-header'
+        ? 'bg-bg-main text-white shadow-sm'
+        : 'text-gray-600 hover:text-gray-900 bg-white border border-gray-200'
     }`
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-10">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-header mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Привязка аккаунта
           </h1>
-          <p className="text-text-primary/70">
+          <p className="text-gray-500">
             Вы вошли через {providerNames[provider] || provider}
             {socialName ? ` как ${socialName}` : ''}
             {socialEmail ? ` (${socialEmail})` : ''}
@@ -125,13 +122,13 @@ function SocialLink() {
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm mb-6">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm mb-6">
             {error}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 bg-bg-header/20 rounded-xl p-1">
+        <div className="flex gap-2 mb-6">
           <button className={tabClass(tab === 'link')} onClick={() => { setTab('link'); setError('') }}>
             У меня есть аккаунт
           </button>
@@ -142,11 +139,11 @@ function SocialLink() {
 
         {/* Link existing account */}
         {tab === 'link' && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h3 className="font-bold text-text-header mb-2">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h3 className="font-bold text-gray-900 mb-2">
               Привязать к существующему аккаунту
             </h3>
-            <p className="text-text-primary/60 text-sm mb-4">
+            <p className="text-gray-500 text-sm mb-4">
               Введите номер телефона и пароль вашего аккаунта, чтобы привязать {providerNames[provider] || provider}
             </p>
             <form onSubmit={handleLink} className="flex flex-col gap-3">
@@ -169,7 +166,7 @@ function SocialLink() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-link-hover text-bg-header py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                className="w-full bg-bg-main text-white py-3 rounded-xl font-bold hover:bg-bg-main/90 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {linkLoading ? 'Привязываем...' : 'Привязать аккаунт'}
               </button>
@@ -179,11 +176,11 @@ function SocialLink() {
 
         {/* Register new account */}
         {tab === 'register' && (
-          <div className="bg-bg-header/40 rounded-2xl p-6">
-            <h3 className="font-bold text-text-header mb-2">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+            <h3 className="font-bold text-gray-900 mb-2">
               Создать новый аккаунт
             </h3>
-            <p className="text-text-primary/60 text-sm mb-4">
+            <p className="text-gray-500 text-sm mb-4">
               Укажите номер телефона и пароль для нового аккаунта
             </p>
             <form onSubmit={handleRegister} className="flex flex-col gap-3">
@@ -230,7 +227,7 @@ function SocialLink() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-link-hover text-bg-header py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                className="w-full bg-bg-main text-white py-3 rounded-xl font-bold hover:bg-bg-main/90 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {regLoading ? 'Создаём...' : 'Зарегистрироваться'}
               </button>
@@ -240,7 +237,7 @@ function SocialLink() {
 
         <Link
           to="/login"
-          className="block text-center text-text-primary/50 hover:text-text-primary/70 text-sm mt-6"
+          className="block text-center text-gray-400 hover:text-gray-600 text-sm mt-6"
         >
           &larr; Вернуться на страницу входа
         </Link>

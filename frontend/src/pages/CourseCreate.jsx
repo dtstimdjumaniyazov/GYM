@@ -151,7 +151,6 @@ function buildModuleContentsPayload(moduleContents) {
 function parseVariantError(data) {
   if (!data) return null
   if (data.detail) return data.detail
-  // Parse nested week/day/content errors
   const weeks = data.weeks
   if (Array.isArray(weeks)) {
     for (let wi = 0; wi < weeks.length; wi++) {
@@ -196,14 +195,12 @@ export default function CourseCreate() {
   const [showDraftBanner, setShowDraftBanner] = useState(false)
   const pendingDraftRef = useRef(null)
 
-  // Check for existing draft on mount (only for new courses)
   useEffect(() => {
     if (editId) return
     try {
       const saved = localStorage.getItem(DRAFT_KEY)
       if (!saved) return
       const parsed = JSON.parse(saved)
-      // Only offer restore if there's meaningful data (not just defaults)
       const hasData = parsed.courseId || parsed.step1Data?.title?.trim()
       if (hasData) {
         pendingDraftRef.current = parsed
@@ -221,8 +218,6 @@ export default function CourseCreate() {
     pendingDraftRef.current = null
     setShowDraftBanner(false)
     if (!parsed) return
-
-    // Restore all state from localStorage — backend doesn't have unsaved uploaded videos
     if (parsed.courseId) setCourseId(parsed.courseId)
     if (parsed.step1Data) setStep1Data(parsed.step1Data)
     if (parsed.variants) setVariants(parsed.variants)
@@ -236,13 +231,11 @@ export default function CourseCreate() {
     setShowDraftBanner(false)
   }
 
-  // Persist draft to localStorage on every change (only for new courses, after banner resolved)
   useEffect(() => {
     if (editId || showDraftBanner) return
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ step1Data, variants, step, courseId, moduleContents }))
   }, [step1Data, variants, step, courseId, moduleContents, editId, showDraftBanner])
 
-  // Warn on browser refresh / tab close
   useEffect(() => {
     const handler = (e) => { e.preventDefault(); e.returnValue = '' }
     window.addEventListener('beforeunload', handler)
@@ -424,7 +417,6 @@ export default function CourseCreate() {
         }
         setVariants(savedVariants)
       }
-      // Save to localStorage with correct savedIds so user can resume the draft
       const modulePayload = buildModuleContentsPayload(moduleContents)
       if (Object.keys(modulePayload).length > 0) {
         await saveModuleContents({ id: courseId, ...modulePayload }).unwrap()
@@ -442,12 +434,12 @@ export default function CourseCreate() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">{t('create.title')}</h1>
-          <p className="text-white/50 text-sm">{t('create.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('create.title')}</h1>
+          <p className="text-gray-500 text-sm">{t('create.subtitle')}</p>
         </div>
         <Link
           to="/trainer/faq"
-          className="shrink-0 flex items-center gap-1.5 text-xs text-white/40 hover:text-amber-300 transition-colors mt-1"
+          className="shrink-0 flex items-center gap-1.5 text-xs text-gray-400 hover:text-amber-500 transition-colors mt-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -457,20 +449,20 @@ export default function CourseCreate() {
       </div>
 
       {showDraftBanner && (
-        <div className="mb-5 flex items-center justify-between gap-4 px-4 py-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-          <p className="text-sm text-amber-300">Найден незаконченный черновик. Продолжить с того места?</p>
+        <div className="mb-5 flex items-center justify-between gap-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
+          <p className="text-sm text-amber-700">Найден незаконченный черновик. Продолжить с того места?</p>
           <div className="flex gap-2 shrink-0">
             <button
               type="button"
               onClick={applyDraft}
-              className="px-3 py-1.5 text-xs font-medium bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-xs font-medium bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg transition-colors"
             >
               Продолжить
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="px-3 py-1.5 text-xs font-medium text-white/40 hover:text-white/70 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
             >
               Начать заново
             </button>
@@ -480,10 +472,10 @@ export default function CourseCreate() {
 
       <StepIndicator currentStep={step} totalSteps={totalSteps} />
 
-      <div className="bg-bg-header border border-white/10 rounded-2xl p-6 mb-6">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 mb-6">
         {step === 1 && (
           <>
-            <h2 className="text-lg font-semibold text-white mb-5">{t('create.block1')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">{t('create.block1')}</h2>
             <StepTip tips={[
               'Название курса — конкретное и понятное. Пример: «Похудение за 4 недели дома» вместо «Мой курс».',
               'Краткое описание — 1–2 предложения о главном результате, который получит ученик.',
@@ -501,7 +493,7 @@ export default function CourseCreate() {
 
         {step === 2 && (
           <>
-            <h2 className="text-lg font-semibold text-white mb-5">{t('create.block2')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">{t('create.block2')}</h2>
             <StepTip tips={[
               'Вариант 1 обязателен. Варианты 2 и 3 — если хотите предложить разные программы (например, «Дома» и «В зале»).',
               'Каждая неделя содержит 7 дней. Отметьте дни отдыха переключателем — тогда видео для них не нужны.',
@@ -515,7 +507,7 @@ export default function CourseCreate() {
 
         {step === 3 && (
           <>
-            <h2 className="text-lg font-semibold text-white mb-5">{t('create.block3')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">{t('create.block3')}</h2>
             <StepTip tips={[
               'Теория — вводные видео, объяснения техники упражнений, инструкции.',
               'Питание / Спортивное питание — загрузите план питания в PDF или таблицу калорий.',
@@ -533,8 +525,8 @@ export default function CourseCreate() {
       </div>
 
       {globalError && (
-        <div className="mb-4 px-4 py-3 bg-red-500/15 border border-red-500/30 rounded-xl">
-          <p className="text-red-400 text-sm">{globalError}</p>
+        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-red-600 text-sm">{globalError}</p>
         </div>
       )}
 
@@ -545,7 +537,7 @@ export default function CourseCreate() {
               type="button"
               onClick={() => setStep((s) => s - 1)}
               disabled={saving}
-              className="px-5 py-2.5 text-sm font-medium text-white/70 hover:text-white bg-white/10 hover:bg-white/15 rounded-xl transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors disabled:opacity-50"
             >
               {t('create.back')}
             </button>
@@ -555,7 +547,7 @@ export default function CourseCreate() {
               type="button"
               onClick={handleSaveDraft}
               disabled={saving}
-              className="px-5 py-2.5 text-sm font-medium text-white/50 hover:text-white/80 transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-medium text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-50"
             >
               {t('create.save_draft')}
             </button>
@@ -568,7 +560,7 @@ export default function CourseCreate() {
               type="button"
               onClick={handleStep1Next}
               disabled={saving}
-              className="px-6 py-2.5 text-sm font-semibold bg-main hover:bg-main/90 text-white rounded-xl transition-colors disabled:opacity-60 min-w-30"
+              className="px-6 py-2.5 text-sm font-semibold bg-bg-main hover:bg-bg-main/90 text-white rounded-xl transition-colors disabled:opacity-60 min-w-30"
             >
               {saving ? t('create.saving') : t('create.next')}
             </button>
@@ -579,7 +571,7 @@ export default function CourseCreate() {
               type="button"
               onClick={handleStep2Next}
               disabled={saving}
-              className="px-6 py-2.5 text-sm font-semibold bg-main hover:bg-main/90 text-white rounded-xl transition-colors disabled:opacity-60 min-w-40"
+              className="px-6 py-2.5 text-sm font-semibold bg-bg-main hover:bg-bg-main/90 text-white rounded-xl transition-colors disabled:opacity-60 min-w-40"
             >
               {saving
                 ? t('create.saving')
