@@ -47,7 +47,10 @@
     "trainers_label": "Команда",
     "trainers_subtitle": "Профессионалы, которые помогут вам достичь результата",
     "courses_label": "Каталог",
-    "courses_subtitle": "Выберите программу под свои цели и уровень подготовки"
+    "courses_subtitle": "Выберите программу под свои цели и уровень подготовки",
+    "stat_courses": "курсов",
+    "stat_trainers": "тренеров",
+    "stat_categories": "категорий"
   },
   "auth": {
     "login_title": "Вход на платформу",

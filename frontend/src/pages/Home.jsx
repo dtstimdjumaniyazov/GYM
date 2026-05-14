@@ -9,24 +9,15 @@ import Loader from '../components/Loader'
 import BannerCarousel from '../components/BannerCarousel'
 import { useTranslation } from 'react-i18next'
 
-function SectionHeading({ label, title, subtitle }) {
-  return (
-    <div className="mb-8 sm:mb-10">
-      {label && (
-        <span className="inline-block text-xs font-semibold tracking-widest uppercase text-bg-main mb-2">
-          {label}
-        </span>
-      )}
-      <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{title}</h2>
-      {subtitle && <p className="mt-2 text-gray-500 text-base">{subtitle}</p>}
-    </div>
-  )
-}
+/* MainLayout adds px-3…px-8 + py-4. We cancel top padding and
+   break out horizontally to achieve true full-bleed for the hero. */
+const BLEED = '-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8'
 
 function Home() {
   const { t } = useTranslation()
   const { data: trainers = [], isLoading: trainersLoading } = useGetTrainersQuery()
   const { data: categories = [], isLoading: categoriesLoading } = useGetCategoriesQuery()
+  const { data: allCoursesData } = useGetCoursesQuery({ page: 1 })
 
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeCategory, setActiveCategory] = useState(null)
@@ -80,16 +71,29 @@ function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="-mt-4">
 
-      {/* Banner */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-6 pb-0 max-w-7xl mx-auto">
-        <BannerCarousel />
-      </section>
+      {/* ── Hero: full-bleed dark block ─────────────────────────── */}
+      <div className={`${BLEED} bg-bg-header`}>
 
-      {/* Trainers */}
-      <section className="bg-white mt-10 py-14 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        {/* Banner — no rounding, fills the dark block */}
+        <BannerCarousel className="" />
+
+        {/* Stats strip — seamlessly attached below banner */}
+        {!trainersLoading && !categoriesLoading && (
+          <div className="border-t border-white/10">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-3 divide-x divide-white/10">
+              <StatCell value={allCoursesData?.count ?? '—'} label={t('home.stat_courses')} />
+              <StatCell value={trainers.length || '—'} label={t('home.stat_trainers')} />
+              <StatCell value={categories.length || '—'} label={t('home.stat_categories')} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Trainers: white section ─────────────────────────────── */}
+      <div className={`${BLEED} bg-white border-b border-gray-100`}>
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
           <SectionHeading
             label={t('home.trainers_label')}
             title={t('home.our_trainers')}
@@ -100,31 +104,30 @@ function Home() {
           ) : trainers.length === 0 ? (
             <EmptyState text={t('home.no_trainers')} />
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2">
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
               {trainers.map((trainer) => (
                 <TrainerCard key={trainer.id} trainer={trainer} />
               ))}
             </div>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
 
-      {/* Courses */}
-      <section
-        id="courses-section"
-        ref={coursesRef}
-        className="bg-gray-50 py-14 px-4 sm:px-6 lg:px-8 scroll-mt-16"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* ── Courses: gray section ───────────────────────────────── */}
+      <div className={`${BLEED} bg-gray-50`}>
+        <section
+          id="courses-section"
+          ref={coursesRef}
+          className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 scroll-mt-16"
+        >
           <SectionHeading
             label={t('home.courses_label')}
             title={t('home.courses')}
             subtitle={t('home.courses_subtitle')}
           />
 
-          {/* Category tabs */}
           {!categoriesLoading && categories.length > 0 && (
-            <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-2 px-2">
+            <div className="flex gap-2 mb-10 overflow-x-auto pb-2 -mx-1 px-1">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
@@ -132,7 +135,7 @@ function Home() {
                   className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all cursor-pointer border ${
                     selectedCategory === cat.id
                       ? 'bg-bg-main text-white border-bg-main shadow-sm'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-bg-main/40 hover:text-bg-main'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-bg-main/50 hover:text-bg-main'
                   }`}
                 >
                   {cat.title}
@@ -141,7 +144,6 @@ function Home() {
             </div>
           )}
 
-          {/* Courses grid */}
           {coursesLoading ? (
             <Loader text={t('home.loading_courses')} />
           ) : courses.length === 0 ? (
@@ -153,7 +155,7 @@ function Home() {
                   <CourseCard key={course.id} course={course} />
                 ))}
               </div>
-              <div className="mt-8">
+              <div className="mt-10">
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
@@ -162,16 +164,41 @@ function Home() {
               </div>
             </>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
 
+    </div>
+  )
+}
+
+/* ── Shared components ──────────────────────────────────────── */
+
+function SectionHeading({ label, title, subtitle }) {
+  return (
+    <div className="mb-8 sm:mb-10">
+      {label && (
+        <span className="inline-block text-xs font-bold tracking-widest uppercase text-bg-main mb-2">
+          {label}
+        </span>
+      )}
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{title}</h2>
+      {subtitle && <p className="mt-2 text-gray-500 text-base max-w-lg">{subtitle}</p>}
+    </div>
+  )
+}
+
+function StatCell({ value, label }) {
+  return (
+    <div className="flex flex-col items-center gap-1 px-4 py-1">
+      <span className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums">{value}</span>
+      <span className="text-xs sm:text-sm text-white/50 text-center">{label}</span>
     </div>
   )
 }
 
 function EmptyState({ text }) {
   return (
-    <div className="py-16 text-center">
+    <div className="py-20 text-center">
       <p className="text-gray-400 text-base">{text}</p>
     </div>
   )

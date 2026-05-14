@@ -47,7 +47,10 @@
     "trainers_label": "Jamoa",
     "trainers_subtitle": "Natijaga erishishga yordam beradigan mutaxassislar",
     "courses_label": "Katalog",
-    "courses_subtitle": "Maqsadlaringiz va tayyorgarlik darajangizga mos dasturni tanlang"
+    "courses_subtitle": "Maqsadlaringiz va tayyorgarlik darajangizga mos dasturni tanlang",
+    "stat_courses": "kurs",
+    "stat_trainers": "murabbiy",
+    "stat_categories": "kategoriya"
   },
   "auth": {
     "login_title": "Platformaga kirish",

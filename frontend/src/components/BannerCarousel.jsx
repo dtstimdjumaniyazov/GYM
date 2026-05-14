@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
-function BannerCarousel() {
-  const banners = ['/banners/banner_1.jpg', '/banners/banner_2.jpg']
+function BannerCarousel({ className = 'rounded-2xl' }) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+
+  const banners = [
+    { src: '/banners/banner_1.jpg', title: t('home.banner_1_title'), subtitle: t('home.banner_1_subtitle') },
+    { src: '/banners/banner_2.jpg', title: t('home.banner_2_title'), subtitle: t('home.banner_2_subtitle') },
+  ]
   const [currentIndex, setCurrentIndex] = useState(0)
   const [progress, setProgress] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
@@ -16,6 +24,12 @@ function BannerCarousel() {
     },
     [banners.length],
   )
+
+  const handleCta = () => {
+    const el = document.getElementById('courses-section')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    else navigate('/#courses')
+  }
 
   // Auto-play with smooth progress bar (rAF-driven)
   useEffect(() => {
@@ -51,7 +65,7 @@ function BannerCarousel() {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-2xl group"
+      className={`relative w-full overflow-hidden group ${className}`}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -63,7 +77,7 @@ function BannerCarousel() {
         <div className="absolute inset-0 bg-[#0a0e23]" />
 
         {/* Slides with crossfade + subtle scale */}
-        {banners.map((src, i) => (
+        {banners.map((banner, i) => (
           <div
             key={i}
             className={`absolute inset-0 transition-all duration-900 ease-out ${
@@ -71,7 +85,7 @@ function BannerCarousel() {
             }`}
           >
             <img
-              src={src}
+              src={banner.src}
               alt={`Banner ${i + 1}`}
               className={`w-full h-full object-cover will-change-transform ${
                 i === currentIndex ? 'animate-ken-burns' : ''
@@ -105,6 +119,28 @@ function BannerCarousel() {
             className="absolute top-0 inset-x-0 h-20"
             style={{ background: 'linear-gradient(to bottom, rgba(10,14,35,0.5), transparent)' }}
           />
+        </div>
+
+        {/* Text overlay */}
+        <div className="absolute inset-0 z-10 flex items-center pointer-events-none">
+          <div className="px-6 sm:px-10 lg:px-14 w-full max-w-2xl">
+            {banners.map((banner, i) => (
+              <div
+                key={i}
+                className={`flex flex-col gap-2 sm:gap-3 transition-all duration-700 ${
+                  i === currentIndex ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 absolute'
+                }`}
+              >
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight drop-shadow-lg">
+                  {banner.title}
+                </h2>
+                <p className="text-sm sm:text-base text-white/80 leading-snug drop-shadow max-w-md">
+                  {banner.subtitle}
+                </p>
+                
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Navigation arrows — appear on hover, hidden on mobile */}
