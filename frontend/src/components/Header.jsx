@@ -214,7 +214,7 @@ function Header() {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
                   >
-                    <div className="w-7 h-7 rounded-full bg-bg-main flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-blue-950 flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0">
                       {avatarUrl
                         ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                         : (user.first_name?.[0]?.toUpperCase() || user.phone?.[0] || '?')
