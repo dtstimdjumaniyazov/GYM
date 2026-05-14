@@ -8,8 +8,10 @@ function BannerCarousel({ className = 'rounded-2xl' }) {
   const navigate = useNavigate()
 
   const banners = [
+    { src: '/banners/banner_3.jpg', title: t('home.banner_3_title'), subtitle: t('home.banner_3_subtitle') },
     { src: '/banners/banner_1.jpg', title: t('home.banner_1_title'), subtitle: t('home.banner_1_subtitle') },
-    { src: '/banners/banner_2.jpg', title: t('home.banner_2_title'), subtitle: t('home.banner_2_subtitle') },
+    // { src: '/banners/banner_2.jpg', title: t('home.banner_2_title'), subtitle: t('home.banner_2_subtitle') },
+    { src: '/banners/banner_4.jpg', title: t('home.banner_4_title'), subtitle: t('home.banner_4_subtitle') },
   ]
   const [currentIndex, setCurrentIndex] = useState(0)
   const [progress, setProgress] = useState(0)
