@@ -9,6 +9,20 @@ import Loader from '../components/Loader'
 import BannerCarousel from '../components/BannerCarousel'
 import { useTranslation } from 'react-i18next'
 
+function SectionHeading({ label, title, subtitle }) {
+  return (
+    <div className="mb-8 sm:mb-10">
+      {label && (
+        <span className="inline-block text-xs font-semibold tracking-widest uppercase text-bg-main mb-2">
+          {label}
+        </span>
+      )}
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">{title}</h2>
+      {subtitle && <p className="mt-2 text-gray-500 text-base">{subtitle}</p>}
+    </div>
+  )
+}
+
 function Home() {
   const { t } = useTranslation()
   const { data: trainers = [], isLoading: trainersLoading } = useGetTrainersQuery()
@@ -19,10 +33,8 @@ function Home() {
   const [page, setPage] = useState(1)
   const coursesRef = useRef(null)
 
-  // Выбираем первую категорию по умолчанию
   const selectedCategory = activeCategory || categories[0]?.id || null
 
-  // Запрос курсов с серверной фильтрацией и пагинацией
   const { data: coursesData, isLoading: coursesLoading } = useGetCoursesQuery({
     page,
     category: selectedCategory,
@@ -31,7 +43,6 @@ function Home() {
   const courses = coursesData?.results || []
   const totalPages = coursesData ? Math.ceil(coursesData.count / 15) : 1
 
-  // Сброс категории и скролл наверх при переходе на «Главная»
   useEffect(() => {
     if (!searchParams.get('category')) {
       setActiveCategory(null)
@@ -40,7 +51,6 @@ function Home() {
     }
   }, [searchParams])
 
-  // Активируем категорию когда данные загрузились
   useEffect(() => {
     const slug = searchParams.get('category')
     if (slug && categories.length > 0) {
@@ -49,7 +59,6 @@ function Home() {
     }
   }, [searchParams, categories])
 
-  // Скролл к курсам после установки категории и полной загрузки DOM
   useEffect(() => {
     if (searchParams.get('category') && activeCategory && !categoriesLoading && !trainersLoading && !coursesLoading) {
       const timer = setTimeout(() => {
@@ -71,73 +80,99 @@ function Home() {
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      {/* Баннер */}
-      <section>
+    <div className="min-h-screen bg-gray-50">
+
+      {/* Banner */}
+      <section className="px-4 sm:px-6 lg:px-8 pt-6 pb-0 max-w-7xl mx-auto">
         <BannerCarousel />
       </section>
 
-      {/* Тренеры */}
-      <section>
-        <h2 className="text-2xl font-bold mb-4">{t('home.our_trainers')}</h2>
-        {trainersLoading ? (
-          <Loader text={t('home.loading_trainers')} />
-        ) : trainers.length === 0 ? (
-          <p className="opacity-70">{t('home.no_trainers')}</p>
-        ) : (
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {trainers.map((trainer) => (
-              <TrainerCard key={trainer.id} trainer={trainer} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Категории + Курсы */}
-      <section ref={coursesRef} className="scroll-mt-16">
-        <h2 className="text-2xl font-bold mb-4">{t('home.courses')}</h2>
-
-        {categoriesLoading ? (
-          <Loader text={t('home.loading_categories')} />
-        ) : categories.length === 0 ? (
-          <p className="opacity-70">{t('home.no_categories')}</p>
-        ) : (
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === cat.id
-                    ? 'bg-text-header text-bg-header'
-                    : 'bg-bg-header/50 text-text-header hover:bg-bg-header/70'
-                }`}
-              >
-                {cat.title}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {coursesLoading ? (
-          <Loader text={t('home.loading_courses')} />
-        ) : courses.length === 0 ? (
-          <p className="opacity-70">{t('home.no_courses_in_category')}</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {courses.map((course) => (
-                <CourseCard key={course.id} course={course} />
+      {/* Trainers */}
+      <section className="bg-white mt-10 py-14 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <SectionHeading
+            label={t('home.trainers_label')}
+            title={t('home.our_trainers')}
+            subtitle={t('home.trainers_subtitle')}
+          />
+          {trainersLoading ? (
+            <Loader text={t('home.loading_trainers')} />
+          ) : trainers.length === 0 ? (
+            <EmptyState text={t('home.no_trainers')} />
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2">
+              {trainers.map((trainer) => (
+                <TrainerCard key={trainer.id} trainer={trainer} />
               ))}
             </div>
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+          )}
+        </div>
       </section>
+
+      {/* Courses */}
+      <section
+        id="courses-section"
+        ref={coursesRef}
+        className="bg-gray-50 py-14 px-4 sm:px-6 lg:px-8 scroll-mt-16"
+      >
+        <div className="max-w-7xl mx-auto">
+          <SectionHeading
+            label={t('home.courses_label')}
+            title={t('home.courses')}
+            subtitle={t('home.courses_subtitle')}
+          />
+
+          {/* Category tabs */}
+          {!categoriesLoading && categories.length > 0 && (
+            <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-2 px-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                    selectedCategory === cat.id
+                      ? 'bg-bg-main text-white border-bg-main shadow-sm'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-bg-main/40 hover:text-bg-main'
+                  }`}
+                >
+                  {cat.title}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Courses grid */}
+          {coursesLoading ? (
+            <Loader text={t('home.loading_courses')} />
+          ) : courses.length === 0 ? (
+            <EmptyState text={t('home.no_courses_in_category')} />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {courses.map((course) => (
+                  <CourseCard key={course.id} course={course} />
+                ))}
+              </div>
+              <div className="mt-8">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+    </div>
+  )
+}
+
+function EmptyState({ text }) {
+  return (
+    <div className="py-16 text-center">
+      <p className="text-gray-400 text-base">{text}</p>
     </div>
   )
 }

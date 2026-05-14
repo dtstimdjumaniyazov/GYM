@@ -38,7 +38,16 @@
     "loading_categories": "Kategoriyalar yuklanmoqda...",
     "no_categories": "Hozircha kategoriyalar yo'q",
     "loading_courses": "Kurslar yuklanmoqda...",
-    "no_courses_in_category": "Bu kategoriyada hozircha kurslar yo'q"
+    "no_courses_in_category": "Bu kategoriyada hozircha kurslar yo'q",
+    "banner_cta": "Kurslarni ko'rish",
+    "banner_1_title": "Mutaxassislar bilan mashq qiling",
+    "banner_1_subtitle": "O'zbekistonning yetakchi murabbiylari kurslar — kuch, ovqatlanish va tiklanish",
+    "banner_2_title": "Maqsadlaringizga erishing",
+    "banner_2_subtitle": "Har qanday tayyorgarlik darajasi uchun shaxsiy dasturlar",
+    "trainers_label": "Jamoa",
+    "trainers_subtitle": "Natijaga erishishga yordam beradigan mutaxassislar",
+    "courses_label": "Katalog",
+    "courses_subtitle": "Maqsadlaringiz va tayyorgarlik darajangizga mos dasturni tanlang"
   },
   "auth": {
     "login_title": "Platformaga kirish",
