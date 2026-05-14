@@ -41,13 +41,13 @@ function ProfileCompletionBanner() {
 
   return (
     <div className="mx-3 mt-3 sm:mx-4 md:mx-6 lg:mx-8 p-3 rounded-xl bg-link-hover/10 border border-link-hover/30 flex items-center justify-between gap-3">
-      <p className="text-text-header text-sm">
+      <p className="text-blue-800 text-sm">
         Заполните профиль для полного доступа ко всем функциям
       </p>
       <div className="flex items-center gap-2 shrink-0">
         <Link
           to="/profile"
-          className="text-sm font-medium text-link-hover hover:underline"
+          className="text-sm font-medium text-blue-900 hover:underline"
         >
           Перейти в профиль
         </Link>

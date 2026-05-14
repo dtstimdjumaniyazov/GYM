@@ -79,7 +79,7 @@ export default function Step2Training({ variants, onChange }) {
         return (
           <div key={idx}>
             {idx > 0 && (
-              <div className="flex items-center gap-3 mb-5 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-3 mb-5 p-4 bg-bg-main/5 rounded-xl border border-bg-main/15">
                 <button
                   type="button"
                   onClick={() => toggleVariantActive(idx)}
@@ -119,7 +119,7 @@ export default function Step2Training({ variants, onChange }) {
                 isFirst={idx === 0}
               />
             ) : (
-              <div className="flex items-center justify-center h-32 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
+              <div className="flex items-center justify-center h-32 text-bg-main/40 text-sm border border-dashed border-bg-main/20 bg-bg-main/5 rounded-xl">
                 {t('create.variant_not_activated')}
               </div>
             )}

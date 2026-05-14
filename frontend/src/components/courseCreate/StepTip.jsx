@@ -4,11 +4,11 @@ export default function StepTip({ tips }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 overflow-hidden">
+    <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-amber-700 hover:bg-amber-100/50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-blue-700 hover:bg-blue-100/50 transition-colors"
       >
         <span className="flex items-center gap-2">
           <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

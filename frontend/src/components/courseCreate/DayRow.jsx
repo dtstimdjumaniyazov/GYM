@@ -260,7 +260,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
               <button
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
-                className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
+                className="flex items-center gap-2 w-full border border-dashed border-bg-main/30 bg-bg-main/5 rounded-lg px-3 py-2 text-sm text-bg-main/70 hover:border-bg-main hover:bg-bg-main/10 hover:text-bg-main transition-colors"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -323,7 +323,7 @@ export default function DayRow({ day, onChange, week1Videos }) {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 w-full border border-dashed border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-400 hover:border-bg-main hover:text-gray-700 transition-colors"
+                    className="flex items-center gap-2 w-full border border-dashed border-bg-main/30 bg-bg-main/5 rounded-lg px-3 py-2 text-sm text-bg-main/70 hover:border-bg-main hover:bg-bg-main/10 hover:text-bg-main transition-colors"
                   >
                     <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

@@ -28,19 +28,19 @@ export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpe
   }
 
   return (
-    <div className="border border-gray-100 rounded-xl overflow-hidden">
+    <div className="border border-bg-main/20 bg-bg-main/5 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 cursor-pointer select-none"
+      <div className="flex items-center justify-between px-4 py-3 bg-bg-main/10 cursor-pointer select-none"
         onClick={() => setOpen((v) => !v)}
       >
         <div className="flex items-center gap-2">
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-90' : ''}`}
+            className={`w-4 h-4 text-bg-main/50 transition-transform ${open ? 'rotate-90' : ''}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <span className="text-sm font-semibold text-gray-900">
+          <span className="text-sm font-semibold text-bg-main">
             {t('create.week_label', { number: week.week_number })}
           </span>
         </div>
@@ -61,14 +61,14 @@ export default function WeekAccordion({ week, onWeekChange, onDelete, defaultOpe
       {open && (
         <div className="px-4 pb-2">
           {/* Column headers */}
-          <div className="grid grid-cols-[140px_80px_1fr_1fr] gap-3 py-2 border-b border-gray-100">
-            <span className="text-xs text-gray-500 font-medium">{t('create.col_day')}</span>
-            <span className="text-xs text-gray-500 font-medium">{t('create.col_rest')}</span>
-            <span className="text-xs text-gray-500 font-medium">
+          <div className="grid grid-cols-[140px_80px_1fr_1fr] gap-3 py-2 border-b border-bg-main/15">
+            <span className="text-xs text-bg-main/60 font-medium">{t('create.col_day')}</span>
+            <span className="text-xs text-bg-main/60 font-medium">{t('create.col_rest')}</span>
+            <span className="text-xs text-bg-main/60 font-medium">
               {t('create.col_video')}
             </span>
-            <span className="text-xs text-gray-500 font-medium">
-              {t('create.col_files')} <span className="text-gray-400">{t('create.col_max')}</span>
+            <span className="text-xs text-bg-main/60 font-medium">
+              {t('create.col_files')} <span className="text-bg-main/40">{t('create.col_max')}</span>
             </span>
           </div>
 
