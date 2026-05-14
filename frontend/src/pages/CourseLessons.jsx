@@ -13,14 +13,20 @@ import FileViewerModal from '../components/FileViewerModal'
 import Loader from '../components/Loader'
 import { useTranslation } from 'react-i18next'
 import { useGetUserProfileQuery } from '../app/api/usersApi'
+import {
+  HiBolt, HiBookOpen, HiBeaker, HiSparkles, HiSquares2X2, HiHeart,
+  HiVideoCamera, HiDocumentText, HiPhoto,
+  HiCheckCircle, HiLockClosed, HiPlayCircle, HiChevronRight,
+  HiClipboardDocumentList, HiMoon,
+} from 'react-icons/hi2'
 
-const MODULE_ICONS = {
-  training: '💪',
-  theory: '🧠',
-  nutrition: '🥗',
-  recovery: '🧘',
-  sports_nutrition: '💊',
-  training_nuances: '🎯',
+const MODULE_ICON_MAP = {
+  training: HiBolt,
+  theory: HiBookOpen,
+  nutrition: HiBeaker,
+  recovery: HiSparkles,
+  sports_nutrition: HiHeart,
+  training_nuances: HiSquares2X2,
 }
 
 const MODULE_ORDER = ['training', 'theory', 'nutrition', 'recovery', 'sports_nutrition', 'training_nuances']
@@ -260,7 +266,7 @@ function CourseLessons() {
         <div className="flex gap-2 overflow-x-auto pb-2">
           {sortedModules.map((module) => {
             const isActive = currentTab === module.type
-            const stars = '⭐'.repeat(module.priority)
+            const Icon = MODULE_ICON_MAP[module.type]
             return (
               <button
                 key={module.id}
@@ -271,12 +277,11 @@ function CourseLessons() {
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
                   isActive
                     ? 'bg-bg-main text-white shadow-sm'
-                    : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'
+                    : 'bg-white border border-bg-main/20 text-gray-700 hover:border-bg-main/50 hover:text-bg-main'
                 }`}
               >
-                <span>{MODULE_ICONS[module.type]}</span>
+                {Icon && <Icon className="w-4 h-4 shrink-0" />}
                 <span>{MODULE_LABELS[module.type]}</span>
-                {module.priority >= 4 && <span className="text-xs">{stars}</span>}
               </button>
             )
           })}
@@ -406,8 +411,8 @@ function TrainingTabContent({
 
   if (!isPurchased) {
     return (
-      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
-        <span className="text-4xl mb-4 block">🔒</span>
+      <div className="bg-bg-main/5 border border-bg-main/15 rounded-2xl p-8 text-center">
+        <HiLockClosed className="w-10 h-10 text-bg-main/40 mx-auto mb-4" />
         <p className="text-gray-900 font-medium mb-2">
           {t('lessons.training_locked_title')}
         </p>
@@ -420,8 +425,8 @@ function TrainingTabContent({
 
   if (needsVariantSelection || !isVariantLocked) {
     return (
-      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-8 text-center">
-        <span className="text-4xl mb-4 block">📋</span>
+      <div className="bg-bg-main/5 border border-bg-main/15 rounded-2xl p-8 text-center">
+        <HiClipboardDocumentList className="w-10 h-10 text-bg-main/40 mx-auto mb-4" />
         <p className="text-gray-900 font-medium mb-2">
           {t('lessons.select_variant_title')}
         </p>
@@ -463,7 +468,7 @@ function TrainingTabContent({
 
       {/* Schedule Tree */}
       <div className={activeVideo ? 'lg:w-1/3' : 'w-full'}>
-        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4">
+        <div className="bg-bg-main/5 border border-bg-main/15 rounded-2xl p-4">
           <h3 className="font-bold text-gray-900 mb-3">
             {variant.name}
           </h3>
@@ -475,14 +480,12 @@ function TrainingTabContent({
               <div key={week.id}>
                 <button
                   onClick={() => toggleWeek(week.id)}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-3 py-2 bg-bg-main/8 hover:bg-bg-main/15 border border-bg-main/15 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-bg-main">
                     {t('lessons.week_label', { number: week.week_number })}
                   </span>
-                  <span className={`transition-transform text-gray-400 ${expandedWeeks[week.id] ? 'rotate-90' : ''}`}>
-                    &#9654;
-                  </span>
+                  <HiChevronRight className={`w-4 h-4 text-bg-main/50 transition-transform ${expandedWeeks[week.id] ? 'rotate-90' : ''}`} />
                 </button>
                 {expandedWeeks[week.id] && (
                   <div className="ml-4 mt-1 flex flex-col gap-1">
@@ -490,8 +493,8 @@ function TrainingTabContent({
                       <div key={day.id}>
                         <button
                           onClick={() => toggleDay(day.id)}
-                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer text-sm ${
-                            day.is_rest_day ? 'text-gray-400' : 'text-gray-800'
+                          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-bg-main/5 transition-colors cursor-pointer text-sm ${
+                            day.is_rest_day ? 'text-gray-400' : 'text-gray-700'
                           }`}
                         >
                           <span>
@@ -499,9 +502,7 @@ function TrainingTabContent({
                             {day.is_rest_day && ` ${t('lessons.rest_day')}`}
                           </span>
                           {!day.is_rest_day && day.contents?.length > 0 && (
-                            <span className={`transition-transform text-gray-400 ${expandedDays[day.id] ? 'rotate-90' : ''}`}>
-                              &#9654;
-                            </span>
+                            <HiChevronRight className={`w-4 h-4 text-bg-main/40 transition-transform ${expandedDays[day.id] ? 'rotate-90' : ''}`} />
                           )}
                         </button>
                         {expandedDays[day.id] && !day.is_rest_day && (
@@ -569,7 +570,7 @@ function ModuleTabContent({
       />
 
       <div className={activeVideo ? 'lg:w-1/3' : 'w-full'}>
-        <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4">
+        <div className="bg-bg-main/5 border border-bg-main/15 rounded-2xl p-4">
           <div className="flex flex-col gap-2">
             {module.contents.map((content) => (
               <ContentItem
@@ -602,13 +603,13 @@ function ContentItem({ content, isPurchased = true, isActive = false, progress, 
   const isCompleted = progress?.is_completed
   const watchPercent = progress?.watch_percent || 0
 
-  const icon = isCompleted
-    ? '✅'
+  const TypeIcon = isCompleted
+    ? HiCheckCircle
     : content.content_type === 'video'
-      ? '🎥'
+      ? HiVideoCamera
       : content.content_type === 'pdf'
-        ? '📄'
-        : '🖼️'
+        ? HiDocumentText
+        : HiPhoto
 
   const handleClick = () => {
     if (isLocked) return
@@ -635,7 +636,7 @@ function ContentItem({ content, isPurchased = true, isActive = false, progress, 
             : 'hover:bg-gray-50'
       }`}
     >
-      <span>{icon}</span>
+      <TypeIcon className={`w-4 h-4 shrink-0 ${isCompleted ? 'text-green-500' : isLocked ? 'text-gray-300' : 'text-bg-main/50'}`} />
       <span className={`flex-1 ${isLocked ? 'text-gray-400' : isActive ? 'text-bg-main font-medium' : 'text-gray-800'}`}>
         {content.title}
       </span>
@@ -644,7 +645,7 @@ function ContentItem({ content, isPurchased = true, isActive = false, progress, 
           {t('lessons.preview_badge')}
         </span>
       )}
-      {isLocked && <span>🔒</span>}
+      {isLocked && <HiLockClosed className="w-4 h-4 text-gray-300 shrink-0" />}
       {!isLocked && !isCompleted && watchPercent > 0 && (
         <span className="text-xs text-bg-main font-medium">{watchPercent}%</span>
       )}
