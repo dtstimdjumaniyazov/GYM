@@ -9,10 +9,6 @@ import Loader from '../components/Loader'
 import BannerCarousel from '../components/BannerCarousel'
 import { useTranslation } from 'react-i18next'
 
-/* MainLayout adds px-3…px-8 + py-4. We cancel top padding and
-   break out horizontally to achieve true full-bleed for the hero. */
-const BLEED = '-mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8'
-
 function Home() {
   const { t } = useTranslation()
   const { data: trainers = [], isLoading: trainersLoading } = useGetTrainersQuery()
@@ -71,50 +67,45 @@ function Home() {
   }
 
   return (
-    <div className="-mt-4">
+    /* -mt-4 cancels MainLayout py-4 so banner touches the header */
+    <div className="bg-white">
 
-      {/* ── Hero: full-bleed dark block ─────────────────────────── */}
-      <div className={`${BLEED} bg-bg-header`}>
+      {/* ── Banner: fills page width, no padding, no rounding ──── */}
+      <BannerCarousel className="bg-bg-header" />
 
-        {/* Banner — no rounding, fills the dark block */}
-        <BannerCarousel className="" />
+      {/* ── Stats strip: same width, directly below banner ─────── */}
+      {!trainersLoading && !categoriesLoading && (
+        <div className="bg-bg-header border-t border-white/10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-3 divide-x divide-white/10">
+            <StatCell value={allCoursesData?.count ?? '—'} label={t('home.stat_courses')} />
+            <StatCell value={trainers.length || '—'} label={t('home.stat_trainers')} />
+            <StatCell value={categories.length || '—'} label={t('home.stat_categories')} />
+          </div>
+        </div>
+      )}
 
-        {/* Stats strip — seamlessly attached below banner */}
-        {!trainersLoading && !categoriesLoading && (
-          <div className="border-t border-white/10">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-3 divide-x divide-white/10">
-              <StatCell value={allCoursesData?.count ?? '—'} label={t('home.stat_courses')} />
-              <StatCell value={trainers.length || '—'} label={t('home.stat_trainers')} />
-              <StatCell value={categories.length || '—'} label={t('home.stat_categories')} />
-            </div>
+      {/* ── Trainers ────────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+        <SectionHeading
+          label={t('home.trainers_label')}
+          title={t('home.our_trainers')}
+          subtitle={t('home.trainers_subtitle')}
+        />
+        {trainersLoading ? (
+          <Loader text={t('home.loading_trainers')} />
+        ) : trainers.length === 0 ? (
+          <EmptyState text={t('home.no_trainers')} />
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
+            {trainers.map((trainer) => (
+              <TrainerCard key={trainer.id} trainer={trainer} />
+            ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* ── Trainers: white section ─────────────────────────────── */}
-      <div className={`${BLEED} bg-white border-b border-gray-100`}>
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <SectionHeading
-            label={t('home.trainers_label')}
-            title={t('home.our_trainers')}
-            subtitle={t('home.trainers_subtitle')}
-          />
-          {trainersLoading ? (
-            <Loader text={t('home.loading_trainers')} />
-          ) : trainers.length === 0 ? (
-            <EmptyState text={t('home.no_trainers')} />
-          ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
-              {trainers.map((trainer) => (
-                <TrainerCard key={trainer.id} trainer={trainer} />
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-
-      {/* ── Courses: gray section ───────────────────────────────── */}
-      <div className={`${BLEED} bg-gray-50`}>
+      {/* ── Courses: subtle gray to separate from trainers ──────── */}
+      <div className="border-t border-gray-100 bg-gray-50">
         <section
           id="courses-section"
           ref={coursesRef}
