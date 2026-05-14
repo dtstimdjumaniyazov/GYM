@@ -26,6 +26,14 @@ class CategoryListView(generics.ListAPIView):
     pagination_class = None
 
 
+class CategoryAllListView(generics.ListAPIView):
+    """Все активные категории — для формы создания курса (тренер)."""
+    queryset = Category.objects.filter(is_active=True).order_by('order', 'title')
+    serializer_class = CategoryCardSerializer
+    pagination_class = None
+    permission_classes = [IsTrainer]
+
+
 class CategoryDetailView(generics.RetrieveAPIView):
     """Детальная информация о категории."""
     queryset = Category.objects.filter(is_active=True)

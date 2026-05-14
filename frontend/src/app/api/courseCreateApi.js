@@ -8,9 +8,15 @@ export const courseCreateApi = apiSlice.injectEndpoints({
 
     // ── Categories ────────────────────────────────────────────
 
-    // GET /api/courses/categories/ — list active categories
+    // GET /api/courses/categories/ — list active categories (published only)
     getCategories: builder.query({
       query: () => '/courses/categories/',
+      providesTags: ['Category'],
+    }),
+
+    // GET /api/courses/categories/all/ — all active categories (for trainers)
+    getAllCategories: builder.query({
+      query: () => '/courses/categories/all/',
       providesTags: ['Category'],
     }),
 
@@ -230,6 +236,7 @@ export function uploadFileToGDrive({ file, onProgress, accessToken, onAbort }) {
 
 export const {
   useGetCategoriesQuery,
+  useGetAllCategoriesQuery,
   useCreateCourseMutation,
   useGetTrainerCourseQuery,
   useUpdateCourseMutation,

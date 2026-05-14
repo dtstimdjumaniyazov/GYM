@@ -1,6 +1,7 @@
 from django.urls import path
 from courses.views import (
     CategoryListView,
+    CategoryAllListView,
     CategoryDetailView,
     CourseListView,
     CourseDetailView,
@@ -18,6 +19,7 @@ app_name = 'courses'
 
 urlpatterns = [
     path('categories/', CategoryListView.as_view(), name='category-list'),
+    path('categories/all/', CategoryAllListView.as_view(), name='category-all'),
     path('categories/<slug:slug>/', CategoryDetailView.as_view(), name='category-detail'),
     path('favorites/', UserFavoritesListView.as_view(), name='user-favorites-list'),
     # Trainer management

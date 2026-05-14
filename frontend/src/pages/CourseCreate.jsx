@@ -13,7 +13,7 @@ import {
   usePublishCourseMutation,
   useSaveTrainingVariantMutation,
   useUpdateTrainingVariantMutation,
-  useGetCategoriesQuery,
+  useGetAllCategoriesQuery,
   useSaveModuleContentsMutation,
   useGetTrainerCourseQuery,
 } from '../app/api/courseCreateApi'
@@ -243,7 +243,7 @@ export default function CourseCreate() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
 
-  const { data: categories = [] } = useGetCategoriesQuery()
+  const { data: categories = [] } = useGetAllCategoriesQuery()
   const { data: existingCourse } = useGetTrainerCourseQuery(editId, { skip: !editId })
 
   useEffect(() => {

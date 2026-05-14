@@ -990,10 +990,10 @@ function TrainerCoursesTab() {
           </div>
 
           {/* Desktop: table layout */}
-          <div className="hidden sm:block bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
-            <table className="w-full text-left">
+          <div className="hidden sm:block bg-white border border-gray-100 shadow-sm rounded-2xl overflow-visible">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr className="border-b border-gray-100 [&>th:first-child]:rounded-tl-2xl [&>th:last-child]:rounded-tr-2xl">
                   <th className="px-5 py-3 text-sm text-gray-500 font-medium">{t('profile.table_course')}</th>
                   <th className="px-5 py-3 text-sm text-gray-500 font-medium">{t('profile.table_status')}</th>
                   <th className="px-5 py-3 text-sm text-gray-500 font-medium text-center">{t('profile.table_students')}</th>
