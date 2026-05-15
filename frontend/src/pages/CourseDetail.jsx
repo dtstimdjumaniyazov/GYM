@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import {
   HiVideoCamera, HiDocumentText, HiPhoto,
   HiBolt, HiBookOpen, HiBeaker, HiSparkles,
-  HiPlayCircle, HiSquares2X2,
+  HiPlayCircle, HiSquares2X2, HiChevronRight,
 } from 'react-icons/hi2'
 
 function CourseDetail() {
@@ -307,32 +307,6 @@ function CourseDetail() {
 
       {/* ─── Hero Body ───────────────────────────────── */}
       <section className="flex flex-col gap-5">
-        {course.stats && (course.stats.video_count > 0 || course.stats.pdf_count > 0 || course.stats.image_count > 0) && (
-          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl px-6 py-4 ">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">{t('course.what_includes')}</p>
-            <div className="flex flex-wrap gap-5">
-              {course.stats.video_count > 0 && (
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <HiVideoCamera className="w-4 h-4 text-bg-main shrink-0" />
-                  <span><span className="font-semibold">{course.stats.video_count}</span> {t('course.stat_videos')}</span>
-                </div>
-              )}
-              {course.stats.pdf_count > 0 && (
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <HiDocumentText className="w-4 h-4 text-bg-main shrink-0" />
-                  <span><span className="font-semibold">{course.stats.pdf_count}</span> {t('course.stat_pdfs')}</span>
-                </div>
-              )}
-              {course.stats.image_count > 0 && (
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <HiPhoto className="w-4 h-4 text-bg-main shrink-0" />
-                  <span><span className="font-semibold">{course.stats.image_count}</span> {t('course.stat_images')}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {course.modules?.length > 0 && (
           <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('course.contents_title')}</h2>
@@ -427,27 +401,35 @@ const MODULE_ICON_MAP = {
 }
 
 function ModuleTocItem({ module, moduleLabels, previewBadge }) {
+  const [open, setOpen] = useState(false)
   const IconComp = MODULE_ICON_MAP[module.type] || HiSquares2X2
   const label = moduleLabels[module.type] || module.type
   const contentCount = module.contents?.length || 0
 
   return (
-    <div className="bg-bg-main/5 border border-bg-main/15 rounded-xl p-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-bg-main/5 border border-bg-main/15 rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-bg-main/8 transition-colors"
+      >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-bg-main/15 flex items-center justify-center shrink-0">
             <IconComp className="w-4 h-4 text-bg-main" />
           </div>
-          <span className="font-semibold text-gray-800">{label}</span>
+          <span className="font-semibold text-gray-800 text-left">{label}</span>
         </div>
-        {contentCount > 0 && (
-          <span className="text-xs text-bg-main/70 bg-bg-main/10 px-2.5 py-1 rounded-full shrink-0">
-            {contentCount} {contentCount === 1 ? 'материал' : contentCount < 5 ? 'материала' : 'материалов'}
-          </span>
-        )}
-      </div>
-      {module.contents?.length > 0 && (
-        <ul className="ml-11 mt-3 space-y-1.5">
+        <div className="flex items-center gap-2 shrink-0">
+          {contentCount > 0 && (
+            <span className="text-xs text-bg-main/70 bg-bg-main/10 px-2.5 py-1 rounded-full">
+              {contentCount} {contentCount === 1 ? 'материал' : contentCount < 5 ? 'материала' : 'материалов'}
+            </span>
+          )}
+          <HiChevronRight className={`w-4 h-4 text-bg-main/40 transition-transform ${open ? 'rotate-90' : ''}`} />
+        </div>
+      </button>
+      {open && module.contents?.length > 0 && (
+        <ul className="px-4 pb-3 ml-11 space-y-1.5 border-t border-bg-main/10 pt-3">
           {module.contents.map((content) => (
             <li key={content.id} className="flex items-center gap-2 text-sm text-gray-500">
               {content.content_type === 'video' ? (
