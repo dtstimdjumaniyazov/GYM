@@ -52,6 +52,8 @@ function CourseDetail() {
     theory: t('course.module_theory'),
     nutrition: t('course.module_nutrition'),
     recovery: t('course.module_recovery'),
+    sports_nutrition: t('course.module_sports_nutrition'),
+    training_nuances: t('course.module_training_nuances'),
   }
 
 
