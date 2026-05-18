@@ -107,64 +107,68 @@ function TrainerDetail() {
         </div>
       </section>
 
-      {/* ─── About ──────────────────────────────────── */}
-      {(trainer.bio || trainer.short_description) && (
-        <section>
-          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.about')}</h2>
-          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 flex flex-col gap-3">
-            {trainer.short_description && (
-              <p className="text-gray-800 font-medium leading-relaxed">{trainer.short_description}</p>
+      {/* ─── About + Video (2-col on desktop) ──────── */}
+      {(trainer.bio || trainer.short_description || trainer.intro_video_url || trainer.certificates?.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+          {/* Left: About + Certificates */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
+            {(trainer.bio || trainer.short_description) && (
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.about')}</h2>
+                <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6 flex flex-col gap-3">
+                  {trainer.short_description && (
+                    <p className="text-gray-800 font-medium leading-relaxed">{trainer.short_description}</p>
+                  )}
+                  {trainer.bio && (
+                    <p className="text-gray-600 whitespace-pre-line leading-relaxed">{trainer.bio}</p>
+                  )}
+                </div>
+              </section>
             )}
-            {trainer.bio && (
-              <p className="text-gray-600 whitespace-pre-line leading-relaxed">{trainer.bio}</p>
+
+            {trainer.certificates?.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.certificates')}</h2>
+                <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
+                  <ul className="flex flex-col gap-2">
+                    {trainer.certificates.map((cert, i) => (
+                      <li key={i} className="flex items-start gap-2 text-gray-700">
+                        <span className="text-bg-main mt-0.5 shrink-0">&#10003;</span>
+                        <span>{typeof cert === 'string' ? cert : cert?.name || cert?.title || ''}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
             )}
           </div>
-        </section>
-      )}
 
-      {/* ─── Intro Video ────────────────────────────── */}
-      {trainer.intro_video_url && (
-        <section>
-          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.intro_video')}</h2>
-          {getEmbedUrl(trainer.intro_video_url) ? (
-            <div className="rounded-2xl overflow-hidden aspect-video shadow-sm">
-              <iframe
-                src={getEmbedUrl(trainer.intro_video_url)}
-                className="w-full h-full"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowFullScreen
-                title={t('trainer.intro_video')}
-              />
-            </div>
-          ) : (
-            <div className="rounded-2xl overflow-hidden bg-black">
-              <video
-                controls
-                className="w-full max-h-120"
-                src={trainer.intro_video_url}
-              >
-                {t('trainer.video_not_supported')}
-              </video>
+          {/* Right: Video */}
+          {trainer.intro_video_url && (
+            <div className="lg:col-span-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.intro_video')}</h2>
+              {getEmbedUrl(trainer.intro_video_url) ? (
+                <div className="rounded-2xl overflow-hidden aspect-video shadow-sm">
+                  <iframe
+                    src={getEmbedUrl(trainer.intro_video_url)}
+                    className="w-full h-full"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title={t('trainer.intro_video')}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-2xl overflow-hidden bg-black">
+                  <video controls className="w-full" src={trainer.intro_video_url}>
+                    {t('trainer.video_not_supported')}
+                  </video>
+                </div>
+              )}
             </div>
           )}
-        </section>
-      )}
 
-      {/* ─── Certificates ───────────────────────────── */}
-      {trainer.certificates?.length > 0 && (
-        <section>
-          <h2 className="text-xl font-bold text-gray-900 mb-3">{t('trainer.certificates')}</h2>
-          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-6">
-            <ul className="flex flex-col gap-2">
-              {trainer.certificates.map((cert, i) => (
-                <li key={i} className="text-gray-700 flex items-start gap-2">
-                  <span className="text-bg-main mt-0.5">&#10003;</span>
-                  <span>{typeof cert === 'string' ? cert : cert?.name || cert?.title || ''}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        </div>
       )}
 
       {/* ─── Trainer's Courses ──────────────────────── */}
