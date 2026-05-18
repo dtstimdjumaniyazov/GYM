@@ -76,7 +76,7 @@ function Home() {
       {/* ── Stats strip: same width, directly below banner ─────── */}
       {!trainersLoading && !categoriesLoading && (
         <div className="bg-bg-header border-t border-white/10">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-3 divide-x divide-white/10">
+          <div className="py-6 grid grid-cols-3 divide-x divide-white/10">
             <StatCell value={allCoursesData?.count ?? '—'} label={t('home.stat_courses')} />
             <StatCell value={trainers.length || '—'} label={t('home.stat_trainers')} />
             <StatCell value={categories.length || '—'} label={t('home.stat_categories')} />
@@ -85,7 +85,7 @@ function Home() {
       )}
 
       {/* ── Trainers ────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+      <section className="py-14 sm:py-20">
         <SectionHeading
           label={t('home.trainers_label')}
           title={t('home.our_trainers')}
@@ -109,7 +109,7 @@ function Home() {
         <section
           id="courses-section"
           ref={coursesRef}
-          className="max-w-5xl mx-auto px-4 sm:px-6 py-14 sm:py-20 scroll-mt-16"
+          className="py-14 sm:py-20 scroll-mt-16"
         >
           <SectionHeading
             label={t('home.courses_label')}
