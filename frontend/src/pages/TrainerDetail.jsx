@@ -159,7 +159,7 @@ function TrainerDetail() {
               {trainer.certificates.map((cert, i) => (
                 <li key={i} className="text-gray-700 flex items-start gap-2">
                   <span className="text-bg-main mt-0.5">&#10003;</span>
-                  <span>{cert}</span>
+                  <span>{typeof cert === 'string' ? cert : cert?.name || cert?.title || ''}</span>
                 </li>
               ))}
             </ul>
