@@ -308,12 +308,13 @@
     "courses_count": "Kurslar: {{count}}",
     "certificates_count": "{{count}} ta sertifikat",
     "about": "Murabbiy haqida",
-    "intro_video": "Murabbiy haqida video",
+    "intro_video": "Men haqimda video",
     "certificates": "Sertifikatlar",
     "courses": "Murabbiy kurslari",
     "no_courses": "Murabbiyda hozircha nashr etilgan kurslar yo'q",
     "loading_courses": "Kurslar yuklanmoqda...",
-    "video_not_supported": "Brauzeringiz video ijrosini qo'llamaydi."
+    "video_not_supported": "Brauzeringiz video ijrosini qo'llamaydi.",
+    "contact": "Men bilan bog'lanish"
   },
   "not_found": {
     "text": "Sahifa topilmadi",
