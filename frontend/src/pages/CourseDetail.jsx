@@ -312,7 +312,13 @@ function CourseDetail() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('course.contents_title')}</h2>
             <div className="flex flex-col gap-3">
               {course.modules.map((module) => (
-                <ModuleTocItem key={module.id} module={module} moduleLabels={MODULE_LABELS} previewBadge={t('course.preview_badge')} />
+                <ModuleTocItem
+                  key={module.id}
+                  module={module}
+                  moduleLabels={MODULE_LABELS}
+                  previewBadge={t('course.preview_badge')}
+                  trainingVariants={module.type === 'training' ? course.training_variants : null}
+                />
               ))}
             </div>
           </div>
@@ -400,18 +406,64 @@ const MODULE_ICON_MAP = {
   training_nuances: HiSquares2X2,
 }
 
-function ModuleTocItem({ module, moduleLabels, previewBadge }) {
+const PREVIEW_LIMIT = 3
+
+function ContentList({ contents, previewBadge }) {
+  const [showAll, setShowAll] = useState(false)
+  const visible = showAll ? contents : contents.slice(0, PREVIEW_LIMIT)
+  const hidden = contents.length - PREVIEW_LIMIT
+
+  return (
+    <div className="border-t border-bg-main/10">
+      <ul className="px-4 pt-3 pb-2 ml-11 space-y-1.5">
+        {visible.map((content) => (
+          <li key={content.id} className="flex items-center gap-2 text-sm text-gray-500">
+            {content.content_type === 'video' ? (
+              <HiVideoCamera className="w-3.5 h-3.5 text-green-500 shrink-0" />
+            ) : content.content_type === 'pdf' ? (
+              <HiDocumentText className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            ) : (
+              <HiPhoto className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            )}
+            <span className="truncate">{content.title}</span>
+            {content.is_preview && content.content_type === 'video' && (
+              <span className="flex items-center gap-1 text-xs bg-bg-main/10 text-bg-main px-2 py-0.5 rounded-full shrink-0">
+                <HiPlayCircle className="w-3 h-3" />
+                {previewBadge}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+      {hidden > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="w-full pb-3 text-xs text-bg-main/60 hover:text-bg-main transition-colors cursor-pointer text-center"
+        >
+          {showAll ? 'Свернуть' : `Ещё ${hidden} ${hidden < 5 ? 'материала' : 'материалов'}`}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function ModuleTocItem({ module, moduleLabels, previewBadge, trainingVariants }) {
   const [open, setOpen] = useState(false)
   const IconComp = MODULE_ICON_MAP[module.type] || HiSquares2X2
   const label = moduleLabels[module.type] || module.type
   const contentCount = module.contents?.length || 0
 
+  const isTraining = module.type === 'training'
+  const hasContent = isTraining ? trainingVariants?.length > 0 : contentCount > 0
+  const totalCount = isTraining ? trainingVariants?.length : contentCount
+
   return (
     <div className="bg-bg-main/5 border border-bg-main/15 rounded-xl overflow-hidden">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-bg-main/8 transition-colors"
+        onClick={() => hasContent && setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hasContent ? 'cursor-pointer hover:bg-bg-main/8' : 'cursor-default'}`}
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-bg-main/15 flex items-center justify-center shrink-0">
@@ -420,35 +472,45 @@ function ModuleTocItem({ module, moduleLabels, previewBadge }) {
           <span className="font-semibold text-gray-800 text-left">{label}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {contentCount > 0 && (
+          {totalCount > 0 && (
             <span className="text-xs text-bg-main/70 bg-bg-main/10 px-2.5 py-1 rounded-full">
-              {contentCount} {contentCount === 1 ? 'материал' : contentCount < 5 ? 'материала' : 'материалов'}
+              {isTraining
+                ? `${totalCount} ${totalCount === 1 ? 'программа' : totalCount < 5 ? 'программы' : 'программ'}`
+                : `${totalCount} ${totalCount === 1 ? 'материал' : totalCount < 5 ? 'материала' : 'материалов'}`}
             </span>
           )}
-          <HiChevronRight className={`w-4 h-4 text-bg-main/40 transition-transform ${open ? 'rotate-90' : ''}`} />
+          {hasContent && (
+            <HiChevronRight className={`w-4 h-4 text-bg-main/40 transition-transform ${open ? 'rotate-90' : ''}`} />
+          )}
         </div>
       </button>
-      {open && module.contents?.length > 0 && (
-        <ul className="px-4 pb-3 ml-11 space-y-1.5 border-t border-bg-main/10 pt-3">
-          {module.contents.map((content) => (
-            <li key={content.id} className="flex items-center gap-2 text-sm text-gray-500">
-              {content.content_type === 'video' ? (
-                <HiVideoCamera className="w-3.5 h-3.5 text-green-500 shrink-0" />
-              ) : content.content_type === 'pdf' ? (
-                <HiDocumentText className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              ) : (
-                <HiPhoto className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-              )}
-              <span className="truncate">{content.title}</span>
-              {content.is_preview && content.content_type === 'video' && (
-                <span className="flex items-center gap-1 text-xs bg-bg-main/10 text-bg-main px-2 py-0.5 rounded-full shrink-0">
-                  <HiPlayCircle className="w-3 h-3" />
-                  {previewBadge}
-                </span>
-              )}
-            </li>
-          ))}
+
+      {open && isTraining && trainingVariants?.length > 0 && (
+        <ul className="px-4 pb-3 ml-11 space-y-2 border-t border-bg-main/10 pt-3">
+          {trainingVariants.map((variant) => {
+            const weekCount = variant.weeks?.length || 0
+            return (
+              <li key={variant.id} className="flex items-start gap-2 text-sm text-gray-600">
+                <HiBolt className="w-3.5 h-3.5 text-bg-main/50 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-medium text-gray-800">{variant.name}</span>
+                  {weekCount > 0 && (
+                    <span className="text-gray-400 ml-1.5">
+                      · {weekCount} {weekCount === 1 ? 'неделя' : weekCount < 5 ? 'недели' : 'недель'}
+                    </span>
+                  )}
+                  {variant.description && (
+                    <p className="text-xs text-gray-400 mt-0.5">{variant.description}</p>
+                  )}
+                </div>
+              </li>
+            )
+          })}
         </ul>
+      )}
+
+      {open && !isTraining && module.contents?.length > 0 && (
+        <ContentList contents={module.contents} previewBadge={previewBadge} />
       )}
     </div>
   )
